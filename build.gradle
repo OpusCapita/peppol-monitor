@@ -1,5 +1,4 @@
 plugins {
-    id "com.moowork.node" version "1.3.1"
     id 'org.springframework.boot' version '2.1.3.RELEASE'
 }
 
@@ -25,6 +24,7 @@ dependencies {
     compile 'mysql:mysql-connector-java:5.1.25'
     compile 'com.opuscapita.peppol:peppol-commons:0.0.27'
 
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf:2.1.3.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa:2.1.3.RELEASE'
 
     testCompile 'junit:junit:4.12'
@@ -35,53 +35,4 @@ dependencyManagement {
     imports {
         mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Greenwich.RELEASE'
     }
-}
-
-// Frontend Related Tasks
-node {
-    version = '10.11.0'
-    npmVersion = '6.4.1'
-    distBaseUrl = 'https://nodejs.org/dist'
-
-    // If false, it will try to use globally installed node.
-    download = true
-
-    workDir = file("${project.buildDir}/target")
-    npmWorkDir = file("${project.buildDir}/target")
-    nodeModulesDir = file("${project.projectDir}")
-}
-
-task npmCacheConfig(type: NpmTask) {
-    description = "Configure the NPM cache"
-    outputs.upToDateWhen {
-        false
-    }
-    def npmCacheDir = "${gradle.getGradleUserHomeDir()}/caches/npm"
-    outputs.files file(npmCacheDir)
-    args = ['config', 'set', 'cache', npmCacheDir]
-}
-
-npmCacheConfig.doFirst {
-    def nodeJsDirectory = null
-    def nodeVersion = this.project.node.version
-
-    file("$webAppSourceAbsolute/nodejs/").traverse(
-            type: FileType.DIRECTORIES,
-            nameFilter: ~"^node-v$nodeVersion.*",
-            postDir: {
-                return FileVisitResult.TERMINATE
-            }
-    ) {
-        nodeJsDirectory = it
-    }
-
-    if (nodeJsDirectory != null) {
-        this.project.node.nodeModulesDir = file("$nodeJsDirectory/lib/")
-    } else {
-        throw new IllegalStateException("nodejs is not installed")
-    }
-}
-
-npmCacheConfig.doLast {
-    this.project.node.nodeModulesDir = file("$webAppSourceAbsolute/")
 }

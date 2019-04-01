@@ -28,6 +28,9 @@
       "mq/user": "${SECRET_:env_RABBITMQUSER}",
       "mq/password": "${SECRET_:env_RABBITMQPASS}"
     },
+    "oc-db-init": {
+      "populate-test-data": "true"
+    },
     "oc-service-user-create-override": "true"
   }
 }

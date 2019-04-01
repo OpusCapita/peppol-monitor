@@ -68,5 +68,8 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Node modules
+node_modules
+
 # My local oxalis home
 oxalis/*
