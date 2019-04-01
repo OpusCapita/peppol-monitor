@@ -10,5 +10,6 @@ The service reads files from the `peppol.monitor.queue.in.name:peppol.message.mo
 After processing, monitoring information will be available in the support-ui. 
 
 Please check the wiki pages for more information:
-* TODO:update [Preprocessing](https://opuscapita.atlassian.net/wiki/spaces/IIPEP/pages/107806873/New+Peppol+solution+modules+description#NewPeppolsolutionmodulesdescription-preprocessing)
-* TODO:update [Internal Routing](https://opuscapita.atlassian.net/wiki/spaces/IIPEP/pages/107806873/New+Peppol+solution+modules+description#NewPeppolsolutionmodulesdescription-internal-routing)
+* [Message History](https://github.com/OpusCapita/peppol-monitor/wiki/Message-History)
+* [Message Statuses](https://github.com/OpusCapita/peppol-monitor/wiki/Message-Statuses)
+* [Monitoring Events](https://github.com/OpusCapita/peppol-monitor/wiki/Monitoring-Events)
