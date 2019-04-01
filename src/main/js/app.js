@@ -15,7 +15,7 @@ class App extends React.Component {
 
     componentDidMount() {
         client({method: 'GET', path: '/api/messages/0'}).done(response => {
-            this.setState({messages: response.entity._embedded.messages});
+            this.setState({messages: response.entity});
         });
     }
 

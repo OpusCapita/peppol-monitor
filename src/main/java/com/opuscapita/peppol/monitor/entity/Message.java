@@ -17,7 +17,7 @@ public class Message {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "message_id", nullable = false)
+    @Column(name = "message_id", nullable = false, length = 50)
     private String messageId;
 
     @Column(name = "filename", nullable = false)
@@ -26,13 +26,11 @@ public class Message {
     @Column(name = "status")
     private MessageStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender")
-    private Participant sender;
+    @Column(name = "sender")
+    private String sender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver")
-    private Participant receiver;
+    @Column(name = "receiver")
+    private String receiver;
 
     @Column(name = "access_point")
     private String accessPoint;
@@ -93,19 +91,19 @@ public class Message {
         this.status = status;
     }
 
-    public Participant getSender() {
+    public String getSender() {
         return sender;
     }
 
-    public void setSender(Participant sender) {
+    public void setSender(String sender) {
         this.sender = sender;
     }
 
-    public Participant getReceiver() {
+    public String getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(Participant receiver) {
+    public void setReceiver(String receiver) {
         this.receiver = receiver;
     }
 

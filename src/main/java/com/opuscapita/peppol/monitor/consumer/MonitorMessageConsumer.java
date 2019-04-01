@@ -87,7 +87,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         return message;
     }
 
-    private Participant getParticipant(String participantId) {
+    private String getParticipant(String participantId) {
         Participant participant = null;
         try {
             participant = participantRepository.getOne(participantId);
@@ -95,10 +95,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             logger.debug("Participant: " + participantId + " couldn't found, creating a new one.");
         }
         if (participant != null) {
-            return participant;
+            return participant.getId();
         }
         participant = new Participant(participantId);
-        return participantRepository.save(participant);
+        return participantRepository.save(participant).getId();
     }
 
     private String getAccessPointId(AccessPointInfo accessPointInfo) {

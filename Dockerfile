@@ -9,6 +9,10 @@ COPY build.gradle settings.gradle gradlew $APP_HOME
 COPY gradle $APP_HOME/gradle
 COPY . $APP_HOME
 
+# compiling support-ui
+RUN npm install && npm cache clean --force
+RUN npx webpack
+
 RUN chmod +x ./gradlew
 RUN ./gradlew build || return 0
 

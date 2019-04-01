@@ -14,7 +14,7 @@ import javax.persistence.Table;
 public class AccessPoint {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", length = 20)
     private String id;
 
     @Column(name = "name")

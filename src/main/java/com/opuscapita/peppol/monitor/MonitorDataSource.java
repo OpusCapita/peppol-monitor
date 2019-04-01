@@ -27,7 +27,7 @@ public class MonitorDataSource {
                 .create()
                 .username(user)
                 .password(password)
-                .url("jdbc:mysql://mysql:3306/" + database)
+                .url("jdbc:mysql://localhost:23306/" + database)
                 .driverClassName("com.mysql.jdbc.Driver")
                 .build();
     }
