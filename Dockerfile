@@ -1,6 +1,6 @@
 ## using multistage docker build for speed
 ## temp container to build
-FROM openjdk:8 AS TEMP_BUILD_IMAGE
+FROM ayltai/circleci-openjdk-node:jdk8-node11 AS TEMP_BUILD_IMAGE
 
 ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
