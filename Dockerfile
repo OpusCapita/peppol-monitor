@@ -12,9 +12,9 @@ COPY gradle $APP_HOME/gradle
 COPY . $APP_HOME
 
 # preparing node user for frontend
-RUN chown -R node:node .
-COPY --chown=node:node . .
-USER node
+# RUN chown -R node:node .
+# COPY --chown=node:node . .
+# USER node
 
 # building frontend
 RUN npm install && npm cache clean --force
