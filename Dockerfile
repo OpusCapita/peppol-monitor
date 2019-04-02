@@ -12,7 +12,7 @@ COPY gradle $APP_HOME/gradle
 COPY . $APP_HOME
 
 # building frontend
-RUN sudo npm install && sudo npm cache clean
+RUN sudo npm install && sudo npm cache verify
 RUN sudo npx webpack
 
 # building backend
