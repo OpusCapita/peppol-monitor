@@ -3,12 +3,14 @@ package com.opuscapita.peppol.monitor.entity;
 import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
 @Entity
+@DynamicUpdate
 @Table(name = "messages", indexes = {@Index(name = "ix_message_id", columnList = "message_id")})
 public class Message {
 
@@ -24,21 +26,24 @@ public class Message {
     private String filename;
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private MessageStatus status;
 
-    @Column(name = "sender")
+    @Column(name = "sender", length = 35)
     private String sender;
 
-    @Column(name = "receiver")
+    @Column(name = "receiver", length = 35)
     private String receiver;
 
-    @Column(name = "access_point")
+    @Column(name = "access_point", length = 35)
     private String accessPoint;
 
     @Column(name = "source", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Source source;
 
     @Column(name = "direction")
+    @Enumerated(EnumType.STRING)
     private ProcessFlow direction;
 
     @Column(name = "document_type")
@@ -53,6 +58,7 @@ public class Message {
     @Column(name = "arrived_at")
     private Date arrivedAt;
 
+    @Lob
     @Column(name = "history")
     private String rawHistory;
 
