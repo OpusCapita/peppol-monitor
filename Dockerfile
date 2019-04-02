@@ -16,7 +16,7 @@ RUN sudo npm install && sudo npm cache verify
 RUN sudo npx webpack
 
 # building backend
-RUN chmod +x ./gradlew
+RUN sudo chmod +x ./gradlew
 RUN ./gradlew build || return 0
 
 ## actual container
