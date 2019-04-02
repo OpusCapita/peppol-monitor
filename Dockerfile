@@ -2,7 +2,7 @@
 ## temp container to build
 FROM ayltai/circleci-openjdk-node:jdk8-node11 AS TEMP_BUILD_IMAGE
 
-ENV APP_HOME=/home/node/peppol-monitor
+ENV APP_HOME=/home/node/peppol-monitor/
 ENV NODE_ENV=development NODE_PATH=/home/node/peppol-monitor/node_modules
 
 WORKDIR $APP_HOME
