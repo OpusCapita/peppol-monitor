@@ -21,7 +21,8 @@
       "SERVICE_3041_CHECK_INTERVAL=15s",
       "SERVICE_3041_CHECK_TIMEOUT=3s",
       "RABBITMQ_USER=${SECRET_:env_RABBITMQUSER}",
-      "RABBITMQ_PASS=${SECRET_:env_RABBITMQPASS}"
+      "RABBITMQ_PASS=${SECRET_:env_RABBITMQPASS}",
+      "NODE_ENV=production"
     ],
     "oc-consul-injection": {
       "redis/password": "${SECRET_:env_REDIS}",

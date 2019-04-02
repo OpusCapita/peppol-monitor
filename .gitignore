@@ -73,3 +73,6 @@ node_modules
 
 # My local oxalis home
 oxalis/*
+
+# Webpack bundle.js and bundle.js.map
+**/bundle.js*
