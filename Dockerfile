@@ -11,6 +11,17 @@ COPY build.gradle settings.gradle gradlew $APP_HOME
 COPY gradle $APP_HOME/gradle
 COPY . $APP_HOME
 
+# install nodejs
+RUN apt-get install -y curl \
+  && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
+  && apt-get install -y nodejs \
+  && curl -L https://www.npmjs.com/install.sh | sh
+
+# building frontend
+RUN npm install && npm cache verify
+RUN npx webpack
+
+# building backend
 RUN chmod +x ./gradlew
 RUN ./gradlew build || return 0
 
