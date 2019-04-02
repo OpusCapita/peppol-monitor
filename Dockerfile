@@ -17,8 +17,8 @@ COPY . $APP_HOME
 # USER node
 
 # building frontend
-RUN npm install && npm cache clean --force
-RUN npx webpack
+RUN sudo npm install && sudo npm cache clean --force
+RUN sudo npx webpack
 
 # building backend
 RUN chmod +x ./gradlew
