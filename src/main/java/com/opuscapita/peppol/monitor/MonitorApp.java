@@ -34,25 +34,25 @@ public class MonitorApp {
         SpringApplication.run(MonitorApp.class, args);
     }
 
-    @Bean
-    public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueIn);
-        container.setPrefetchCount(10);
-        container.setMessageListener(listenerAdapter);
-        return container;
-    }
-
-    @Bean
-    public MessageListenerAdapter listenerAdapter(@NotNull CommonMessageReceiver receiver) {
-        receiver.setContainerMessageConsumer(consumer);
-        return new MessageListenerAdapter(receiver, "receiveMessage");
-    }
-
-    @Bean
-    public Queue queue() {
-        return new Queue(queueIn);
-    }
+//    @Bean
+//    public SimpleMessageListenerContainer container(ConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter) {
+//        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+//        container.setConnectionFactory(connectionFactory);
+//        container.setQueueNames(queueIn);
+//        container.setPrefetchCount(10);
+//        container.setMessageListener(listenerAdapter);
+//        return container;
+//    }
+//
+//    @Bean
+//    public MessageListenerAdapter listenerAdapter(@NotNull CommonMessageReceiver receiver) {
+//        receiver.setContainerMessageConsumer(consumer);
+//        return new MessageListenerAdapter(receiver, "receiveMessage");
+//    }
+//
+//    @Bean
+//    public Queue queue() {
+//        return new Queue(queueIn);
+//    }
 
 }
