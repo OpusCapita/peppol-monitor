@@ -256,8 +256,7 @@ class PeppolMonitor extends Components.ContextComponent {
                         },
                         {
                             accessor: 'status',
-                            Header: 'Status',
-                            Cell: ({val}) => <span className={`label label-default label-${val}`}>{val}</span>
+                            Header: 'Status'
                         },
                         {
                             accessor: 'sender',
@@ -273,8 +272,7 @@ class PeppolMonitor extends Components.ContextComponent {
                         },
                         {
                             accessor: 'source',
-                            Header: 'Source',
-                            Cell: ({val}) => <span className={`label label-default label-${val}`}>{val}</span>
+                            Header: 'Source'
                         },
                         {
                             accessor: 'arrivedAt',
