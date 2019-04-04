@@ -8,7 +8,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, './src/main/resources/static'),
         publicPath: '/static',
-        filename: 'bundle.js'
+        filename: 'built/bundle.js'
     },
 
     //exclude empty dependencies, require for Joi
@@ -24,12 +24,12 @@ module.exports = {
     ],
 
     resolve: {
-        modules: ['./node_modules', 'node_modules'],
+        modules: [process.env.NODE_PATH, 'node_modules'],
         extensions: ['.js']
     },
 
     resolveLoader: {
-        modules: ['./node_modules', 'node_modules'],
+        modules: [process.env.NODE_PATH, 'node_modules'],
         extensions: ['.js']
     },
 

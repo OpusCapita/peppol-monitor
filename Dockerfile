@@ -17,13 +17,16 @@ RUN apt-get install -y curl \
   && apt-get install -y nodejs \
   && curl -L https://www.npmjs.com/install.sh | sh
 
-# building frontend
+# building local frontend
 RUN npm install && npm cache verify
-RUN npm run build
+RUN npm run build:local
 
 # building backend
 RUN chmod +x ./gradlew
 RUN ./gradlew build || return 0
+
+# building frontend components for BNP
+RUN npm run build
 
 ## actual container
 FROM openjdk:8
@@ -32,7 +35,12 @@ LABEL author="Ibrahim Bilge <Ibrahim.Bilge@opuscapita.com>"
 ENV APP_HOME=/usr/app/
 WORKDIR $APP_HOME
 
+# copy actual application as jar
 COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/peppol-monitor.jar .
+
+# copy frontend component bundles for BNP
+RUN mkdir -p src/server/static
+COPY --from=TEMP_BUILD_IMAGE $APP_HOME/src/main/resources/static ./src/server/static
 
 HEALTHCHECK --interval=15s --timeout=3s --retries=15 \
   CMD curl --silent --fail http://localhost:3041/api/health/check || exit 1

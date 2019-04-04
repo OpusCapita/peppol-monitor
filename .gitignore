@@ -76,3 +76,4 @@ oxalis/*
 
 # Webpack bundle.js and bundle.js.map
 **/*bundle.js*
+src/main/resources/static/statistics.html
