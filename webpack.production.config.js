@@ -4,7 +4,7 @@ const Visualizer = require('webpack-visualizer-plugin');
 
 module.exports = {
     entry: {
-        'home': './src/client/components/SupportHome/index.js'
+        'home': './src/main/client/components/SupportHome/index.js'
     },
     output: {
         path: path.resolve(__dirname, './src/main/resources/static'),
