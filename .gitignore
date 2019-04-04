@@ -75,4 +75,4 @@ node_modules
 oxalis/*
 
 # Webpack bundle.js and bundle.js.map
-**/bundle.js*
+**/*bundle.js*
