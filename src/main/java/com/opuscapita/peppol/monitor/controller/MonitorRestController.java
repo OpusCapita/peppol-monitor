@@ -39,7 +39,9 @@ public class MonitorRestController {
     @GetMapping("/messages/{pageNumber}")
     public List<Message> getMessages(@PathVariable Integer pageNumber) {
         pageNumber = pageNumber == null ? 0 : pageNumber;
-        return messageService.getAllMessages(pageNumber, pageSize);
+        List<Message> result = messageService.getAllMessages(pageNumber, pageSize);
+        logger.info(String.format("GetMessages invoked, returning %s record for page: %s", result.size(), pageNumber));
+        return result;
     }
 
     @GetMapping("/message/{id}")

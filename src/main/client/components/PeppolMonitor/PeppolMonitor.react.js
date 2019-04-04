@@ -133,8 +133,7 @@ class PeppolMonitor extends Components.ContextComponent {
 
         return (
             <div>
-                <h2>PEPPOL OC Access Point Monitoring</h2>
-                <hr/>
+                <h2>PEPPOL Access Point Monitoring</h2>
                 {
                     showSearch &&
                     <div>
@@ -147,26 +146,27 @@ class PeppolMonitor extends Components.ContextComponent {
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.id}
+                                                   placeholder={"e7a85712-21ae-4d8b-a2de-c012a39bbb12"}
                                                    onChange={e => this.handleSearchFormChange('id', e.target.value)}/>
                                         </div>
                                     </div>
                                     <div className="form-group">
                                         <div className="col-sm-3">
-                                            <label
-                                                className="control-label">File Name</label>
+                                            <label className="control-label">File Name</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.filename}
+                                                   placeholder={"logger_5723_0000000001703094.xml"}
                                                    onChange={e => this.handleSearchFormChange('filename', e.target.value)}/>
                                         </div>
                                     </div>
                                     <div className="form-group">
                                         <div className="col-sm-3">
-                                            <label
-                                                className="control-label">Participant</label>
+                                            <label className="control-label">Participant</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.participant}
+                                                   placeholder={"9908:919779446"}
                                                    onChange={e => this.handleSearchFormChange('participant', e.target.value)}/>
                                         </div>
                                     </div>
@@ -174,11 +174,11 @@ class PeppolMonitor extends Components.ContextComponent {
                                 <div className="col-md-6">
                                     <div className="form-group">
                                         <div className="col-sm-3">
-                                            <label
-                                                className="control-label">Access Point</label>
+                                            <label className="control-label">Access Point</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.accessPoint}
+                                                   placeholder={"PNO000104"}
                                                    onChange={e => this.handleSearchFormChange('accessPoint', e.target.value)}/>
                                         </div>
                                     </div>
@@ -189,7 +189,7 @@ class PeppolMonitor extends Components.ContextComponent {
                                         <div className="offset-md-1 col-md-8">
                                             <Select
                                                 className="react-select"
-                                                placeholder=""
+                                                placeholder="NETWORK"
                                                 value={searchValues.sources && searchValues.sources.map(src => ({
                                                     label: src,
                                                     value: src
@@ -207,7 +207,7 @@ class PeppolMonitor extends Components.ContextComponent {
                                         <div className="offset-md-1 col-md-8">
                                             <Select
                                                 className="react-select"
-                                                placeholder=""
+                                                placeholder="failed"
                                                 value={searchValues.statuses && searchValues.statuses.map(sts => ({
                                                     label: sts,
                                                     value: sts
