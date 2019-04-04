@@ -9,8 +9,6 @@ const ReactDOM = require('react-dom');
 
 const home = () => (
     <div className={'wrapper'}>
-        <h2>PEPPOL OC Access Point Monitoring</h2>
-        <hr/>
         <PeppolMonitor/>
     </div>
 );

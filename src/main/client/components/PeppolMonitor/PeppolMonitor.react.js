@@ -129,11 +129,12 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     render() {
-        const {i18n} = this.context;
         const {loading, messages, searchValues, showSearch} = this.state;
 
         return (
             <div>
+                <h2>PEPPOL OC Access Point Monitoring</h2>
+                <hr/>
                 {
                     showSearch &&
                     <div>
@@ -278,7 +279,6 @@ class PeppolMonitor extends Components.ContextComponent {
                         {
                             accessor: 'arrivedAt',
                             Header: 'Arrived At',
-                            Cell: ({val}) => i18n.formatDate(val)
                         }
                         // {
                         //     id: 'actions',
