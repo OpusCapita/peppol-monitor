@@ -19,7 +19,7 @@ RUN apt-get install -y curl \
 
 # building frontend
 RUN npm install && npm cache verify
-RUN npm run build:local
+RUN npm run build
 
 # building backend
 RUN chmod +x ./gradlew

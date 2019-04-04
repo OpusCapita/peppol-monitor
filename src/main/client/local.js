@@ -1,7 +1,7 @@
 'use strict';
 import 'babel-polyfill';
 import {Route} from 'react-router';
-import SupportHome from './components/SupportHome';
+import PeppolMonitor from './components/PeppolMonitor';
 import {Containers} from '@opuscapita/service-base-ui';
 
 const React = require('react');
@@ -11,7 +11,7 @@ const home = () => (
     <div className={'wrapper'}>
         <h2>PEPPOL OC Access Point Monitoring</h2>
         <hr/>
-        <SupportHome/>
+        <PeppolMonitor/>
     </div>
 );
 

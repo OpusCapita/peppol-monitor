@@ -4,9 +4,9 @@ import ReactTable from 'react-table';
 import {Message} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
-import './SupportHome.css';
+import './PeppolMonitor.css';
 
-class SupportHome extends Components.ContextComponent {
+class PeppolMonitor extends Components.ContextComponent {
 
     static sources = [
         'NETWORK',
@@ -55,13 +55,13 @@ class SupportHome extends Components.ContextComponent {
     }
 
     mapSourcesSelect() {
-        return SupportHome.sources.map(value => {
+        return PeppolMonitor.sources.map(value => {
             return {value: value, label: value};
         });
     }
 
     mapStatusesSelect() {
-        return SupportHome.statuses.map(value => {
+        return PeppolMonitor.statuses.map(value => {
             return {value: value, label: value};
         });
     }
@@ -303,4 +303,4 @@ class SupportHome extends Components.ContextComponent {
     }
 }
 
-export default SupportHome;
+export default PeppolMonitor;
