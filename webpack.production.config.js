@@ -9,7 +9,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, './src/main/resources/static'),
         publicPath: '/static',
-        filename: 'components/[name]-bundle.js',
+        filename: 'static/components/[name]-bundle.js',
         library: 'peppol-monitor',
         libraryTarget: 'umd',
         umdNamedDefine: true
