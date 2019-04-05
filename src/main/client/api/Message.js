@@ -6,6 +6,14 @@ class Message extends ApiBase {
         return this.ajax.get(`/peppol-monitor/api/messages/${pageNumber}`).then(res => res.body).catch(this.getErrorFromResponse);
     }
 
+    getMessageById(id) {
+        return this.ajax.get(`/peppol-monitor/api/message-by-id/${id}`).then(res => res.body).catch(this.getErrorFromResponse);
+    }
+
+    getMessageByMessageId(messageId) {
+        return this.ajax.get(`/peppol-monitor/api/message-by-messageId/${messageId}`).then(res => res.body).catch(this.getErrorFromResponse);
+    }
+
     filterMessages(filterObj) {
         return this.ajax.post('/peppol-monitor/api/messages/filter').send(filterObj).then(res => res.body).catch(this.getErrorFromResponse);
     }

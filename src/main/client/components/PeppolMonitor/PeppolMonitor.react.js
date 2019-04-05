@@ -1,5 +1,6 @@
 import React from 'react';
-import {Components} from '@opuscapita/service-base-ui';
+import PropTypes from 'prop-types';
+import { Components } from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import {Message} from '../../api';
 import Select from '@opuscapita/react-select';
@@ -33,6 +34,14 @@ class PeppolMonitor extends Components.ContextComponent {
         showSearch: true
     };
 
+    static propTypes = {
+        goMessageDetail: PropTypes.func.isRequired
+    };
+
+    static defaultProps = {
+        goMessageDetail: () => null
+    };
+
     constructor(props, context) {
         super(props);
 
@@ -52,6 +61,10 @@ class PeppolMonitor extends Components.ContextComponent {
         finally {
             this.setState({loading: false});
         }
+    }
+
+    showMessageDetail(id) {
+        this.props.goMessageDetail(id);
     }
 
     mapSourcesSelect() {
@@ -129,7 +142,7 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     render() {
-        console.log(this.context);
+        const { i18n } = this.context;
         const {loading, messages, searchValues, showSearch} = this.state;
 
         return (
@@ -249,7 +262,8 @@ class PeppolMonitor extends Components.ContextComponent {
                     columns={[
                         {
                             accessor: 'messageId',
-                            Header: 'ID'
+                            Header: 'ID',
+                            Cell: ({value}) => <a className="btn btn-link" onClick={this.showMessageDetail.bind(this, value)}>value</a>
                         },
                         {
                             accessor: 'filename',
@@ -277,24 +291,8 @@ class PeppolMonitor extends Components.ContextComponent {
                         },
                         {
                             accessor: 'arrivedAt',
-                            Header: 'Arrived At',
+                            Header: 'Arrived At'
                         }
-                        // {
-                        //     id: 'actions',
-                        //     accessor: user => user,
-                        //     width: 200,
-                        //     Cell: ({value}) =>
-                        //         <nobr>
-                        //             {
-                        //                 this.shouldShowEdit(value) &&
-                        //                 <button type="button" className="btn btn-sm btn-default"
-                        //                         onClick={() => this.props.onEdit(value.id)}>
-                        //                     <span
-                        //                         className="icon glyphicon glyphicon-pencil"/>&nbsp;{i18n.getMessage('UserList.table.column.actions.edit')}
-                        //                 </button>
-                        //             }
-                        //         </nobr>
-                        // }
                     ]}
                 />
             </div>

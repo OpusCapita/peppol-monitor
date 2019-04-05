@@ -42,9 +42,18 @@ public class MonitorRestController {
         return messageService.getAllMessages(pageNumber, pageSize);
     }
 
-    @GetMapping("/message/{id}")
-    public ResponseEntity<?> getMessage(@PathVariable Long id) {
+    @GetMapping("/message-by-id/{id}")
+    public ResponseEntity<?> getById(@PathVariable Long id) {
         Message message = messageService.getMessage(id);
+        if (message != null) {
+            return ResponseEntity.ok(message);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/message-by-messageId/{messageId}")
+    public ResponseEntity<?> getByMessageId(@PathVariable String messageId) {
+        Message message = messageService.getMessage(messageId);
         if (message != null) {
             return ResponseEntity.ok(message);
         }
