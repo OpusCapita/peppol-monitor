@@ -24,12 +24,12 @@ module.exports = {
     ],
 
     resolve: {
-        modules: [process.env.NODE_PATH, 'node_modules'],
+        modules: ['./node_modules', 'node_modules'],
         extensions: ['.js']
     },
 
     resolveLoader: {
-        modules: [process.env.NODE_PATH, 'node_modules'],
+        modules: ['./node_modules', 'node_modules'],
         extensions: ['.js']
     },
 

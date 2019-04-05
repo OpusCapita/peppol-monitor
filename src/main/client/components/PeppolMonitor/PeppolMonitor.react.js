@@ -129,6 +129,7 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     render() {
+        console.log(this.context);
         const {loading, messages, searchValues, showSearch} = this.state;
 
         return (
