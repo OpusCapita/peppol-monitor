@@ -142,7 +142,7 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     render() {
-        const { i18n } = this.context;
+        const {i18n} = this.context;
         const {loading, messages, searchValues, showSearch} = this.state;
 
         return (
@@ -263,7 +263,7 @@ class PeppolMonitor extends Components.ContextComponent {
                         {
                             accessor: 'messageId',
                             Header: 'ID',
-                            Cell: ({value}) => <a className="btn btn-link" onClick={this.showMessageDetail.bind(this, value)}>value</a>
+                            Cell: props => <a className="btn btn-link" onClick={this.showMessageDetail.bind(this, props.value)}>{props.value}</a>
                         },
                         {
                             accessor: 'filename',
@@ -292,7 +292,7 @@ class PeppolMonitor extends Components.ContextComponent {
                         {
                             accessor: 'arrivedAt',
                             Header: 'Arrived At',
-                            Cell: ({value}) => i18n.formatDate(value)
+                            Cell: props => <span>{i18n.formatDate(props.value)}</span>
                         }
                     ]}
                 />
