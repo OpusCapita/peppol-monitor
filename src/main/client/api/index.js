@@ -1,4 +1,4 @@
-import Message from './Message';
+import ApiBase from './ApiBase';
 
-export { Message }
-export default { Message };
+export { ApiBase }
+export default { ApiBase };

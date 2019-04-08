@@ -69,8 +69,11 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
         process.setFilename(cm.getFileName());
         process.setStatus(extractStatusInfo(cm));
+        process.setSource(cm.getSource());
+        process.setDirection(cm.getFlow());
         process.setSender(getParticipant(metadata.getSenderId()));
         process.setReceiver(getParticipant(metadata.getRecipientId()));
+        process.setAccessPoint(getAccessPointId(cm.getApInfo()));
         process.setDocumentType(null); // need to find a way to set this
         process.setDocumentTypeId(metadata.getDocumentTypeIdentifier());
         process.setProfileId(metadata.getProfileTypeIdentifier());
@@ -98,10 +101,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
         Message message = new Message();
         message.setMessageId(metadata.getMessageId());
-        message.setSource(cm.getSource());
-        message.setDirection(cm.getFlow());
-        message.setAccessPoint(getAccessPointId(cm.getApInfo()));
-
         message = messageService.saveMessage(message);
         return message;
     }

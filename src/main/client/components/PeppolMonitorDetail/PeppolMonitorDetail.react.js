@@ -2,33 +2,34 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
-import {Message} from '../../api';
+import {ApiBase} from '../../api';
 import 'react-table/react-table.css';
+import './PeppolMonitorDetail.css';
 
 class PeppolMonitorDetail extends Components.ContextComponent {
 
     state = {
         loading: false,
-        message: {},
+        process: {},
         history: [],
         showHistory: false
     };
 
     static propTypes = {
-        messageId: PropTypes.string.isRequired,
+        messageId: PropTypes.string.isRequired, //rename to processId
     };
 
     constructor(props, context) {
         super(props);
 
-        this.messageApi = new Message();
+        this.api = new ApiBase();
     }
 
     componentDidMount() {
         this.setState({loading: true});
 
-        this.messageApi.getMessageByMessageId(this.props.messageId).then(message => {
-            this.setState({loading: false, message: message});
+        this.api.getProcessById(this.props.messageId).then(process => {
+            this.setState({loading: false, process: process});
 
         }).catch(e => {
             this.context.showNotification(e.message, 'error', 10);
@@ -39,7 +40,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
     loadHistory(e) {
         this.setState({loading: true});
 
-        this.messageApi.getMessageHistory(this.props.messageId).then(history => {
+        this.api.getMessageHistory(this.state.process.messageId).then(history => {
             this.setState({loading: false, history: history, showHistory: true});
 
         }).catch(e => {
@@ -54,84 +55,84 @@ class PeppolMonitorDetail extends Components.ContextComponent {
 
     render() {
         const {i18n} = this.context;
-        const {loading, message, history, showHistory} = this.state;
+        const {loading, process, history, showHistory} = this.state;
 
         return (
             <div>
-                <h3>Message Details</h3>
-                <div className="form-horizontal message-detail">
+                <h3>Process Details</h3>
+                <div className="form-horizontal process-detail">
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Message ID</label>
+                                    <label className="control-label btn-link">Message ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.messageId}</label>
+                                    <label className="control-label">{process.messageId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Last Transmission ID</label>
+                                    <label className="control-label btn-link">Transmission ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.transmissionId}</label>
+                                    <label className="control-label">{process.transmissionId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">File Name</label>
+                                    <label className="control-label btn-link">File Name</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.filename}</label>
+                                    <label className="control-label">{process.filename}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Source / Status</label>
+                                    <label className="control-label btn-link">Source / Status</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.source} / {message.status}</label>
+                                    <label className="control-label">{process.source} / {process.status}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Sender / Receiver</label>
+                                    <label className="control-label btn-link">Sender / Receiver</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.sender} / {message.receiver}</label>
+                                    <label className="control-label">{process.sender} / {process.receiver}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Document Type</label>
+                                    <label className="control-label btn-link">Document Type</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.documentType}</label>
+                                    <label className="control-label">{process.documentType}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Document Type ID</label>
+                                    <label className="control-label btn-link">Document Type ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.documentTypeId}</label>
+                                    <label className="control-label">{process.documentTypeId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Profile ID</label>
+                                    <label className="control-label btn-link">Profile ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{message.profileId}</label>
+                                    <label className="control-label">{process.profileId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">Arrived At</label>
+                                    <label className="control-label btn-link">Arrived At</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="value-label">{i18n.formatDate(message.arrivedAt)}</label>
+                                    <label className="control-label">{process.arrivedAt}</label>
                                 </div>
                             </div>
                         </div>
@@ -150,7 +151,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                     showHistory &&
                     <div>
                         <h3>Message History</h3>
-                        <div className="form-horizontal message-detail">
+                        <div className="form-horizontal process-detail">
                             <div className="row">
                                 <div className="col-md-12">
                                     <ReactTable
@@ -160,10 +161,13 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                                         columns={[
                                             {
                                                 id: 'type',
+                                                width: 150,
+                                                Header: 'Type from Source',
                                                 accessor: log => ((log.level === 'ERROR' ? log.errorType : log.level) + ' from ' + log.source),
                                             },
                                             {
                                                 id: 'message',
+                                                Header: 'Message',
                                                 accessor: 'message',
                                             }
                                         ]}

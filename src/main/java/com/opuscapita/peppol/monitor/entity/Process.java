@@ -1,5 +1,7 @@
 package com.opuscapita.peppol.monitor.entity;
 
+import com.opuscapita.peppol.commons.container.state.ProcessFlow;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
@@ -29,11 +31,22 @@ public class Process {
     @Enumerated(EnumType.STRING)
     private MessageStatus status;
 
+    @Column(name = "source", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Source source;
+
+    @Column(name = "direction")
+    @Enumerated(EnumType.STRING)
+    private ProcessFlow direction;
+
     @Column(name = "sender", length = 35)
     private String sender;
 
     @Column(name = "receiver", length = 35)
     private String receiver;
+
+    @Column(name = "access_point", length = 35)
+    private String accessPoint;
 
     @Column(name = "document_type")
     private String documentType;
@@ -91,6 +104,22 @@ public class Process {
         this.status = status;
     }
 
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
+    }
+
+    public ProcessFlow getDirection() {
+        return direction;
+    }
+
+    public void setDirection(ProcessFlow direction) {
+        this.direction = direction;
+    }
+
     public String getSender() {
         return sender;
     }
@@ -105,6 +134,14 @@ public class Process {
 
     public void setReceiver(String receiver) {
         this.receiver = receiver;
+    }
+
+    public String getAccessPoint() {
+        return accessPoint;
+    }
+
+    public void setAccessPoint(String accessPoint) {
+        this.accessPoint = accessPoint;
     }
 
     public String getDocumentType() {

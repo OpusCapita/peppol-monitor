@@ -2,13 +2,12 @@ package com.opuscapita.peppol.monitor.controller.dtos;
 
 import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.Source;
-import com.opuscapita.peppol.monitor.entity.Message;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Process;
 
 import java.util.Date;
 
-public class MessageDto {
+public class ProcessDto {
 
     public Long id;
     public String messageId;
@@ -25,15 +24,17 @@ public class MessageDto {
     public String profileId;
     public Date arrivedAt;
 
-    public static MessageDto of(Message message) {
-        Process process = message.getProcesses().get(message.getProcesses().size() - 1);
+    public static ProcessDto of(Process process) {
+        if (process == null) {
+            return null;
+        }
 
-        MessageDto dto = new MessageDto();
-        dto.id = message.getId();
-        dto.messageId = message.getMessageId();
-        dto.accessPoint = message.getAccessPoint();
-        dto.source = message.getSource();
-        dto.direction = message.getDirection();
+        ProcessDto dto = new ProcessDto();
+        dto.id = process.getId();
+        dto.messageId = process.getMessage().getMessageId();
+        dto.accessPoint = process.getAccessPoint();
+        dto.source = process.getSource();
+        dto.direction = process.getDirection();
         dto.transmissionId = process.getTransmissionId();
         dto.filename = process.getFilename();
         dto.status = process.getStatus();

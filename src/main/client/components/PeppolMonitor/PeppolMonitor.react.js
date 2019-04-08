@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Components } from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
-import {Message} from '../../api';
+import {ApiBase} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './PeppolMonitor.css';
@@ -27,10 +27,9 @@ class PeppolMonitor extends Components.ContextComponent {
 
     state = {
         loading: false,
-        messages: [],
+        processes: [],
         pageNumber: 0,
         searchValues: {},
-        availableRoles: [],
         showSearch: true
     };
 
@@ -39,21 +38,21 @@ class PeppolMonitor extends Components.ContextComponent {
     };
 
     static defaultProps = {
-        goMessageDetail: () => null
+        goMessageDetail: () => null //rename to goProcessDetail
     };
 
     constructor(props, context) {
         super(props);
 
-        this.messageApi = new Message();
+        this.api = new ApiBase();
     }
 
-    async loadMessages() {
+    async loadProcesses() {
         this.setState({loading: true});
 
         try {
-            const messages = await this.messageApi.getMessages(this.state.pageNumber);
-            this.setState({messages});
+            const processes = await this.api.getProcesses(this.state.pageNumber);
+            this.setState({processes});
         }
         catch (e) {
             this.context.showNotification(e.message, 'error', 10);
@@ -63,8 +62,8 @@ class PeppolMonitor extends Components.ContextComponent {
         }
     }
 
-    showMessageDetail(messageId) {
-        this.props.goMessageDetail(messageId);
+    showProcessDetail(id) {
+        this.props.goMessageDetail(id);
     }
 
     mapSourcesSelect() {
@@ -94,7 +93,7 @@ class PeppolMonitor extends Components.ContextComponent {
         e.preventDefault();
 
         const searchValues = {
-            id: '',
+            messageId: '',
             filename: '',
             participant: '',
             accessPoint: '',
@@ -109,41 +108,16 @@ class PeppolMonitor extends Components.ContextComponent {
         e && e.preventDefault();
 
         const {searchValues} = this.state;
+        console.log(searchValues); // TOODDDOOO: remove after debugging
         let searchObj = {};
 
-        if (searchValues.id) {
-            searchObj = {
-                $or: {
-                    id: {$like: `%${searchValues.id}%`},
-                    '$UserProfile.email$': {$like: `%${searchValues.id}%`}
-                }
-            }
-        }
-
-        if (searchValues.name) {
-            const names = searchValues.name.split(' ');
-
-            searchObj = {
-                $or: {
-                    '$UserProfile.firstName$': {$like: `%${names[0]}%`},
-                    '$UserProfile.lastName$': {$like: `%${names[1] || names[0]}%`}
-                }
-            }
-        }
-
-        if (searchValues.roles && searchValues.roles.length > 0)
-            searchObj['$UserRoles.id$'] = {$in: searchValues.roles};
-
-        if (searchValues.statuses && searchValues.statuses.length > 0)
-            searchObj.status = {$in: searchValues.statuses};
-
-        return this.messageApi.filterMessages(searchObj).then(messages => this.setState({messages}))
+        return this.api.filterProcesses(searchObj).then(processes => this.setState({processes}))
             .catch(e => this.context.showNotification(e.message, 'error', 10));
     }
 
     render() {
         const {i18n} = this.context;
-        const {loading, messages, searchValues, showSearch} = this.state;
+        const {loading, processes, searchValues, showSearch} = this.state;
 
         return (
             <div>
@@ -151,17 +125,17 @@ class PeppolMonitor extends Components.ContextComponent {
                 {
                     showSearch &&
                     <div>
-                        <div className="form-horizontal message-search">
+                        <div className="form-horizontal process-search">
                             <div className="row">
                                 <div className="col-md-6">
                                     <div className="form-group">
                                         <div className="col-sm-3">
-                                            <label className="control-label">ID</label>
+                                            <label className="control-label">Message ID</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.id}
+                                            <input type="text" className="form-control" value={searchValues.messageId}
                                                    placeholder={"e7a85712-21ae-4d8b-a2de-c012a39bbb12"}
-                                                   onChange={e => this.handleSearchFormChange('id', e.target.value)}/>
+                                                   onChange={e => this.handleSearchFormChange('messageId', e.target.value)}/>
                                         </div>
                                     </div>
                                     <div className="form-group">
@@ -244,14 +218,14 @@ class PeppolMonitor extends Components.ContextComponent {
                 }
 
                 <ReactTable
-                    className="message-list-table"
+                    className="process-list-table"
 
-                    data={messages}
-                    onFetchData={() => this.loadMessages()}
+                    data={processes}
+                    onFetchData={() => this.loadProcesses()}
                     loading={loading}
 
                     defaultSorted={[{id: 'arrivedAt', desc: true}]}
-                    minRows={0}
+                    minRows={10}
 
                     getTrProps={(state, rowInfo, instance) => {
                         if (rowInfo && rowInfo.original.status === 'failed')
@@ -261,9 +235,9 @@ class PeppolMonitor extends Components.ContextComponent {
 
                     columns={[
                         {
-                            accessor: 'messageId',
+                            accessor: 'id',
                             Header: 'ID',
-                            Cell: props => <a className="btn btn-link" onClick={this.showMessageDetail.bind(this, props.value)}>{props.value}</a>
+                            Cell: props => <a className="btn btn-link" onClick={this.showProcessDetail.bind(this, props.value)}>{props.value}</a>
                         },
                         {
                             accessor: 'filename',

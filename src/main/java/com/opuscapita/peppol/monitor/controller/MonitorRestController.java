@@ -1,8 +1,7 @@
 package com.opuscapita.peppol.monitor.controller;
 
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
-import com.opuscapita.peppol.monitor.controller.dtos.MessageDto;
-import com.opuscapita.peppol.monitor.entity.Message;
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ProcessService;
@@ -38,31 +37,37 @@ public class MonitorRestController {
         this.processService = processService;
     }
 
-    @GetMapping("/message-count")
-    public Long getMessageCount() {
-        return messageService.countMessages();
-    }
-
-    @GetMapping("/messages/{pageNumber}")
-    public List<MessageDto> getMessages(@PathVariable Integer pageNumber) {
+    @GetMapping("/get-processes/{pageNumber}")
+    public List<ProcessDto> getProcesses(@PathVariable Integer pageNumber) {
         pageNumber = pageNumber == null ? 0 : pageNumber;
-        List<Message> messages = messageService.getAllMessages(pageNumber, pageSize);
-        return messages.stream().map(MessageDto::of).collect(Collectors.toList());
+
+        List<Process> processes = processService.getAllProcesses(pageNumber, pageSize);
+        return processes.stream().map(ProcessDto::of).collect(Collectors.toList());
     }
 
-    @GetMapping("/message-by-messageId/{messageId}")
-    public ResponseEntity<?> getByMessageId(@PathVariable String messageId) {
-        Message message = messageService.getMessage(messageId);
-        if (message != null) {
-            return ResponseEntity.ok(MessageDto.of(message));
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @GetMapping("/get-process-by-id/{id}")
+    public ResponseEntity<?> getProcessById(@PathVariable Long id) {
+        Process process = processService.getProcess(id);
+        return wrap(ProcessDto.of(process));
     }
 
-    @GetMapping("/message-history/{messageId}")
+    @GetMapping("/get-process-by-transmissionId/{transmissionId}")
+    public ResponseEntity<?> getProcessByTransmissionId(@PathVariable String transmissionId) {
+        Process process = processService.getProcess(transmissionId);
+        return wrap(ProcessDto.of(process));
+    }
+
+    @GetMapping("/get-history/{messageId}")
     public List<DocumentLog> getMessageHistory(@PathVariable String messageId) {
         List<Process> processes = processService.getAllProcesses(messageId);
         return processes.stream().flatMap(process -> process.getLogs().stream()).collect(Collectors.toList());
+    }
+
+    private <T> ResponseEntity<T> wrap(T body) {
+        if (body != null) {
+            return ResponseEntity.ok(body);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }
