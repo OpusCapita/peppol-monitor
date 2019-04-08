@@ -4,14 +4,14 @@ const Visualizer = require('webpack-visualizer-plugin');
 
 module.exports = {
     entry: {
-        'peppol-monitor': './src/main/client/components/PeppolMonitor/index.js',
-        'peppol-monitor-detail': './src/main/client/components/PeppolMonitorDetail/index.js'
+        'home': './src/main/client/components/PeppolMonitor/index.js',
+        'detail': './src/main/client/components/PeppolMonitorDetail/index.js'
     },
     output: {
         path: path.resolve(__dirname, './src/main/resources/static'),
         publicPath: '/static',
         filename: 'static/components/[name]-bundle.js',
-        library: 'peppol-monitor',
+        library: 'peppol-monitor-[name]',
         libraryTarget: 'umd',
         umdNamedDefine: true
     },
