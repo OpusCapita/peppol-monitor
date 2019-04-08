@@ -2,11 +2,10 @@ package com.opuscapita.peppol.monitor.entity;
 
 import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.Source;
-import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,21 +18,8 @@ public class Message {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "message_id", nullable = false, length = 50)
+    @Column(name = "message_id", unique = true, nullable = false, length = 50)
     private String messageId;
-
-    @Column(name = "filename", nullable = false)
-    private String filename;
-
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private MessageStatus status;
-
-    @Column(name = "sender", length = 35)
-    private String sender;
-
-    @Column(name = "receiver", length = 35)
-    private String receiver;
 
     @Column(name = "access_point", length = 35)
     private String accessPoint;
@@ -46,24 +32,13 @@ public class Message {
     @Enumerated(EnumType.STRING)
     private ProcessFlow direction;
 
-    @Column(name = "document_type")
-    private String documentType;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ElementCollection(targetClass = Process.class)
+    private List<Process> processes;
 
-    @Column(name = "document_type_id")
-    private String documentTypeId;
-
-    @Column(name = "profile_id")
-    private String profileId;
-
-    @Column(name = "arrived_at")
-    private Date arrivedAt;
-
-    @Lob
-    @Column(name = "history")
-    private String rawHistory;
-
-    @Transient
-    private List<DocumentLog> logs;
+    public Message() {
+        this.processes = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
@@ -79,38 +54,6 @@ public class Message {
 
     public void setMessageId(String messageId) {
         this.messageId = messageId;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    public void setFilename(String filename) {
-        this.filename = filename;
-    }
-
-    public MessageStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(MessageStatus status) {
-        this.status = status;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    public String getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
     }
 
     public String getAccessPoint() {
@@ -137,52 +80,11 @@ public class Message {
         this.direction = direction;
     }
 
-    public String getDocumentType() {
-        return documentType;
+    public List<Process> getProcesses() {
+        return processes;
     }
 
-    public void setDocumentType(String documentType) {
-        this.documentType = documentType;
+    public void setProcesses(List<Process> processes) {
+        this.processes = processes;
     }
-
-    public String getDocumentTypeId() {
-        return documentTypeId;
-    }
-
-    public void setDocumentTypeId(String documentTypeId) {
-        this.documentTypeId = documentTypeId;
-    }
-
-    public String getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(String profileId) {
-        this.profileId = profileId;
-    }
-
-    public Date getArrivedAt() {
-        return arrivedAt;
-    }
-
-    public void setArrivedAt(Date arrivedAt) {
-        this.arrivedAt = arrivedAt;
-    }
-
-    public String getRawHistory() {
-        return rawHistory;
-    }
-
-    public void setRawHistory(String rawHistory) {
-        this.rawHistory = rawHistory;
-    }
-
-    public List<DocumentLog> getLogs() {
-        return logs;
-    }
-
-    public void setLogs(List<DocumentLog> logs) {
-        this.logs = logs;
-    }
-
 }

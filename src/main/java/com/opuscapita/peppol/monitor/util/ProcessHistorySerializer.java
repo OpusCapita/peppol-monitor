@@ -11,12 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class MessageHistorySerializer {
+public class ProcessHistorySerializer {
 
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().setVersion(1.0).create();
 
     public List<DocumentLog> fromJson(String json) {
-        Type listType = new TypeToken<ArrayList<DocumentLog>>() {}.getType();
+        Type listType = new TypeToken<ArrayList<DocumentLog>>() {
+        }.getType();
         return gson.fromJson(json, listType);
     }
 

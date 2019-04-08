@@ -2,18 +2,16 @@ package com.opuscapita.peppol.monitor.consumer;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.container.metadata.AccessPointInfo;
-import com.opuscapita.peppol.commons.container.metadata.PeppolMessageMetadata;
+import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
-import com.opuscapita.peppol.monitor.entity.AccessPoint;
-import com.opuscapita.peppol.monitor.entity.Message;
-import com.opuscapita.peppol.monitor.entity.MessageStatus;
-import com.opuscapita.peppol.monitor.entity.Participant;
+import com.opuscapita.peppol.monitor.entity.*;
+import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
-import com.opuscapita.peppol.monitor.util.MessageHistorySerializer;
-import org.apache.commons.io.FilenameUtils;
+import com.opuscapita.peppol.monitor.repository.ProcessService;
+import com.opuscapita.peppol.monitor.util.ProcessHistorySerializer;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +24,16 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     private static final Logger logger = LoggerFactory.getLogger(MonitorMessageConsumer.class);
 
     private MessageService messageService;
-    private MessageHistorySerializer historySerializer;
+    private ProcessService processService;
+    private ProcessHistorySerializer historySerializer;
     private AccessPointRepository accessPointRepository;
     private ParticipantRepository participantRepository;
 
     @Autowired
-    public MonitorMessageConsumer(MessageService messageService, MessageHistorySerializer historySerializer,
+    public MonitorMessageConsumer(MessageService messageService, ProcessService processService, ProcessHistorySerializer historySerializer,
                                   AccessPointRepository accessPointRepository, ParticipantRepository participantRepository) {
         this.messageService = messageService;
+        this.processService = processService;
         this.historySerializer = historySerializer;
         this.accessPointRepository = accessPointRepository;
         this.participantRepository = participantRepository;
@@ -44,46 +44,65 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         logger.info("Monitor received the message: " + cm.toKibana());
 
         String messageId = cm.getMetadata().getMessageId();
+        String transmissionId = cm.getMetadata().getTransmissionId();
+
         Message message = messageService.getMessage(messageId);
         if (message == null) {
             message = createMessageEntity(cm);
-        } else {
-            message = updateMessageEntity(cm, message);
         }
+
+        Process process = processService.getProcess(transmissionId);
+        if (process == null) {
+            process = createProcessEntity(cm, message);
+        } else {
+            process = updateProcessEntity(cm, process);
+        }
+
+        processService.saveProcess(process);
         messageService.saveMessage(message);
 
         logger.info("Monitor saved the message: " + cm.getFileName());
     }
 
-    private Message updateMessageEntity(ContainerMessage cm, Message message) {
-        return setCommonFields(cm, message);
+    private Process updateProcessEntity(ContainerMessage cm, Process process) {
+        ContainerMessageMetadata metadata = cm.getMetadata();
+
+        process.setFilename(cm.getFileName());
+        process.setStatus(extractStatusInfo(cm));
+        process.setSender(getParticipant(metadata.getSenderId()));
+        process.setReceiver(getParticipant(metadata.getRecipientId()));
+        process.setDocumentType(null); // need to find a way to set this
+        process.setDocumentTypeId(metadata.getDocumentTypeIdentifier());
+        process.setProfileId(metadata.getProfileTypeIdentifier());
+        process.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs()));
+
+        return process;
+    }
+
+    private Process createProcessEntity(ContainerMessage cm, Message message) {
+        ContainerMessageMetadata metadata = cm.getMetadata();
+
+        Process process = new Process();
+        process.setMessage(message);
+        process.setTransmissionId(metadata.getTransmissionId());
+        process.setArrivedAt(metadata.getTimestamp());
+
+        process = updateProcessEntity(cm, process);
+        message.getProcesses().add(process);
+
+        return process;
     }
 
     private Message createMessageEntity(ContainerMessage cm) {
-        PeppolMessageMetadata metadata = cm.getMetadata();
+        ContainerMessageMetadata metadata = cm.getMetadata();
 
         Message message = new Message();
         message.setMessageId(metadata.getMessageId());
-        message.setSource(cm.getEndpoint().getSource());
-        message.setDirection(cm.getEndpoint().getFlow());
-        message.setArrivedAt(metadata.getReceivedTimeStamp());
-
-        return setCommonFields(cm, message);
-    }
-
-    private Message setCommonFields(ContainerMessage cm, Message message) {
-        PeppolMessageMetadata metadata = cm.getMetadata();
-
-        message.setFilename(FilenameUtils.getName(cm.getFileName()));
-        message.setStatus(extractStatusInfo(cm));
-        message.setSender(getParticipant(metadata.getSenderId()));
-        message.setReceiver(getParticipant(metadata.getRecipientId()));
+        message.setSource(cm.getSource());
+        message.setDirection(cm.getFlow());
         message.setAccessPoint(getAccessPointId(cm.getApInfo()));
-        message.setDocumentType(null); // need to find a way to set this
-        message.setDocumentTypeId(metadata.getDocumentTypeIdentifier());
-        message.setProfileId(metadata.getProfileTypeIdentifier());
-        message.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs()));
 
+        message = messageService.saveMessage(message);
         return message;
     }
 
@@ -97,8 +116,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         if (participant != null) {
             return participant.getId();
         }
+
         participant = new Participant(participantId);
-        return participantRepository.save(participant).getId();
+        participant = participantRepository.save(participant);
+        return participant.getId();
     }
 
     private String getAccessPointId(AccessPointInfo accessPointInfo) {
@@ -114,27 +135,29 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         if (accessPoint != null) {
             return accessPoint.getId();
         }
+
         accessPoint = new AccessPoint(accessPointInfo);
-        return accessPointRepository.save(accessPoint).getId();
+        accessPoint = accessPointRepository.save(accessPoint);
+        return accessPoint.getId();
     }
 
     private MessageStatus extractStatusInfo(ContainerMessage cm) {
         if (cm.getHistory().hasError()) {
             return MessageStatus.failed;
         }
-        if (cm.getEndpoint().getStep().equals(ProcessStep.INBOUND)) {
+        if (cm.getStep().equals(ProcessStep.INBOUND)) {
             return MessageStatus.received;
         }
-        if (cm.getEndpoint().getStep().equals(ProcessStep.PROCESS)) {
+        if (cm.getStep().equals(ProcessStep.PROCESS)) {
             return MessageStatus.processing;
         }
-        if (cm.getEndpoint().getStep().equals(ProcessStep.VALIDATION)) {
+        if (cm.getStep().equals(ProcessStep.VALIDATION)) {
             return MessageStatus.validating;
         }
-        if (cm.getEndpoint().getStep().equals(ProcessStep.OUTBOUND)) {
+        if (cm.getStep().equals(ProcessStep.OUTBOUND)) {
             return MessageStatus.sending;
         }
-        if (cm.getEndpoint().getStep().equals(ProcessStep.NETWORK)) {
+        if (cm.getStep().equals(ProcessStep.NETWORK)) {
             return MessageStatus.delivered;
         }
         return MessageStatus.unknown;

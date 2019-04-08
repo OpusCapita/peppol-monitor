@@ -1,7 +1,6 @@
 package com.opuscapita.peppol.monitor.repository;
 
 import com.opuscapita.peppol.monitor.entity.Message;
-import com.opuscapita.peppol.monitor.util.MessageHistorySerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -12,12 +11,10 @@ import java.util.List;
 public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository repository;
-    private final MessageHistorySerializer historySerializer;
 
     @Autowired
-    public MessageServiceImpl(MessageRepository repository, MessageHistorySerializer historySerializer) {
+    public MessageServiceImpl(MessageRepository repository) {
         this.repository = repository;
-        this.historySerializer = historySerializer;
     }
 
     @Override
@@ -27,11 +24,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message getMessage(Long id) {
-        Message message = repository.findById(id).orElse(null);
-        if (message != null) {
-            message.setLogs(historySerializer.fromJson(message.getRawHistory()));
-        }
-        return message;
+        return repository.findById(id).orElse(null);
     }
 
     @Override
