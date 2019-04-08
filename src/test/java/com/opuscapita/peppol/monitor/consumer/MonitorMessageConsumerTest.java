@@ -1,10 +1,14 @@
 package com.opuscapita.peppol.monitor.consumer;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
-import com.opuscapita.peppol.commons.container.metadata.PeppolMessageMetadata;
+import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
+import com.opuscapita.peppol.commons.container.state.ProcessStep;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.Message;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
+import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.repository.MessageService;
+import com.opuscapita.peppol.monitor.repository.ProcessService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,38 +30,49 @@ public class MonitorMessageConsumerTest {
     private MessageService messageService;
 
     @Autowired
+    private ProcessService processService;
+
+    @Autowired
     private MonitorMessageConsumer consumer;
 
     @Test
     @Ignore
     public void testStore() throws Exception {
-        String messageId = UUID.randomUUID().toString();
-
-        ContainerMessage cm = new ContainerMessage();
-        cm.setFileName("test_" + System.currentTimeMillis() + ".xml");
+        String filename = "test_" + System.currentTimeMillis() + ".xml";
+        ContainerMessage cm = new ContainerMessage(filename, Source.UNKNOWN, ProcessStep.TEST);
         cm.getHistory().addError("Test Failed");
 
-        PeppolMessageMetadata metadata = PeppolMessageMetadata.createDummy();
+        ContainerMessageMetadata metadata = ContainerMessageMetadata.createDummy();
+        String messageId = UUID.randomUUID().toString();
+        String transmissionId = UUID.randomUUID().toString();
         metadata.setMessageId(messageId);
+        metadata.setTransmissionId(transmissionId);
         cm.setMetadata(metadata);
 
-        Message notExists = messageService.getMessage(messageId);
-        assertNull(notExists);
+        Message notExists1 = messageService.getMessage(messageId);
+        assertNull(notExists1);
+
+        Process notExists2 = processService.getProcess(transmissionId);
+        assertNull(notExists2);
 
         consumer.consume(cm);
 
-        Message exists = messageService.getMessage(messageId);
-        assertNotNull(exists);
-        assertEquals(exists.getFilename(), cm.getFileName());
-        assertEquals(exists.getStatus(), MessageStatus.failed);
+        Message exists1 = messageService.getMessage(messageId);
+        assertNotNull(exists1);
+        assertEquals(exists1.getSource(), cm.getSource());
+
+        Process exists2 = processService.getProcess(transmissionId);
+        assertNotNull(exists2);
+        assertEquals(exists2.getFilename(), cm.getFileName());
+        assertEquals(exists2.getStatus(), MessageStatus.failed);
 
         cm.getMetadata().setProfileTypeIdentifier("new-profile-type-id");
         consumer.consume(cm);
 
         Message updated = messageService.getMessage(messageId);
         assertNotNull(updated);
-        assertEquals(updated.getFilename(), cm.getFileName());
-        assertEquals(updated.getProfileId(), cm.getMetadata().getProfileTypeIdentifier());
+        assertEquals(updated.getProcesses().size(), 1);
+        assertEquals(updated.getProcesses().get(0).getProfileId(), cm.getMetadata().getProfileTypeIdentifier());
     }
 
 }
