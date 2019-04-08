@@ -63,8 +63,8 @@ class PeppolMonitor extends Components.ContextComponent {
         }
     }
 
-    showMessageDetail(id) {
-        this.props.goMessageDetail(id);
+    showMessageDetail(messageId) {
+        this.props.goMessageDetail(messageId);
     }
 
     mapSourcesSelect() {
@@ -291,7 +291,8 @@ class PeppolMonitor extends Components.ContextComponent {
                         },
                         {
                             accessor: 'arrivedAt',
-                            Header: 'Arrived At'
+                            Header: 'Arrived At',
+                            Cell: ({value}) => i18n.formatDate(value)
                         }
                     ]}
                 />

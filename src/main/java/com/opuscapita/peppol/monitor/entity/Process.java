@@ -47,7 +47,7 @@ public class Process {
     @Column(name = "arrived_at")
     private Date arrivedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "message_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Message message;

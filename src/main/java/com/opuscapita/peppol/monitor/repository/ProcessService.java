@@ -12,6 +12,8 @@ public interface ProcessService {
 
     Process getProcess(String transmissionId);
 
+    List<Process> getAllProcesses(String messageId);
+
     void deleteProcess(Process process);
 
     void deleteProcess(Long id);

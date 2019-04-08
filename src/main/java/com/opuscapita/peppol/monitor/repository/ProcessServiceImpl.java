@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ProcessServiceImpl implements ProcessService {
@@ -37,6 +38,12 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public Process getProcess(String transmissionId) {
         return repository.findByTransmissionId(transmissionId);
+    }
+
+    @Override
+    public List<Process> getAllProcesses(String messageId) {
+        List<Process> processes = repository.findByMessageMessageId(messageId);
+        return processes.stream().peek(process -> process.setLogs(historySerializer.fromJson(process.getRawHistory()))).collect(Collectors.toList());
     }
 
     @Override

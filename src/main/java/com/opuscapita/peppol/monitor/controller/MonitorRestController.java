@@ -1,7 +1,11 @@
 package com.opuscapita.peppol.monitor.controller;
 
+import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
+import com.opuscapita.peppol.monitor.controller.dtos.MessageDto;
 import com.opuscapita.peppol.monitor.entity.Message;
+import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.repository.MessageService;
+import com.opuscapita.peppol.monitor.repository.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -25,10 +30,12 @@ public class MonitorRestController {
     private Integer pageSize;
 
     private final MessageService messageService;
+    private final ProcessService processService;
 
     @Autowired
-    public MonitorRestController(MessageService messageService) {
+    public MonitorRestController(MessageService messageService, ProcessService processService) {
         this.messageService = messageService;
+        this.processService = processService;
     }
 
     @GetMapping("/message-count")
@@ -37,27 +44,25 @@ public class MonitorRestController {
     }
 
     @GetMapping("/messages/{pageNumber}")
-    public List<Message> getMessages(@PathVariable Integer pageNumber) {
+    public List<MessageDto> getMessages(@PathVariable Integer pageNumber) {
         pageNumber = pageNumber == null ? 0 : pageNumber;
-        return messageService.getAllMessages(pageNumber, pageSize);
-    }
-
-    @GetMapping("/message-by-id/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        Message message = messageService.getMessage(id);
-        if (message != null) {
-            return ResponseEntity.ok(message);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        List<Message> messages = messageService.getAllMessages(pageNumber, pageSize);
+        return messages.stream().map(MessageDto::of).collect(Collectors.toList());
     }
 
     @GetMapping("/message-by-messageId/{messageId}")
     public ResponseEntity<?> getByMessageId(@PathVariable String messageId) {
         Message message = messageService.getMessage(messageId);
         if (message != null) {
-            return ResponseEntity.ok(message);
+            return ResponseEntity.ok(MessageDto.of(message));
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/message-history/{messageId}")
+    public List<DocumentLog> getMessageHistory(@PathVariable String messageId) {
+        List<Process> processes = processService.getAllProcesses(messageId);
+        return processes.stream().flatMap(process -> process.getLogs().stream()).collect(Collectors.toList());
     }
 
 }

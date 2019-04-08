@@ -51,4 +51,5 @@ public class MessageServiceImpl implements MessageService {
     public long countMessages() {
         return repository.count();
     }
+
 }

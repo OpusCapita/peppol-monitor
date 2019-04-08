@@ -107,16 +107,12 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     }
 
     private String getParticipant(String participantId) {
-        Participant participant = null;
-        try {
-            participant = participantRepository.getOne(participantId);
-        } catch (Exception e) {
-            logger.debug("Participant: " + participantId + " couldn't found, creating a new one.");
-        }
+        Participant participant = participantRepository.findById(participantId).orElse(null);
         if (participant != null) {
             return participant.getId();
         }
 
+        logger.debug("Participant: " + participantId + " couldn't found, creating a new one.");
         participant = new Participant(participantId);
         participant = participantRepository.save(participant);
         return participant.getId();
@@ -126,16 +122,13 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         if (accessPointInfo == null) {
             return null;
         }
-        AccessPoint accessPoint = null;
-        try {
-            accessPoint = accessPointRepository.getOne(accessPointInfo.getId());
-        } catch (Exception e) {
-            logger.debug("AccessPoint: " + accessPointInfo.getId() + " couldn't found, creating a new one.");
-        }
+
+        AccessPoint accessPoint = accessPointRepository.findById(accessPointInfo.getId()).orElse(null);
         if (accessPoint != null) {
             return accessPoint.getId();
         }
 
+        logger.debug("AccessPoint: " + accessPointInfo.getId() + " couldn't found, creating a new one.");
         accessPoint = new AccessPoint(accessPointInfo);
         accessPoint = accessPointRepository.save(accessPoint);
         return accessPoint.getId();

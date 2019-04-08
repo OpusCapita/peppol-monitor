@@ -10,7 +10,8 @@ class PeppolMonitorDetail extends Components.ContextComponent {
     state = {
         loading: false,
         message: {},
-        showHistory: true
+        history: [],
+        showHistory: false
     };
 
     static propTypes = {
@@ -35,10 +36,25 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         });
     }
 
+    loadHistory(e) {
+        this.setState({loading: true});
+
+        this.messageApi.getMessageHistory(this.props.messageId).then(history => {
+            this.setState({loading: false, history: history, showHistory: true});
+
+        }).catch(e => {
+            this.context.showNotification(e.message, 'error', 10);
+            this.setState({loading: false});
+        });
+    }
+
+    hideHistory(e) {
+        this.setState({history: [], showHistory: false});
+    }
+
     render() {
         const {i18n} = this.context;
-        const {loading, message, showHistory} = this.state;
-        console.log(message);
+        const {loading, message, history, showHistory} = this.state;
 
         return (
             <div>
@@ -48,10 +64,18 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                         <div className="col-md-12">
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label">ID</label>
+                                    <label className="control-label">Message ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
                                     <label className="value-label">{message.messageId}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label">Last Transmission ID</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="value-label">{message.transmissionId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -114,8 +138,13 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                     </div>
                 </div>
                 <div className="form-submit text-right">
+                    <button className="btn btn-link">Upload</button>
                     <button className="btn btn-link">Download</button>
-                    <button className="btn btn-primary">Reprocess</button>
+                    <button className="btn btn-danger">Reprocess</button>
+                    { showHistory
+                        ? <button className="btn btn-primary" onClick={e => this.hideHistory(e)}>Hide History</button>
+                        : <button className="btn btn-primary" onClick={e => this.loadHistory(e)}>Show History</button>
+                    }
                 </div>
                 {
                     showHistory &&
@@ -126,7 +155,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                                 <div className="col-md-12">
                                     <ReactTable
                                         className="message-detail-history-table"
-                                        data={message.logs}
+                                        data={history}
                                         loading={loading}
                                         columns={[
                                             {

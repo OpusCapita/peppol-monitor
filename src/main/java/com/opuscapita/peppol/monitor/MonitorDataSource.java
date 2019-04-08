@@ -11,6 +11,12 @@ import javax.sql.DataSource;
 @Component
 public class MonitorDataSource {
 
+    @Value("${db-init.host:mysql}")
+    private String host;
+
+    @Value("${db-init.port:3306}")
+    private String port;
+
     @Value("${db-init.user:root}")
     private String user;
 
@@ -27,9 +33,9 @@ public class MonitorDataSource {
                 .create()
                 .username(user)
                 .password(password)
-                .url("jdbc:mysql://mysql:3306/" + database)
+                .url("jdbc:mysql://" + host + ":" + port + "/" + database)
                 .driverClassName("com.mysql.jdbc.Driver")
                 .build();
     }
-    
+
 }
