@@ -12,7 +12,7 @@ class ApiBase {
     }
 
     getProcesses(pagination, filter) {
-        return this.ajax.get(`/peppol-monitor/api/get-processes`).send({pagination, filter}).then(res => res.body).catch(this.getErrorFromResponse);
+        return this.ajax.post(`/peppol-monitor/api/get-processes`).send({pagination, filter}).then(res => res.body).catch(this.getErrorFromResponse);
     }
 
     getProcessById(id) {

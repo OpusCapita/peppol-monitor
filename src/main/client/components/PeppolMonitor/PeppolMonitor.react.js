@@ -59,8 +59,6 @@ class PeppolMonitor extends Components.ContextComponent {
                 pagination.sorted = tableState.sorted;
             }
 
-            console.log(pagination);
-
             const response = await this.api.getProcesses(pagination, searchValues);
             this.setState({processes: response.data, pageCount: response.pages});
         }

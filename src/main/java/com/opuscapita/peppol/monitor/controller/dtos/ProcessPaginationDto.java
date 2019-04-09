@@ -39,7 +39,7 @@ public class ProcessPaginationDto {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    public class SortingDto {
+    public static class SortingDto {
         private String id;
         private Boolean desc;
 

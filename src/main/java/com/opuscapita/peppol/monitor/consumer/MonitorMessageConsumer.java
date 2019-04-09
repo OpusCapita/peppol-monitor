@@ -49,6 +49,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         Message message = messageService.getMessage(messageId);
         if (message == null) {
             message = createMessageEntity(cm);
+            message = messageService.saveMessage(message);
         }
 
         Process process = processService.getProcess(transmissionId);
@@ -57,9 +58,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         } else {
             process = updateProcessEntity(cm, process);
         }
-
         processService.saveProcess(process);
-        messageService.saveMessage(message);
 
         logger.info("Monitor saved the message: " + cm.getFileName());
     }
