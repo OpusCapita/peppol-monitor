@@ -233,6 +233,7 @@ class PeppolMonitor extends Components.ContextComponent {
 
                     columns={[
                         {
+                            id: 'transmissionId',
                             Header: 'Transmission ID',
                             accessor: row => row,
                             Cell: ({value}) => <a className="btn btn-link"
