@@ -1,10 +1,14 @@
 package com.opuscapita.peppol.monitor.repository;
 
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessRequestDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.util.ProcessHistorySerializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,14 +46,26 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<Process> getAllProcesses(String messageId) {
-        List<Process> processes = repository.findByMessageMessageId(messageId);
-        return processes.stream().peek(process -> process.setLogs(historySerializer.fromJson(process.getRawHistory()))).collect(Collectors.toList());
+    public List<Process> filterProcesses(ProcessFilterDto filterDto) {
+        return repository.findAll(ProcessFilterSpecification.filter(filterDto));
     }
 
     @Override
-    public List<Process> filterProcesses(ProcessFilterDto filterDto) {
-        return repository.findAll(ProcessFilterSpecification.filter(filterDto));
+    public List<Process> getAllProcesses(int pageNumber, int pageSize) {
+        return repository.findAll(PageRequest.of(pageNumber, pageSize)).getContent();
+    }
+
+    @Override
+    public Page<Process> getProcesses(ProcessRequestDto request) {
+        Specification<Process> spec = ProcessFilterSpecification.filter(request.getFilter());
+        Pageable pageable = PageRequest.of(request.getPagination().getPage(), request.getPagination().getPageSize());
+        return repository.findAll(spec, pageable);
+    }
+
+    @Override
+    public List<Process> getAllProcesses(String messageId) {
+        List<Process> processes = repository.findByMessageMessageId(messageId);
+        return processes.stream().peek(process -> process.setLogs(historySerializer.fromJson(process.getRawHistory()))).collect(Collectors.toList());
     }
 
     @Override
@@ -60,11 +76,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void deleteProcess(Long id) {
         repository.deleteById(id);
-    }
-
-    @Override
-    public List<Process> getAllProcesses(int pageNumber, int pageSize) {
-        return repository.findAll(PageRequest.of(pageNumber, pageSize)).getContent();
     }
 
     @Override

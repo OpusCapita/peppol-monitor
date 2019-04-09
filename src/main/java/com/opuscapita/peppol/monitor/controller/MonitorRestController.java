@@ -2,18 +2,19 @@ package com.opuscapita.peppol.monitor.controller;
 
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessDto;
-import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessRequestDto;
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessResponseDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ProcessService;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,32 +23,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class MonitorRestController {
 
-    private static final Logger logger = LoggerFactory.getLogger(MonitorRestController.class);
-
-    @Value("${support-ui.page-size:20}")
-    private Integer pageSize;
-
-    private final MessageService messageService;
     private final ProcessService processService;
 
     @Autowired
     public MonitorRestController(MessageService messageService, ProcessService processService) {
-        this.messageService = messageService;
         this.processService = processService;
     }
 
-    @GetMapping("/get-processes/{pageNumber}")
-    public List<ProcessDto> getProcesses(@PathVariable Integer pageNumber) {
-        pageNumber = pageNumber == null ? 0 : pageNumber;
-
-        List<Process> processes = processService.getAllProcesses(pageNumber, pageSize);
-        return processes.stream().map(ProcessDto::of).collect(Collectors.toList());
-    }
-
-    @PostMapping("/filter-processes")
-    public List<ProcessDto> filterProcesses(ProcessFilterDto filterDto) {
-        logger.info("Filtering: " + ToStringBuilder.reflectionToString(filterDto));
-        return processService.filterProcesses(filterDto).stream().map(ProcessDto::of).collect(Collectors.toList());
+    @GetMapping("/get-processes")
+    public ProcessResponseDto getProcesses(ProcessRequestDto request) {
+        Page<Process> processes = processService.getProcesses(request);
+        return new ProcessResponseDto(processes.getContent(), processes.getTotalPages());
     }
 
     @GetMapping("/get-process-by-id/{id}")

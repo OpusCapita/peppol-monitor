@@ -28,9 +28,10 @@ class PeppolMonitor extends Components.ContextComponent {
     state = {
         loading: false,
         processes: [],
-        pageNumber: 0,
         searchValues: {},
-        showSearch: true
+        showSearch: true,
+        pageCount: -1,
+        pagination: {},
     };
 
     static propTypes = {
@@ -47,12 +48,21 @@ class PeppolMonitor extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
-    async loadProcesses() {
+    async loadProcesses(tableState) {
         this.setState({loading: true});
+        const {pagination, searchValues} = this.state;
 
         try {
-            const processes = await this.api.getProcesses(this.state.pageNumber);
-            this.setState({processes});
+            if (tableState) {
+                pagination.page = tableState.page;
+                pagination.pageSize = tableState.pageSize;
+                pagination.sorted = tableState.sorted;
+            }
+
+            console.log(pagination);
+
+            const response = await this.api.getProcesses(pagination, searchValues);
+            this.setState({processes: response.data, pageCount: response.pages});
         }
         catch (e) {
             this.context.showNotification(e.message, 'error', 10);
@@ -89,9 +99,7 @@ class PeppolMonitor extends Components.ContextComponent {
         this.setState({searchValues});
     }
 
-    resetSearch(e) {
-        e.preventDefault();
-
+    resetSearch() {
         const searchValues = {
             id: '',
             filename: '',
@@ -101,20 +109,12 @@ class PeppolMonitor extends Components.ContextComponent {
             statuses: []
         };
 
-        this.setState({searchValues}, () => this.handleSearch());
-    }
-
-    handleSearch(e) {
-        e && e.preventDefault();
-
-        return this.api.filterProcesses(this.state.searchValues)
-            .then(processes => this.setState({processes}))
-            .catch(e => this.context.showNotification(e.message, 'error', 10));
+        this.setState({searchValues}, () => this.loadProcesses());
     }
 
     render() {
         const {i18n} = this.context;
-        const {loading, processes, searchValues, showSearch} = this.state;
+        const {loading, processes, pageCount, searchValues, showSearch} = this.state;
 
         return (
             <div>
@@ -207,8 +207,8 @@ class PeppolMonitor extends Components.ContextComponent {
                             </div>
                         </div>
                         <div className="form-submit text-right">
-                            <button className="btn btn-link" onClick={e => this.resetSearch(e)}>Reset</button>
-                            <button className="btn btn-primary" onClick={e => this.handleSearch(e)}>Filter</button>
+                            <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
+                            <button className="btn btn-primary" onClick={() => this.loadProcesses()}>Filter</button>
                         </div>
                         <hr/>
                     </div>
@@ -216,16 +216,18 @@ class PeppolMonitor extends Components.ContextComponent {
 
                 <ReactTable
                     className="process-list-table"
-
-                    data={processes}
-                    onFetchData={() => this.loadProcesses()}
                     loading={loading}
+                    data={processes}
+                    onFetchData={(state) => this.loadProcesses(state)}
 
-                    defaultSorted={[{id: 'arrivedAt', desc: true}]}
-                    showPageSizeOptions={false}
+                    manual
                     minRows={10}
+                    pages={pageCount}
+                    defaultPageSize={20}
+                    pageSizeOptions={[5, 10, 20, 50]}
+                    defaultSorted={[{id: 'arrivedAt', desc: true}]}
 
-                    getTrProps={(state, rowInfo, instance) => {
+                    getTrProps={(state, rowInfo) => {
                         if (rowInfo && rowInfo.original.status === 'failed')
                             return {style: {'background-color': '#f2dedf'}};
                         return {}
@@ -236,8 +238,10 @@ class PeppolMonitor extends Components.ContextComponent {
                             id: 'transmissionId',
                             Header: 'Transmission ID',
                             accessor: row => row,
-                            Cell: ({value}) => <a className="btn btn-link"
-                                                  onClick={this.showProcessDetail.bind(this, value.id)}>{value.transmissionId}</a>
+                            Cell: ({value}) =>
+                                <a className="btn btn-link" onClick={this.showProcessDetail.bind(this, value.id)}>
+                                    {value.transmissionId}
+                                </a>
                         },
                         {
                             accessor: 'filename',
