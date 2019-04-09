@@ -59,7 +59,6 @@ public class MonitorMessageConsumerTest {
 
         Message exists1 = messageService.getMessage(messageId);
         assertNotNull(exists1);
-        assertEquals(exists1.getSource(), cm.getSource());
 
         Process exists2 = processService.getProcess(transmissionId);
         assertNotNull(exists2);

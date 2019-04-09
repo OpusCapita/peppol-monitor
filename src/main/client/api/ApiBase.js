@@ -16,7 +16,7 @@ class ApiBase {
     }
 
     filterProcesses(filterObj) {
-        return this.ajax.post('/peppol-monitor/api/messages/filter').send(filterObj).then(res => res.body).catch(this.getErrorFromResponse);
+        return this.ajax.post('/peppol-monitor/api/filter-processes').send(filterObj).then(res => res.body).catch(this.getErrorFromResponse);
     }
 
     getProcessById(id) {

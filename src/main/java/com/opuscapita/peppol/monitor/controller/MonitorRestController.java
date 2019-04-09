@@ -2,19 +2,18 @@ package com.opuscapita.peppol.monitor.controller;
 
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessDto;
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ProcessService;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +42,12 @@ public class MonitorRestController {
 
         List<Process> processes = processService.getAllProcesses(pageNumber, pageSize);
         return processes.stream().map(ProcessDto::of).collect(Collectors.toList());
+    }
+
+    @PostMapping("/filter-processes")
+    public List<ProcessDto> filterProcesses(ProcessFilterDto filterDto) {
+        logger.info("Filtering: " + ToStringBuilder.reflectionToString(filterDto));
+        return processService.filterProcesses(filterDto).stream().map(ProcessDto::of).collect(Collectors.toList());
     }
 
     @GetMapping("/get-process-by-id/{id}")

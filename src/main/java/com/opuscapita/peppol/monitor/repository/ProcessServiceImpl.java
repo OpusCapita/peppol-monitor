@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.monitor.repository;
 
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.util.ProcessHistorySerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,11 @@ public class ProcessServiceImpl implements ProcessService {
     public List<Process> getAllProcesses(String messageId) {
         List<Process> processes = repository.findByMessageMessageId(messageId);
         return processes.stream().peek(process -> process.setLogs(historySerializer.fromJson(process.getRawHistory()))).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Process> filterProcesses(ProcessFilterDto filterDto) {
+        return repository.findAll(ProcessFilterSpecification.filter(filterDto));
     }
 
     @Override

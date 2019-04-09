@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Components } from '@opuscapita/service-base-ui';
+import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import {ApiBase} from '../../api';
 import Select from '@opuscapita/react-select';
@@ -93,7 +93,7 @@ class PeppolMonitor extends Components.ContextComponent {
         e.preventDefault();
 
         const searchValues = {
-            messageId: '',
+            id: '',
             filename: '',
             participant: '',
             accessPoint: '',
@@ -107,11 +107,8 @@ class PeppolMonitor extends Components.ContextComponent {
     handleSearch(e) {
         e && e.preventDefault();
 
-        const {searchValues} = this.state;
-        console.log(searchValues); // TOODDDOOO: remove after debugging
-        let searchObj = {};
-
-        return this.api.filterProcesses(searchObj).then(processes => this.setState({processes}))
+        return this.api.filterProcesses(this.state.searchValues)
+            .then(processes => this.setState({processes}))
             .catch(e => this.context.showNotification(e.message, 'error', 10));
     }
 
@@ -133,9 +130,9 @@ class PeppolMonitor extends Components.ContextComponent {
                                             <label className="control-label">Message ID</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.messageId}
+                                            <input type="text" className="form-control" value={searchValues.id}
                                                    placeholder={"e7a85712-21ae-4d8b-a2de-c012a39bbb12"}
-                                                   onChange={e => this.handleSearchFormChange('messageId', e.target.value)}/>
+                                                   onChange={e => this.handleSearchFormChange('id', e.target.value)}/>
                                         </div>
                                     </div>
                                     <div className="form-group">
@@ -225,6 +222,7 @@ class PeppolMonitor extends Components.ContextComponent {
                     loading={loading}
 
                     defaultSorted={[{id: 'arrivedAt', desc: true}]}
+                    showPageSizeOptions: false
                     minRows={10}
 
                     getTrProps={(state, rowInfo, instance) => {
@@ -235,9 +233,10 @@ class PeppolMonitor extends Components.ContextComponent {
 
                     columns={[
                         {
-                            accessor: 'id',
-                            Header: 'ID',
-                            Cell: props => <a className="btn btn-link" onClick={this.showProcessDetail.bind(this, props.value)}>{props.value}</a>
+                            Header: 'Transmission ID',
+                            accessor: row => row,
+                            Cell: ({value}) => <a className="btn btn-link"
+                                                  onClick={this.showProcessDetail.bind(this, value.id)}>{value.transmissionId}</a>
                         },
                         {
                             accessor: 'filename',

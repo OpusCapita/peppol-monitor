@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.monitor.repository;
 
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public interface ProcessService {
     Process getProcess(String transmissionId);
 
     List<Process> getAllProcesses(String messageId);
+
+    List<Process> filterProcesses(ProcessFilterDto filterDto);
 
     void deleteProcess(Process process);
 
