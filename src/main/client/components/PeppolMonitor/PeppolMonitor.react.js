@@ -222,7 +222,7 @@ class PeppolMonitor extends Components.ContextComponent {
                     loading={loading}
 
                     defaultSorted={[{id: 'arrivedAt', desc: true}]}
-                    showPageSizeOptions: false
+                    showPageSizeOptions={false}
                     minRows={10}
 
                     getTrProps={(state, rowInfo, instance) => {
