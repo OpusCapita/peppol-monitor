@@ -4,6 +4,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -53,5 +54,9 @@ public class Message {
 
     public void setProcesses(List<Process> processes) {
         this.processes = processes;
+    }
+
+    public Process getLastProcess() {
+        return this.processes.stream().max(Comparator.comparingLong(Process::getId)).orElse(null);
     }
 }

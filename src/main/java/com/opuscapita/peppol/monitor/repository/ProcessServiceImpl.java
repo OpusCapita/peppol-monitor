@@ -47,7 +47,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public List<Process> filterProcesses(ProcessFilterDto filterDto) {
-        return repository.findAll(ProcessFilterSpecification.filter(filterDto));
+        return repository.findAll(ProcessFilterSpecification.filter(filterDto, null));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public Page<Process> getProcesses(ProcessRequestDto request) {
-        Specification<Process> spec = ProcessFilterSpecification.filter(request.getFilter());
+        Specification<Process> spec = ProcessFilterSpecification.filter(request.getFilter(), request.getPagination().getSorted());
         Pageable pageable = PageRequest.of(request.getPagination().getPage(), request.getPagination().getPageSize());
         return repository.findAll(spec, pageable);
     }

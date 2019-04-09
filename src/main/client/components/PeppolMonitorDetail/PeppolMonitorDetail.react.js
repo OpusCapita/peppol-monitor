@@ -105,18 +105,10 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Document Type</label>
+                                    <label className="control-label btn-link">Arrived At</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.documentType}</label>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <div className="col-sm-3">
-                                    <label className="control-label btn-link">Document Type ID</label>
-                                </div>
-                                <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.documentTypeId}</label>
+                                    <label className="control-label">{process.arrivedAt}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -129,10 +121,18 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Arrived At</label>
+                                    <label className="control-label btn-link">Document Type</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.arrivedAt}</label>
+                                    <label className="control-label">{process.documentType}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Document Type ID</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{process.documentTypeId}</label>
                                 </div>
                             </div>
                         </div>

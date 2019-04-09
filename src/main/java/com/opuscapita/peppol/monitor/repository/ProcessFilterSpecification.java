@@ -1,17 +1,19 @@
 package com.opuscapita.peppol.monitor.repository;
 
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
+import com.opuscapita.peppol.monitor.controller.dtos.ProcessPaginationDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProcessFilterSpecification {
 
-    public static Specification<Process> filter(ProcessFilterDto filterDto) {
+    public static Specification<Process> filter(ProcessFilterDto filterDto, List<ProcessPaginationDto.SortingDto> sortingDtos) {
         return (Specification<Process>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -57,6 +59,17 @@ public class ProcessFilterSpecification {
                         criteriaBuilder.in(root.get("status")).value(filterDto.getStatuses())
                 );
                 predicates.add(statusPredicate);
+            }
+
+            if (sortingDtos != null && !sortingDtos.isEmpty()) {
+                List<Order> orderList = new ArrayList<>();
+                for (ProcessPaginationDto.SortingDto sortingDto : sortingDtos) {
+                    orderList.add(sortingDto.getDesc()
+                            ? criteriaBuilder.desc(root.get(sortingDto.getId()))
+                            : criteriaBuilder.asc(root.get(sortingDto.getId()))
+                    );
+                }
+                query.orderBy(orderList);
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));

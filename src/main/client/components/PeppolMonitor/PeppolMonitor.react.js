@@ -74,6 +74,11 @@ class PeppolMonitor extends Components.ContextComponent {
         this.props.goMessageDetail(id);
     }
 
+    showParticipantLookup(participant) {
+        const parts = participant.split(":");
+        window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`,'_blank');
+    }
+
     mapSourcesSelect() {
         return PeppolMonitor.sources.map(value => {
             return {value: value, label: value};
@@ -84,6 +89,19 @@ class PeppolMonitor extends Components.ContextComponent {
         return PeppolMonitor.statuses.map(value => {
             return {value: value, label: value};
         });
+    }
+
+    getStatusLabelClass(status) {
+        switch (status) {
+            case 'delivered':
+                return 'success';
+            case 'unknown':
+                return 'warning';
+            case 'failed':
+                return 'danger';
+            default:
+                return 'info';
+        }
     }
 
     handleSearchFormChange(field, value) {
@@ -246,24 +264,39 @@ class PeppolMonitor extends Components.ContextComponent {
                             Header: 'File Name'
                         },
                         {
+                            id: 'status',
                             accessor: 'status',
-                            Header: 'Status'
+                            Header: 'Status',
+                            Cell: ({value}) =>
+                                <span className={`label label-${this.getStatusLabelClass(value)}`}>{value}</span>
                         },
                         {
+                            id: 'sender',
                             accessor: 'sender',
-                            Header: 'Sender'
+                            Header: 'Sender',
+                            Cell: ({value}) =>
+                                <a className="btn btn-link" onClick={this.showParticipantLookup.bind(this, value)}>
+                                    {value}
+                                </a>
                         },
                         {
+                            id: 'receiver',
                             accessor: 'receiver',
-                            Header: 'Receiver'
+                            Header: 'Receiver',
+                            Cell: ({value}) =>
+                                <a className="btn btn-link" onClick={this.showParticipantLookup.bind(this, value)}>
+                                    {value}
+                                </a>
                         },
                         {
                             accessor: 'accessPoint',
                             Header: 'Access Point'
                         },
                         {
+                            id: 'source',
                             accessor: 'source',
-                            Header: 'Source'
+                            Header: 'Source',
+                            Cell: ({value}) => <span className="well">{value}</span>
                         },
                         {
                             accessor: 'arrivedAt',
