@@ -122,6 +122,19 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         });
     }
 
+    getHistoryTypeLabelClass(level) {
+        switch (level) {
+            case 'INFO':
+                return 'info';
+            case 'WARNING':
+                return 'warning';
+            case 'ERROR':
+                return 'danger';
+            default:
+                return 'default';
+        }
+    }
+
     render() {
         const {i18n} = this.context;
         const {loading, process, showHistory, showInfos, showErrors, showWarnings} = this.state;
@@ -250,7 +263,14 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                                                 id: 'type',
                                                 width: 150,
                                                 Header: 'Type from Source',
-                                                accessor: log => ((log.level === 'ERROR' ? log.errorType : log.level) + ' from ' + log.source),
+                                                accessor: log => log,
+                                                Cell: ({value}) =>
+                                                    <span>
+                                                        <span className={`label label-${this.getHistoryTypeLabelClass(value.level)}`}>
+                                                            {(value.level === 'ERROR') ? value.errorType : value.level}
+                                                        </span> from
+                                                        <span className="label label-default">{value.source}</span>
+                                                    </span>
                                             },
                                             {
                                                 id: 'message',
