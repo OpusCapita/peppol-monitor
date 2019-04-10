@@ -14,6 +14,7 @@ public class ProcessDto {
     public String transmissionId;
     public String filename;
     public MessageStatus status;
+    public MessageStatus messageStatus;
     public String sender;
     public String receiver;
     public String accessPoint;
@@ -38,6 +39,7 @@ public class ProcessDto {
         dto.transmissionId = process.getTransmissionId();
         dto.filename = process.getFilename();
         dto.status = process.getStatus();
+        dto.messageStatus = process.getMessage().getLastProcess().getStatus();
         dto.sender = process.getSender();
         dto.receiver = process.getReceiver();
         dto.documentType = process.getDocumentType();

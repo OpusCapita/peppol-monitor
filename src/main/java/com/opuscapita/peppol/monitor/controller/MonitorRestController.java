@@ -1,11 +1,13 @@
 package com.opuscapita.peppol.monitor.controller;
 
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
+import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessDto;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessRequestDto;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessResponseDto;
 import com.opuscapita.peppol.monitor.entity.Process;
 import com.opuscapita.peppol.monitor.repository.ProcessService;
+import com.opuscapita.peppol.monitor.reprocess.ReprocessManager;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -31,10 +33,12 @@ public class MonitorRestController {
     private static final Logger logger = LoggerFactory.getLogger(MonitorRestController.class);
 
     private final ProcessService processService;
+    private final ReprocessManager reprocessManager;
 
     @Autowired
-    public MonitorRestController(ProcessService processService) {
+    public MonitorRestController(ProcessService processService, ReprocessManager reprocessManager) {
         this.processService = processService;
+        this.reprocessManager = reprocessManager;
     }
 
     @PostMapping("/get-processes")
@@ -43,9 +47,9 @@ public class MonitorRestController {
         return new ProcessResponseDto(processes.getContent(), processes.getTotalPages());
     }
 
-    @GetMapping("/get-process-by-id/{id}")
-    public ResponseEntity<?> getProcessById(@PathVariable Long id) {
-        Process process = processService.getProcess(id);
+    @GetMapping("/get-process-by-id/{processId}")
+    public ResponseEntity<?> getProcessById(@PathVariable Long processId) {
+        Process process = processService.getProcess(processId);
         return wrap(ProcessDto.of(process));
     }
 
@@ -53,12 +57,6 @@ public class MonitorRestController {
     public ResponseEntity<?> getProcessByTransmissionId(@PathVariable String transmissionId) {
         Process process = processService.getProcess(transmissionId);
         return wrap(ProcessDto.of(process));
-    }
-
-    @GetMapping("/get-history/{messageId}")
-    public List<DocumentLog> getMessageHistory(@PathVariable String messageId) {
-        List<Process> processes = processService.getAllProcesses(messageId);
-        return processes.stream().flatMap(process -> process.getLogs().stream()).collect(Collectors.toList());
     }
 
     @PostMapping("/upload-file/{processId}")
@@ -81,6 +79,26 @@ public class MonitorRestController {
         header.setContentLength(rawData.length);
         header.set("Content-Disposition", "attachment; filename=" + FilenameUtils.getName(process.getFilename()));
         return new ResponseEntity<>(rawData, header, HttpStatus.OK);
+    }
+
+    @GetMapping("/reprocess-message/{processId}")
+    public ResponseEntity<?> reprocessMessage(@PathVariable Long processId) throws IOException {
+        Process process = processService.getProcess(processId);
+        if (process == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        DocumentLog log = new DocumentLog("Sending REPROCESS request for the message", DocumentLogLevel.INFO);
+        processService.addMessageToHistoryOfProcess(process, log);
+
+        reprocessManager.reprocessMessage(process);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/get-history/{messageId}")
+    public List<DocumentLog> getMessageHistory(@PathVariable String messageId) {
+        List<Process> processes = processService.getAllProcesses(messageId);
+        return processes.stream().flatMap(process -> process.getLogs().stream()).collect(Collectors.toList());
     }
 
     private <T> ResponseEntity<T> wrap(T body) {

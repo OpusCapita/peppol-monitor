@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.monitor.repository;
 
+import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.storage.StorageException;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessRequestDto;
@@ -29,10 +30,6 @@ public interface ProcessService {
 
     void updateFileContent(InputStream content, Process process) throws StorageException;
 
-    void deleteProcess(Process process);
-
-    void deleteProcess(Long id);
-
-    long countProcesses();
+    void addMessageToHistoryOfProcess(Process process, DocumentLog log);
 
 }

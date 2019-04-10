@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.monitor.repository;
 
+import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
@@ -84,17 +85,11 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void deleteProcess(Process process) {
-        repository.delete(process);
+    public void addMessageToHistoryOfProcess(Process process, DocumentLog log) {
+        process.getLogs().add(log);
+        process.setRawHistory(historySerializer.toJson(process.getLogs()));
+
+        saveProcess(process);
     }
 
-    @Override
-    public void deleteProcess(Long id) {
-        repository.deleteById(id);
-    }
-
-    @Override
-    public long countProcesses() {
-        return repository.count();
-    }
 }

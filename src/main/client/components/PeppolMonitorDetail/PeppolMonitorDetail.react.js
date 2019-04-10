@@ -74,6 +74,18 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         });
     }
 
+    reprocessMessage(event) {
+        event.preventDefault();
+
+        this.api.reprocessMessage(this.props.messageId, data).then(() => {
+            this.setState({loading: false});
+            this.context.showNotification('The file is sent for reprocessing', 'info', 10);
+        }).catch(e => {
+            this.setState({loading: false});
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
     loadHistory(e) {
         this.setState({loading: true});
 
@@ -126,10 +138,26 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Source / Status</label>
+                                    <label className="control-label btn-link">Message Status</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.source} / {process.status}</label>
+                                    <label className="control-label">{process.messageStatus}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Process Status</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{process.status}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
+                                    <label className="control-label btn-link">Source / Direction</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{process.source} / {process.direction}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -180,7 +208,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                         Upload<input type="file" hidden onChange={e => this.uploadFile(e)}/>
                     </label>
                     <button className="btn btn-default" onClick={e => this.downloadFile(e)}>Download</button>
-                    <button className="btn btn-danger">Reprocess</button>
+                    <button className="btn btn-danger" onClick={e => this.reprocessMessage(e)}>Reprocess</button>
                     { showHistory
                         ? <button className="btn btn-primary" onClick={e => this.hideHistory(e)}>Hide History</button>
                         : <button className="btn btn-primary" onClick={e => this.loadHistory(e)}>Show History</button>
