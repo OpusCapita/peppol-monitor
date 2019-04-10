@@ -261,7 +261,7 @@ class PeppolMonitor extends Components.ContextComponent {
                                        onClick={this.showProcessDetail.bind(this, value.id)}>
                                         {value.transmissionId}
                                     </a>
-                                    <ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} delayHide={250}>
+                                    <ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>
                                         <p>Message ID: {value.messageId}</p>
                                         <p>Transmission ID: {value.transmissionId}</p>
                                     </ReactTooltip>
@@ -276,7 +276,7 @@ class PeppolMonitor extends Components.ContextComponent {
                                     <span data-tip data-for={`name-tooltip-${value.transmissionId}`}>
                                         {value.filename.split('/').pop()}
                                     </span>
-                                    <ReactTooltip className="sticky" id={`name-tooltip-${value.transmissionId}`} delayHide={250}>
+                                    <ReactTooltip className="sticky" id={`name-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>
                                         {value.filename}
                                     </ReactTooltip>
                                 </span>

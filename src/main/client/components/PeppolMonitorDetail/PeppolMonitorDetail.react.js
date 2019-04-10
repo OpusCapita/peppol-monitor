@@ -80,7 +80,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
     reprocessMessage(event) {
         event.preventDefault();
 
-        this.api.reprocessMessage(this.props.messageId, data).then(() => {
+        this.api.reprocessMessage(this.props.messageId).then(() => {
             this.setState({loading: false});
             this.context.showNotification('The file is sent for reprocessing', 'info', 10);
         }).catch(e => {
@@ -270,16 +270,16 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                         </div>
                         <div className="form-submit text-right process-detail-actions">
                             { showInfos
-                                ? <button className="btn btn-info btn-passive" onClick={() => this.setState({showInfos: false})}>Hide Infos</button>
-                                : <button className="btn btn-info" onClick={() => this.setState({showInfos: true})}>Show Infos</button>
+                                ? <button className="btn btn-info" onClick={() => this.setState({showInfos: false})}>Hide Infos</button>
+                                : <button className="btn btn-info btn-passive" onClick={() => this.setState({showInfos: true})}>Show Infos</button>
                             }
                             { showWarnings
-                                ? <button className="btn btn-warning btn-passive" onClick={() => this.setState({showWarnings: false})}>Hide Warnings</button>
-                                : <button className="btn btn-warning" onClick={() => this.setState({showWarnings: true})}>Show Warnings</button>
+                                ? <button className="btn btn-warning" onClick={() => this.setState({showWarnings: false})}>Hide Warnings</button>
+                                : <button className="btn btn-warning btn-passive" onClick={() => this.setState({showWarnings: true})}>Show Warnings</button>
                             }
                             { showErrors
-                                ? <button className="btn btn-danger btn-passive" onClick={() => this.setState({showErrors: false})}>Hide Errors</button>
-                                : <button className="btn btn-danger" onClick={() => this.setState({showErrors: true})}>Show Errors</button>
+                                ? <button className="btn btn-danger" onClick={() => this.setState({showErrors: false})}>Hide Errors</button>
+                                : <button className="btn btn-danger btn-passive" onClick={() => this.setState({showErrors: true})}>Show Errors</button>
                             }
                         </div>
                     </div>
