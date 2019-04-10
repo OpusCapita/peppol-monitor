@@ -1,5 +1,7 @@
 package com.opuscapita.peppol.monitor.repository;
 
+import com.opuscapita.peppol.commons.storage.Storage;
+import com.opuscapita.peppol.commons.storage.StorageException;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessRequestDto;
 import com.opuscapita.peppol.monitor.entity.Process;
@@ -11,17 +13,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class ProcessServiceImpl implements ProcessService {
 
+    private final Storage storage;
     private final ProcessRepository repository;
     private final ProcessHistorySerializer historySerializer;
 
     @Autowired
-    public ProcessServiceImpl(ProcessRepository repository, ProcessHistorySerializer historySerializer) {
+    public ProcessServiceImpl(Storage storage, ProcessRepository repository, ProcessHistorySerializer historySerializer) {
+        this.storage = storage;
         this.repository = repository;
         this.historySerializer = historySerializer;
     }
@@ -66,6 +71,11 @@ public class ProcessServiceImpl implements ProcessService {
     public List<Process> getAllProcesses(String messageId) {
         List<Process> processes = repository.findByMessageMessageId(messageId);
         return processes.stream().peek(process -> process.setLogs(historySerializer.fromJson(process.getRawHistory()))).collect(Collectors.toList());
+    }
+
+    @Override
+    public InputStream getFileContent(Process process) throws StorageException {
+        return storage.get(process.getFilename());
     }
 
     @Override

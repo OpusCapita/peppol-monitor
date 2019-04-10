@@ -9,6 +9,7 @@ import './PeppolMonitorDetail.css';
 class PeppolMonitorDetail extends Components.ContextComponent {
 
     state = {
+        uploadedFile: '',
         loading: false,
         process: {},
         history: [],
@@ -34,6 +35,52 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         }).catch(e => {
             this.context.showNotification(e.message, 'error', 10);
             this.setState({loading: false});
+        });
+    }
+
+    onFileChange(event) {
+        this.setState({
+            uploadedFile: event.target.files[0]
+        });
+        console.log(this.state.uploadedFile);
+    }
+
+    uploadFile(event) {
+        event.preventDefault();
+
+        if(!this.state.uploadedFile) {
+            this.context.showNotification('Please select a file first', 'error', 10);
+            return;
+        }
+
+        let data = new FormData();
+        data.append('file', this.state.uploadedFile);
+
+        this.setState({loading: true});
+        this.api.uploadFile(this.props.messageId, data).then(() => {
+            this.setState({loading: false});
+            this.context.showNotification('Successfully updated the file', 'success', 10);
+        }).catch(e => {
+            this.setState({loading: false});
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
+    downloadFile(event) {
+        this.setState({loading: true});
+        this.api.downloadFile(this.props.messageId).then((response) => {
+            this.setState({loading: false});
+            const filename =  response.headers.get('Content-Disposition').split('filename=')[1];
+            response.blob().then(blob => {
+                let url = window.URL.createObjectURL(blob);
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+            });
+        }).catch(e => {
+            this.setState({loading: false});
+            this.context.showNotification(e.message, 'error', 10);
         });
     }
 
@@ -138,9 +185,10 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                         </div>
                     </div>
                 </div>
-                <div className="form-submit text-right">
-                    <button className="btn btn-link">Upload</button>
-                    <button className="btn btn-link">Download</button>
+                <div className="form-submit text-right process-detail-actions">
+                    <input onChange={e => this.onFileChange(e)} type="file"/>
+                    <button className="btn btn-link" onClick={e => this.uploadFile(e)}>Upload</button>
+                    <button className="btn btn-link" onClick={e => this.downloadFile(e)}>Download</button>
                     <button className="btn btn-danger">Reprocess</button>
                     { showHistory
                         ? <button className="btn btn-primary" onClick={e => this.hideHistory(e)}>Hide History</button>

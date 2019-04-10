@@ -26,6 +26,14 @@ class ApiBase {
     getMessageHistory(messageId) {
         return this.ajax.get(`/peppol-monitor/api/get-history/${messageId}`).then(res => res.body).catch(this.getErrorFromResponse);
     }
+
+    uploadFile(processId, data) {
+        return this.ajax.post(`/peppol-monitor/api/upload-file/${processId}`).send(data).then(res => res.body).catch(this.getErrorFromResponse);
+    }
+
+    downloadFile(processId) {
+        return this.ajax.get(`/peppol-monitor/api/download-file/${processId}`).then(res => res.body).catch(this.getErrorFromResponse);
+    }
 }
 
 export default ApiBase;

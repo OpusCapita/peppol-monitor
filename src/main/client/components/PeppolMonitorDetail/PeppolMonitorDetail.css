@@ -1,3 +1,11 @@
 .process-detail .form-group {
 	margin-bottom: 0;
 }
+
+.process-detail-actions {
+	margin-top: 10px;
+}
+
+.process-detail-actions .btn {
+	margin-left: 5px;
+}

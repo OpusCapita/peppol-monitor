@@ -257,21 +257,28 @@ class PeppolMonitor extends Components.ContextComponent {
                             accessor: row => row,
                             Cell: ({value}) =>
                                 <span>
-                                    <a className="btn btn-link" data-tip data-for="id-tooltip"
+                                    <a className="btn btn-link" data-tip data-for={`id-tooltip-${value.transmissionId}`}
                                        onClick={this.showProcessDetail.bind(this, value.id)}>
                                         {value.transmissionId}
                                     </a>
-                                    <ReactTooltip id='id-tooltip'>{value.transmissionId}</ReactTooltip>
+                                    <ReactTooltip id={`id-tooltip-${value.transmissionId}`} delayHide={500}>
+                                        <p>Message ID: {value.messageId}</p>
+                                        <p>Transmission ID: {value.transmissionId}</p>
+                                    </ReactTooltip>
                                 </span>
                         },
                         {
                             id: 'filename',
-                            accessor: 'filename',
+                            accessor: row => row,
                             Header: 'File Name',
                             Cell: ({value}) =>
                                 <span>
-                                    <span data-tip data-for="name-tooltip">{value.split('/').pop()}</span>
-                                    <ReactTooltip id='name-tooltip'>{value}</ReactTooltip>
+                                    <span data-tip data-for={`name-tooltip-${value.transmissionId}`}>
+                                        {value.filename.split('/').pop()}
+                                    </span>
+                                    <ReactTooltip id={`name-tooltip-${value.transmissionId}`} delayHide={500}>
+                                        {value.filename}
+                                    </ReactTooltip>
                                 </span>
                         },
                         {
