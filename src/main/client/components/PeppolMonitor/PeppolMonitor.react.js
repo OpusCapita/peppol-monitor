@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
+import ReactTooltip from 'react-tooltip';
 import {ApiBase} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
@@ -255,13 +256,23 @@ class PeppolMonitor extends Components.ContextComponent {
                             Header: 'Transmission ID',
                             accessor: row => row,
                             Cell: ({value}) =>
-                                <a className="btn btn-link" onClick={this.showProcessDetail.bind(this, value.id)}>
-                                    {value.transmissionId}
-                                </a>
+                                <span>
+                                    <a className="btn btn-link" data-tip data-for="id-tooltip"
+                                       onClick={this.showProcessDetail.bind(this, value.id)}>
+                                        {value.transmissionId}
+                                    </a>
+                                    <ReactTooltip id='id-tooltip'>{value.transmissionId}</ReactTooltip>
+                                </span>
                         },
                         {
+                            id: 'filename',
                             accessor: 'filename',
-                            Header: 'File Name'
+                            Header: 'File Name',
+                            Cell: ({value}) =>
+                                <span>
+                                    <span data-tip data-for="name-tooltip">{value.split('/').pop()}</span>
+                                    <ReactTooltip id='name-tooltip'>{value}</ReactTooltip>
+                                </span>
                         },
                         {
                             id: 'status',

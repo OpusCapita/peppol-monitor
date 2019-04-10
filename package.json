@@ -14,10 +14,10 @@
   "homepage": "https://github.com/OpusCapita/peppol-monitor",
   "dependencies": {
     "@opuscapita/web-init": "^3.0.81",
+    "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.3",
     "extend": "^3.0.1",
-    "superagent": "^3.8.3",
-    "babel-polyfill": "^6.26.0"
+    "superagent": "^3.8.3"
   },
   "devDependencies": {
     "@opuscapita/config": "^3.0.16",
@@ -40,6 +40,7 @@
     "react-dom": "^15.4.2",
     "react-router": "^3.2.1",
     "react-table": "^6.8.6",
+    "react-tooltip": "^3.10.0",
     "style-loader": "^0.19.0",
     "validate.js": "0.11.1",
     "webpack": "^3.12.0",
