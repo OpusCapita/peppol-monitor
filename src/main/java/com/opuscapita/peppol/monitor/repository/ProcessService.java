@@ -27,6 +27,8 @@ public interface ProcessService {
 
     InputStream getFileContent(Process process) throws StorageException;
 
+    void updateFileContent(InputStream content, Process process) throws StorageException;
+
     void deleteProcess(Process process);
 
     void deleteProcess(Long id);

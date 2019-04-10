@@ -63,9 +63,9 @@ public class MonitorRestController {
 
     @PostMapping("/upload-file/{processId}")
     public ResponseEntity<?> uploadFileOfProcess(@PathVariable Long processId, @RequestParam("file") MultipartFile multipartFile) throws IOException {
-        logger.info(multipartFile.getContentType());
+        Process process = processService.getProcess(processId);
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            logger.info(IOUtils.toString(inputStream));
+            processService.updateFileContent(inputStream, process);
         }
         return ResponseEntity.ok().build();
     }
@@ -77,7 +77,7 @@ public class MonitorRestController {
         byte[] data = IOUtils.toByteArray(inputStream);
 
         HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.valueOf(""));
+        header.setContentType(MediaType.TEXT_XML);
         header.setContentLength(data.length);
         header.set("Content-Disposition", "attachment; filename=" + FilenameUtils.getName(process.getFilename()));
         return new ResponseEntity<>(data, header, HttpStatus.OK);

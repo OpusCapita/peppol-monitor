@@ -9,7 +9,6 @@ import './PeppolMonitorDetail.css';
 class PeppolMonitorDetail extends Components.ContextComponent {
 
     state = {
-        uploadedFile: '',
         loading: false,
         process: {},
         history: [],
@@ -38,25 +37,16 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         });
     }
 
-    onFileChange(event) {
-        this.setState({
-            uploadedFile: event.target.files[0]
-        });
-        console.log(this.state.uploadedFile);
-    }
-
     uploadFile(event) {
-        event.preventDefault();
+        const file = event.target.files[0];
+        console.log(file);
 
-        if(!this.state.uploadedFile) {
-            this.context.showNotification('Please select a file first', 'error', 10);
-            return;
-        }
+        event.preventDefault();
+        this.setState({loading: true});
 
         let data = new FormData();
-        data.append('file', this.state.uploadedFile);
+        data.append('file', file);
 
-        this.setState({loading: true});
         this.api.uploadFile(this.props.messageId, data).then(() => {
             this.setState({loading: false});
             this.context.showNotification('Successfully updated the file', 'success', 10);
@@ -186,9 +176,10 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                     </div>
                 </div>
                 <div className="form-submit text-right process-detail-actions">
-                    <input onChange={e => this.onFileChange(e)} type="file"/>
-                    <button className="btn btn-link" onClick={e => this.uploadFile(e)}>Upload</button>
-                    <button className="btn btn-link" onClick={e => this.downloadFile(e)}>Download</button>
+                    <label className="btn btn-default">
+                        Upload<input type="file" hidden onChange={e => this.uploadFile(e)}/>
+                    </label>
+                    <button className="btn btn-default" onClick={e => this.downloadFile(e)}>Download</button>
                     <button className="btn btn-danger">Reprocess</button>
                     { showHistory
                         ? <button className="btn btn-primary" onClick={e => this.hideHistory(e)}>Hide History</button>

@@ -79,6 +79,11 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public void updateFileContent(InputStream content, Process process) throws StorageException {
+        storage.update(content, process.getFilename());
+    }
+
+    @Override
     public void deleteProcess(Process process) {
         repository.delete(process);
     }
