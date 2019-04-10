@@ -13,3 +13,7 @@
 .process-detail-actions [hidden] {
 	display: none !important;
 }
+
+.process-detail-actions .btn-passive {
+	opacity: 0.5;
+}

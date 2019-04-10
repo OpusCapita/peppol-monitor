@@ -12,7 +12,10 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         loading: false,
         process: {},
         history: [],
-        showHistory: false
+        showHistory: false,
+        showInfos: true,
+        showErrors: true,
+        showWarnings: true,
     };
 
     static propTypes = {
@@ -102,9 +105,26 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         this.setState({history: [], showHistory: false});
     }
 
+    getHistory() {
+        const {history, showInfos, showErrors, showWarnings} = this.state;
+
+        return history.filter(log => {
+            if (!showInfos && log.level === 'INFO') {
+                return false;
+            }
+            if (!showErrors && log.level === 'ERROR') {
+                return false;
+            }
+            if (!showWarnings && log.level === 'WARNING') {
+                return false;
+            }
+            return true;
+        });
+    }
+
     render() {
         const {i18n} = this.context;
-        const {loading, process, history, showHistory} = this.state;
+        const {loading, process, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
         return (
             <div>
@@ -223,7 +243,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                                 <div className="col-md-12">
                                     <ReactTable
                                         className="message-detail-history-table"
-                                        data={history}
+                                        data={this.getHistory()}
                                         loading={loading}
                                         columns={[
                                             {
@@ -247,6 +267,20 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                                     />
                                 </div>
                             </div>
+                        </div>
+                        <div className="form-submit text-right process-detail-actions">
+                            { showInfos
+                                ? <button className="btn btn-info btn-passive" onClick={() => this.setState({showInfos: false})}>Hide Infos</button>
+                                : <button className="btn btn-info" onClick={() => this.setState({showInfos: true})}>Show Infos</button>
+                            }
+                            { showWarnings
+                                ? <button className="btn btn-warning btn-passive" onClick={() => this.setState({showWarnings: false})}>Hide Warnings</button>
+                                : <button className="btn btn-warning" onClick={() => this.setState({showWarnings: true})}>Show Warnings</button>
+                            }
+                            { showErrors
+                                ? <button className="btn btn-danger btn-passive" onClick={() => this.setState({showErrors: false})}>Hide Errors</button>
+                                : <button className="btn btn-danger" onClick={() => this.setState({showErrors: true})}>Show Errors</button>
+                            }
                         </div>
                     </div>
                 }
