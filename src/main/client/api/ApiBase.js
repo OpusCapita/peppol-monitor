@@ -32,7 +32,7 @@ class ApiBase {
     }
 
     downloadFile(processId) {
-        return this.ajax.get(`/peppol-monitor/api/download-file/${processId}`).then(res => res.body).catch(this.getErrorFromResponse);
+        return this.ajax.get(`/peppol-monitor/api/download-file/${processId}`).responseType('blob').catch(this.getErrorFromResponse);
     }
 }
 

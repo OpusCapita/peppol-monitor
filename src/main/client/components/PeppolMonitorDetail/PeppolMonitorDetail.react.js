@@ -39,11 +39,12 @@ class PeppolMonitorDetail extends Components.ContextComponent {
 
     uploadFile(event) {
         const file = event.target.files[0];
-        console.log(file);
+        if (file.type !== 'text/xml') {
+            this.context.showNotification('Please select an XML file', 'error', 10);
+            return;
+        }
 
-        event.preventDefault();
         this.setState({loading: true});
-
         let data = new FormData();
         data.append('file', file);
 
@@ -60,14 +61,13 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         this.setState({loading: true});
         this.api.downloadFile(this.props.messageId).then((response) => {
             this.setState({loading: false});
-            const filename =  response.headers.get('Content-Disposition').split('filename=')[1];
-            response.blob().then(blob => {
-                let url = window.URL.createObjectURL(blob);
-                let a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                a.click();
-            });
+
+            const filename = response.headers['content-disposition'].split('filename=')[1];
+            let url = window.URL.createObjectURL(response.body);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
         }).catch(e => {
             this.setState({loading: false});
             this.context.showNotification(e.message, 'error', 10);

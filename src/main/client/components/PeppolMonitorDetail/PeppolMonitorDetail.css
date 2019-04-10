@@ -9,3 +9,7 @@
 .process-detail-actions .btn {
 	margin-left: 5px;
 }
+
+.process-detail-actions [hidden] {
+	display: none !important;
+}

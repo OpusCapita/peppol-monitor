@@ -74,13 +74,13 @@ public class MonitorRestController {
     public ResponseEntity<byte[]> downloadFileOfProcess(@PathVariable Long processId) throws IOException {
         Process process = processService.getProcess(processId);
         InputStream inputStream = processService.getFileContent(process);
-        byte[] data = IOUtils.toByteArray(inputStream);
+        byte[] rawData = IOUtils.toByteArray(inputStream);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.TEXT_XML);
-        header.setContentLength(data.length);
+        header.setContentLength(rawData.length);
         header.set("Content-Disposition", "attachment; filename=" + FilenameUtils.getName(process.getFilename()));
-        return new ResponseEntity<>(data, header, HttpStatus.OK);
+        return new ResponseEntity<>(rawData, header, HttpStatus.OK);
     }
 
     private <T> ResponseEntity<T> wrap(T body) {
