@@ -93,8 +93,7 @@ class PeppolMonitor extends Components.ContextComponent {
                     }
                     {
                         (showProcessTable || showProcessDetail || showAccessPointTable || showCustomerTable) &&
-                        <button className='btn btn-default' onClick={(event) => this.handleBackClick(event)}
-                                style="margin-bottom: 10px">
+                        <button className='btn btn-default' onClick={(event) => this.handleBackClick(event)}>
                             <span className="icon glyphicon glyphicon-chevron-left"/>&nbsp;
                         </button>
                     }
