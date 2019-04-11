@@ -90,6 +90,12 @@ class PeppolMonitor extends Components.ContextComponent {
                                         Participants
                                     </a>
                                 </div>
+                                <div className="col-2">
+                                    <a href="#" className="thumbnail">
+                                        <span className="glyphicon glyphicon-file"></span>
+                                        Document Types
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     }
