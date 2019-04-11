@@ -1,5 +1,6 @@
 package com.opuscapita.peppol.monitor.controller;
 
+import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessDto;
@@ -89,6 +90,7 @@ public class MonitorRestController {
         }
 
         DocumentLog log = new DocumentLog("Sending REPROCESS request for the message", DocumentLogLevel.INFO);
+        log.setSource(ProcessStep.REPROCESSOR);
         processService.addMessageToHistoryOfProcess(process, log);
 
         reprocessManager.reprocessMessage(process);

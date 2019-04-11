@@ -4,9 +4,9 @@ import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import {ApiBase} from '../../api';
 import 'react-table/react-table.css';
-import './PeppolMonitorDetail.css';
+import './ProcessDetail.css';
 
-class PeppolMonitorDetail extends Components.ContextComponent {
+class ProcessDetail extends Components.ContextComponent {
 
     state = {
         loading: false,
@@ -19,19 +19,18 @@ class PeppolMonitorDetail extends Components.ContextComponent {
     };
 
     static propTypes = {
-        messageId: PropTypes.string.isRequired, //rename to processId
+        processId: PropTypes.string.isRequired,
     };
 
     constructor(props, context) {
         super(props);
-
         this.api = new ApiBase();
     }
 
     componentDidMount() {
         this.setState({loading: true});
 
-        this.api.getProcessById(this.props.messageId).then(process => {
+        this.api.getProcessById(this.props.processId).then(process => {
             this.setState({loading: false, process: process});
 
         }).catch(e => {
@@ -51,7 +50,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
         let data = new FormData();
         data.append('file', file);
 
-        this.api.uploadFile(this.props.messageId, data).then(() => {
+        this.api.uploadFile(this.props.processId, data).then(() => {
             this.setState({loading: false});
             this.context.showNotification('Successfully updated the file', 'success', 10);
         }).catch(e => {
@@ -62,7 +61,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
 
     downloadFile(event) {
         this.setState({loading: true});
-        this.api.downloadFile(this.props.messageId).then((response) => {
+        this.api.downloadFile(this.props.processId).then((response) => {
             this.setState({loading: false});
 
             const filename = response.headers['content-disposition'].split('filename=')[1];
@@ -80,7 +79,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
     reprocessMessage(event) {
         event.preventDefault();
 
-        this.api.reprocessMessage(this.props.messageId).then(() => {
+        this.api.reprocessMessage(this.props.processId).then(() => {
             this.setState({loading: false});
             this.context.showNotification('The file is sent for reprocessing', 'info', 10);
         }).catch(e => {
@@ -136,7 +135,6 @@ class PeppolMonitorDetail extends Components.ContextComponent {
     }
 
     render() {
-        const {i18n} = this.context;
         const {loading, process, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
         return (
@@ -261,7 +259,7 @@ class PeppolMonitorDetail extends Components.ContextComponent {
                                         columns={[
                                             {
                                                 id: 'type',
-                                                width: 150,
+                                                width: 200,
                                                 Header: 'Type from Source',
                                                 accessor: log => log,
                                                 Cell: ({value}) =>
@@ -309,4 +307,4 @@ class PeppolMonitorDetail extends Components.ContextComponent {
     }
 }
 
-export default PeppolMonitorDetail;
+export default ProcessDetail;

@@ -139,10 +139,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         if (cm.getStep().equals(ProcessStep.INBOUND)) {
             return MessageStatus.received;
         }
-        if (cm.getStep().equals(ProcessStep.PROCESS)) {
+        if (cm.getStep().equals(ProcessStep.PROCESSOR)) {
             return MessageStatus.processing;
         }
-        if (cm.getStep().equals(ProcessStep.VALIDATION)) {
+        if (cm.getStep().equals(ProcessStep.VALIDATOR)) {
             return MessageStatus.validating;
         }
         if (cm.getStep().equals(ProcessStep.OUTBOUND)) {

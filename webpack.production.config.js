@@ -4,8 +4,7 @@ const Visualizer = require('webpack-visualizer-plugin');
 
 module.exports = {
     entry: {
-        'home': './src/main/client/components/PeppolMonitor/index.js',
-        'detail': './src/main/client/components/PeppolMonitorDetail/index.js'
+        'home': './src/main/client/components/PeppolMonitor/index.js'
     },
     output: {
         path: path.resolve(__dirname, './src/main/resources/static'),

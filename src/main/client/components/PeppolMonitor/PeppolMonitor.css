@@ -1,30 +1,11 @@
-.process-search .react-select {
-    min-width: 150px;
-    vertical-align: middle;
+.monitoring-home {
+    font-size: 2em;
+    text-align: center;
 }
 
-.process-list-table .label + .label {
-    margin-left: 3px;
-}
-
-.process-list-table .rt-td {
-    display: flex;
-    align-items: center;
-}
-
-.process-list-table .well {
-    margin: 0;
-    padding: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.process-list-table .sticky {
-    pointer-events: auto !important;
-}
-
-.process-list-table .sticky:hover {
-    visibility: visible !important;
-    opacity: 1 !important;
+.monitoring-home .glyphicon {
+    font-size: 3em;
+    margin: auto;
+    width: 100%;
+    padding: 10px 10px 0;
 }
