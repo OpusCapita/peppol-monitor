@@ -32,6 +32,14 @@ class ApiBase {
     getMessageHistory(messageId) {
         return this.ajax.get(`/peppol-monitor/api/get-history/${messageId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
+
+    getAccessPoints() {
+        return this.ajax.get(`/peppol-monitor/api/get-access-points`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
+    getParticipants() {
+        return this.ajax.get(`/peppol-monitor/api/get-participants`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
 }
 
 export default ApiBase;

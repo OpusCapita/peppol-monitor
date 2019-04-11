@@ -139,7 +139,6 @@ class ProcessDetail extends Components.ContextComponent {
 
         return (
             <div>
-                <h3>Process Details</h3>
                 <div className="form-horizontal process-detail">
                     <div className="row">
                         <div className="col-md-12">

@@ -6,7 +6,11 @@ import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessDto;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessRequestDto;
 import com.opuscapita.peppol.monitor.controller.dtos.ProcessResponseDto;
+import com.opuscapita.peppol.monitor.entity.AccessPoint;
+import com.opuscapita.peppol.monitor.entity.Participant;
 import com.opuscapita.peppol.monitor.entity.Process;
+import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
+import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
 import com.opuscapita.peppol.monitor.repository.ProcessService;
 import com.opuscapita.peppol.monitor.reprocess.ReprocessManager;
 import org.apache.commons.io.FilenameUtils;
@@ -35,11 +39,16 @@ public class MonitorRestController {
 
     private final ProcessService processService;
     private final ReprocessManager reprocessManager;
+    private final ParticipantRepository participantRepository;
+    private final AccessPointRepository accessPointRepository;
 
     @Autowired
-    public MonitorRestController(ProcessService processService, ReprocessManager reprocessManager) {
+    public MonitorRestController(ProcessService processService, ReprocessManager reprocessManager,
+                                 ParticipantRepository participantRepository, AccessPointRepository accessPointRepository) {
         this.processService = processService;
         this.reprocessManager = reprocessManager;
+        this.participantRepository = participantRepository;
+        this.accessPointRepository = accessPointRepository;
     }
 
     @PostMapping("/get-processes")
@@ -101,6 +110,18 @@ public class MonitorRestController {
     public List<DocumentLog> getMessageHistory(@PathVariable String messageId) {
         List<Process> processes = processService.getAllProcesses(messageId);
         return processes.stream().flatMap(process -> process.getLogs().stream()).collect(Collectors.toList());
+    }
+
+    @GetMapping("/get-access-points")
+    public ResponseEntity<?> getAccessPoints() {
+        List<AccessPoint> accessPoints = accessPointRepository.findAll();
+        return wrap(accessPoints);
+    }
+
+    @GetMapping("/get-participants")
+    public ResponseEntity<?> getParticipants() {
+        List<Participant> participants = participantRepository.findAll();
+        return wrap(participants);
     }
 
     private <T> ResponseEntity<T> wrap(T body) {

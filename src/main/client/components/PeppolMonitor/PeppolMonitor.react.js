@@ -4,6 +4,8 @@ import {ApiBase} from '../../api';
 import 'react-table/react-table.css';
 import ProcessTable from '../ProcessTable';
 import ProcessDetail from '../ProcessDetail';
+import AccessPoints from '../AccessPoints';
+import ParticipantTable from '../ParticipantTable';
 import './PeppolMonitor.css';
 
 class PeppolMonitor extends Components.ContextComponent {
@@ -92,12 +94,6 @@ class PeppolMonitor extends Components.ContextComponent {
                         </div>
                     }
                     {
-                        (showProcessTable || showProcessDetail || showAccessPointTable || showCustomerTable) &&
-                        <button className='btn btn-default' onClick={(event) => this.handleBackClick(event)}>
-                            <span className="icon glyphicon glyphicon-chevron-left"/>&nbsp;
-                        </button>
-                    }
-                    {
                         showProcessTable &&
                         <div className="process-table-wrapper">
                             <ProcessTable goProcessDetail={processId => this.showProcessDetail(processId)}/>
@@ -105,23 +101,31 @@ class PeppolMonitor extends Components.ContextComponent {
                     }
                     {
                         showProcessDetail &&
-                        <div className="process-table-wrapper">
+                        <div className="process-detail-wrapper">
                             <ProcessDetail processId={processDetailId}/>
                         </div>
                     }
                     {
                         showAccessPointTable &&
                         <div className="access-point-wrapper">
-                            <h4>Access points table here</h4>
+                            <AccessPoints/>
                         </div>
                     }
                     {
                         showCustomerTable &&
                         <div className="customer-table-wrapper">
-                            <h4>Customer table here</h4>
+                            <ParticipantTable/>
                         </div>
                     }
                 </div>
+                {
+                    (showProcessTable || showProcessDetail || showAccessPointTable || showCustomerTable) &&
+                    <div className="footer-wrapper">
+                        <button className='btn btn-default' onClick={(event) => this.handleBackClick(event)}>
+                            <span className="icon glyphicon glyphicon-chevron-left"/> Go to Menu
+                        </button>
+                    </div>
+                }
             </div>
         );
     }
