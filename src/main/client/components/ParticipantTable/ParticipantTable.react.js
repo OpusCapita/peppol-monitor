@@ -44,6 +44,7 @@ class ParticipantTable extends Components.ContextComponent {
                     filterable={true}
                     onFetchData={() => this.loadParticipants()}
                     minRows={10}
+                    defaultPageSize={10}
                     columns={[
                         {
                             Header: 'ID',

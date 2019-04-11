@@ -118,6 +118,12 @@ public class MonitorRestController {
         return wrap(accessPoints);
     }
 
+    @PostMapping("/update-access-point")
+    public ResponseEntity<?> updateAccessPoint(@RequestBody AccessPoint accessPoint) {
+        AccessPoint persisted = accessPointRepository.save(accessPoint);
+        return wrap(persisted);
+    }
+
     @GetMapping("/get-participants")
     public ResponseEntity<?> getParticipants() {
         List<Participant> participants = participantRepository.findAll();

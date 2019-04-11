@@ -20,6 +20,8 @@ class AccessPoints extends Components.ContextComponent {
     constructor(props, context) {
         super(props);
         this.api = new ApiBase();
+
+        this.renderEditable = this.renderEditable.bind(this);
     }
 
     async loadAccessPoints() {
@@ -37,6 +39,26 @@ class AccessPoints extends Components.ContextComponent {
         }
     }
 
+    renderEditable(cellInfo) {
+        return (
+            <div
+                className="editable-cell"
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={e => {
+                    const {accessPoints} = this.state;
+                    accessPoints[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
+                    this.setState({accessPoints});
+
+                    this.api.updateAccessPoint(accessPoints[cellInfo.index]);
+                }}
+                dangerouslySetInnerHTML={{
+                    __html: this.state.accessPoints[cellInfo.index][cellInfo.column.id]
+                }}
+            />
+        );
+    }
+
     render() {
         const {loading, accessPoints} = this.state;
 
@@ -49,6 +71,7 @@ class AccessPoints extends Components.ContextComponent {
                     filterable={true}
                     onFetchData={() => this.loadAccessPoints()}
                     minRows={10}
+                    defaultPageSize={10}
                     columns={[
                         {
                             Header: 'ID',
@@ -59,17 +82,18 @@ class AccessPoints extends Components.ContextComponent {
                             accessor: 'name',
                         },
                         {
-                            Header: 'subject',
+                            Header: 'Subject',
                             accessor: 'subject',
                         },
                         {
-                            id: 'emailList',
                             accessor: 'emailList',
                             Header: 'Email Addresses',
+                            Cell: this.renderEditable,
                         },
                         {
                             accessor: 'contactPerson',
                             Header: 'Contact Person',
+                            Cell: this.renderEditable,
                         },
                     ]}
                 />
