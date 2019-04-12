@@ -44,6 +44,10 @@ class ApiBase {
     updateAccessPoint(accessPoint) {
         return this.ajax.post(`/peppol-monitor/api/update-access-point`).send(accessPoint).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
+
+    getDocumentTypes() {
+        return this.ajax.get(`/peppol-validator/api/get-document-types`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
 }
 
 export default ApiBase;

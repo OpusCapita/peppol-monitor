@@ -6,6 +6,7 @@ import ProcessTable from '../ProcessTable';
 import ProcessDetail from '../ProcessDetail';
 import AccessPoints from '../AccessPoints';
 import ParticipantTable from '../ParticipantTable';
+import DocumentTypes from '../DocumentTypes';
 import './PeppolMonitor.css';
 
 class PeppolMonitor extends Components.ContextComponent {
@@ -16,6 +17,7 @@ class PeppolMonitor extends Components.ContextComponent {
         showProcessDetail: false,
         showAccessPointTable: false,
         showCustomerTable: false,
+        showDocumentTypes: false,
     };
 
     constructor(props, context) {
@@ -28,7 +30,8 @@ class PeppolMonitor extends Components.ContextComponent {
             showProcessTable: false,
             showProcessDetail: false,
             showAccessPointTable: false,
-            showCustomerTable: false
+            showCustomerTable: false,
+            showDocumentTypes: false,
         });
     }
 
@@ -50,9 +53,10 @@ class PeppolMonitor extends Components.ContextComponent {
         this.setState({showCustomerTable: true});
     }
 
-    handleBackClick(event) {
+    showDocumentTypes(event) {
         event.preventDefault();
         this.hideAll();
+        this.setState({showDocumentTypes: true});
     }
 
     showProcessDetail(processId) {
@@ -60,38 +64,43 @@ class PeppolMonitor extends Components.ContextComponent {
         this.setState({processDetailId: processId, showProcessDetail: true});
     }
 
+    handleBackClick(event) {
+        event.preventDefault();
+        this.hideAll();
+    }
+
     render() {
-        const {showProcessTable, showProcessDetail, showAccessPointTable, showCustomerTable, processDetailId} = this.state;
+        const {showProcessTable, showProcessDetail, showAccessPointTable, showCustomerTable, showDocumentTypes, processDetailId} = this.state;
 
         return (
             <div>
                 <h2>PEPPOL Access Point Monitoring</h2>
                 <div>
                     {
-                        !showProcessTable && !showProcessDetail && !showAccessPointTable && !showCustomerTable &&
+                        !showProcessTable && !showProcessDetail && !showAccessPointTable && !showCustomerTable && !showDocumentTypes &&
                         <div className="form-horizontal monitoring-home">
                             <div className="row">
-                                <div className="col-2 offset-3">
+                                <div className="col-12">
                                     <a href="#" className="thumbnail" onClick={event => this.showProcessTable(event)}>
                                         <span className="glyphicon glyphicon-envelope"></span>
                                         Process List
                                     </a>
                                 </div>
-                                <div className="col-2">
+                                <div className="col-12">
                                     <a href="#" className="thumbnail"
                                        onClick={event => this.showAccessPointTable(event)}>
                                         <span className="glyphicon glyphicon-globe"></span>
                                         Access Points
                                     </a>
                                 </div>
-                                <div className="col-2">
+                                <div className="col-12">
                                     <a href="#" className="thumbnail" onClick={event => this.showCustomerTable(event)}>
                                         <span className="glyphicon glyphicon-user"></span>
                                         Participants
                                     </a>
                                 </div>
-                                <div className="col-2">
-                                    <a href="#" className="thumbnail">
+                                <div className="col-12">
+                                    <a href="#" className="thumbnail" onClick={event => this.showDocumentTypes(event)}>
                                         <span className="glyphicon glyphicon-file"></span>
                                         Document Types
                                     </a>
@@ -123,9 +132,15 @@ class PeppolMonitor extends Components.ContextComponent {
                             <ParticipantTable/>
                         </div>
                     }
+                    {
+                        showDocumentTypes &&
+                        <div className="document-types-wrapper">
+                            <DocumentTypes/>
+                        </div>
+                    }
                 </div>
                 {
-                    (showProcessTable || showProcessDetail || showAccessPointTable || showCustomerTable) &&
+                    (showProcessTable || showProcessDetail || showAccessPointTable || showCustomerTable || showDocumentTypes) &&
                     <div className="footer-wrapper">
                         <button className='btn btn-default' onClick={(event) => this.handleBackClick(event)}>
                             <span className="icon glyphicon glyphicon-chevron-left"/> Go to Menu
