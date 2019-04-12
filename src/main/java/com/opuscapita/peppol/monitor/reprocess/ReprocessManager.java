@@ -35,9 +35,9 @@ public class ReprocessManager {
     }
 
     public void reprocessMessage(Process process) throws IOException {
-        logger.info("Message reprocess requested for process: " + process.getTransmissionId());
+        logger.debug("Message reprocess requested for process: " + process.getTransmissionId());
         String endpoint = getEndpoint(process.getFilename(), process.getSource());
-        logger.info("Sending reprocess request to endpoint: " + endpoint);
+        logger.info("Sending reprocess request to endpoint: " + endpoint + " for file: " + process.getFilename());
 
         HttpHeaders headers = new HttpHeaders();
         authService.setAuthorizationHeader(headers);

@@ -12,12 +12,14 @@ import './PeppolMonitor.css';
 class PeppolMonitor extends Components.ContextComponent {
 
     state = {
+        show: {
+            processTable: false,
+            processDetail: false,
+            accessPointTable: false,
+            customerTable: false,
+            documentTypes: false,
+        },
         processDetailId: 0,
-        showProcessTable: false,
-        showProcessDetail: false,
-        showAccessPointTable: false,
-        showCustomerTable: false,
-        showDocumentTypes: false,
     };
 
     constructor(props, context) {
@@ -26,81 +28,71 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     hideAll() {
-        this.setState({
-            showProcessTable: false,
-            showProcessDetail: false,
-            showAccessPointTable: false,
-            showCustomerTable: false,
-            showDocumentTypes: false,
+        const {show} = this.state;
+        Object.keys(show).forEach((p) => {
+            show[p] = false;
         });
+        this.setState({show});
     }
 
-    showProcessTable(event) {
-        event.preventDefault();
-        this.hideAll();
-        this.setState({showProcessTable: true});
+    isAllHide() {
+        let result = false;
+        const {show} = this.state;
+
+        Object.keys(show).forEach((p) => {
+            if (show[p]) {
+                result = true;
+            }
+        });
+        return result;
     }
 
-    showAccessPointTable(event) {
-        event.preventDefault();
-        this.hideAll();
-        this.setState({showAccessPointTable: true});
+    showPage(page, event) {
+        event && event.preventDefault();
+
+        const {show} = this.state;
+        Object.keys(show).forEach((p) => {
+            show[p] = page === p;
+        });
+        this.setState({show});
     }
 
-    showCustomerTable(event) {
-        event.preventDefault();
-        this.hideAll();
-        this.setState({showCustomerTable: true});
-    }
-
-    showDocumentTypes(event) {
-        event.preventDefault();
-        this.hideAll();
-        this.setState({showDocumentTypes: true});
-    }
-
-    showProcessDetail(processId) {
-        this.hideAll();
-        this.setState({processDetailId: processId, showProcessDetail: true});
-    }
-
-    handleBackClick(event) {
-        event.preventDefault();
-        this.hideAll();
+    goProcessDetail(processId) {
+        this.setState({processDetailId: processId});
+        this.showPage('processDetail')
     }
 
     render() {
-        const {showProcessTable, showProcessDetail, showAccessPointTable, showCustomerTable, showDocumentTypes, processDetailId} = this.state;
+        const {show, processDetailId} = this.state;
 
         return (
             <div>
                 <h2>PEPPOL Access Point Monitoring</h2>
                 <div>
                     {
-                        !showProcessTable && !showProcessDetail && !showAccessPointTable && !showCustomerTable && !showDocumentTypes &&
+                        this.isAllHide() &&
                         <div className="form-horizontal monitoring-home">
                             <div className="row">
                                 <div className="col-12">
-                                    <a href="#" className="thumbnail" onClick={event => this.showProcessTable(event)}>
+                                    <a href="#" className="thumbnail" onClick={e => this.showPage('processTable', e)}>
                                         <span className="glyphicon glyphicon-envelope"></span>
                                         Process List
                                     </a>
                                 </div>
                                 <div className="col-12">
-                                    <a href="#" className="thumbnail"
-                                       onClick={event => this.showAccessPointTable(event)}>
+                                    <a href="#" className="thumbnail" onClick={e => this.showPage('accessPointTable', e)}>
                                         <span className="glyphicon glyphicon-globe"></span>
                                         Access Points
                                     </a>
                                 </div>
                                 <div className="col-12">
-                                    <a href="#" className="thumbnail" onClick={event => this.showCustomerTable(event)}>
+                                    <a href="#" className="thumbnail" onClick={e => this.showPage('customerTable', e)}>
                                         <span className="glyphicon glyphicon-user"></span>
                                         Participants
                                     </a>
                                 </div>
                                 <div className="col-12">
-                                    <a href="#" className="thumbnail" onClick={event => this.showDocumentTypes(event)}>
+                                    <a href="#" className="thumbnail" onClick={e => this.showPage('documentTypes', e)}>
                                         <span className="glyphicon glyphicon-file"></span>
                                         Document Types
                                     </a>
@@ -109,40 +101,30 @@ class PeppolMonitor extends Components.ContextComponent {
                         </div>
                     }
                     {
-                        showProcessTable &&
-                        <div className="process-table-wrapper">
-                            <ProcessTable goProcessDetail={processId => this.showProcessDetail(processId)}/>
-                        </div>
+                        show.processTable &&
+                        <ProcessTable goProcessDetail={processId => this.goProcessDetail(processId)}/>
                     }
                     {
-                        showProcessDetail &&
-                        <div className="process-detail-wrapper">
-                            <ProcessDetail processId={processDetailId}/>
-                        </div>
+                        show.processDetail &&
+                        <ProcessDetail processId={processDetailId}/>
                     }
                     {
-                        showAccessPointTable &&
-                        <div className="access-point-wrapper">
-                            <AccessPoints/>
-                        </div>
+                        show.accessPointTable &&
+                        <AccessPoints/>
                     }
                     {
-                        showCustomerTable &&
-                        <div className="customer-table-wrapper">
-                            <ParticipantTable/>
-                        </div>
+                        show.customerTable &&
+                        <ParticipantTable/>
                     }
                     {
-                        showDocumentTypes &&
-                        <div className="document-types-wrapper">
-                            <DocumentTypes/>
-                        </div>
+                        show.documentTypes &&
+                        <DocumentTypes/>
                     }
                 </div>
                 {
-                    (showProcessTable || showProcessDetail || showAccessPointTable || showCustomerTable || showDocumentTypes) &&
+                    (!this.isAllHide()) &&
                     <div className="footer-wrapper">
-                        <button className='btn btn-default' onClick={(event) => this.handleBackClick(event)}>
+                        <button className='btn btn-default' onClick={() => this.hideAll()}>
                             <span className="icon glyphicon glyphicon-chevron-left"/> Go to Menu
                         </button>
                     </div>

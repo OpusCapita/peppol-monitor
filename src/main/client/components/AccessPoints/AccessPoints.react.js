@@ -39,6 +39,18 @@ class AccessPoints extends Components.ContextComponent {
         }
     }
 
+    updateAccessPoint(accessPoint) {
+        this.setState({loading: true});
+
+        this.api.updateAccessPoint(accessPoint).then(() => {
+            this.setState({loading: false});
+
+        }).catch(e => {
+            this.context.showNotification(e.message, 'error', 10);
+            this.setState({loading: false});
+        });
+    }
+
     renderEditable(cellInfo) {
         return (
             <div
@@ -50,7 +62,7 @@ class AccessPoints extends Components.ContextComponent {
                     accessPoints[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
                     this.setState({accessPoints});
 
-                    this.api.updateAccessPoint(accessPoints[cellInfo.index]);
+                    this.updateAccessPoint(accessPoints[cellInfo.index]);
                 }}
                 dangerouslySetInnerHTML={{
                     __html: this.state.accessPoints[cellInfo.index][cellInfo.column.id]
