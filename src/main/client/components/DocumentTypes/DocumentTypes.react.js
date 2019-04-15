@@ -32,6 +32,19 @@ class DocumentTypes extends Components.ContextComponent {
         }
     }
 
+    copyToClipboard(txt) {
+        const el = document.createElement('textarea');
+        el.value = txt;
+        el.setAttribute('readonly', '');
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        this.context.showNotification('Value copied to clipboard', 'info', 10);
+    }
+
     render() {
         const {loading, documentTypes} = this.state;
 
@@ -47,6 +60,8 @@ class DocumentTypes extends Components.ContextComponent {
                     defaultPageSize={10}
                     columns={[
                         {
+                            id: 'id',
+                            width: 50,
                             Header: 'ID',
                             accessor: 'id',
                         },
@@ -55,20 +70,34 @@ class DocumentTypes extends Components.ContextComponent {
                             accessor: 'description',
                         },
                         {
+                            id: 'archetype',
+                            width: 70,
                             Header: 'Archetype',
                             accessor: 'archetype',
                         },
                         {
+                            id: 'localName',
+                            width: 70,
                             Header: 'Local Name',
                             accessor: 'localName',
                         },
                         {
+                            id: 'documentId',
                             Header: 'Document Identifier',
                             accessor: 'documentId',
+                            Cell: ({value}) =>
+                                <span className="copy-link" onClick={this.copyToClipboard.bind(this, value)}>
+                                    {value}
+                                </span>
                         },
                         {
+                            id: 'processId',
                             Header: 'Profile Identifier',
                             accessor: 'processId',
+                            Cell: ({value}) =>
+                                <span className="copy-link" onClick={this.copyToClipboard.bind(this, value)}>
+                                    {value}
+                                </span>
                         },
                     ]}
                 />
