@@ -52,7 +52,7 @@ class PeppolMonitor extends Components.ContextComponent {
 
     goProcessDetail(processId) {
         this.setState({processDetailId: processId});
-        this.showPage('processDetail')
+        this.showPage('processDetail');
     }
 
     render() {

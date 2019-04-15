@@ -42,7 +42,7 @@ class DocumentTypes extends Components.ContextComponent {
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        this.context.showNotification('Value copied to clipboard', 'info', 10);
+        this.context.showNotification('Value copied to clipboard', 'info', 2);
     }
 
     render() {
@@ -71,13 +71,13 @@ class DocumentTypes extends Components.ContextComponent {
                         },
                         {
                             id: 'archetype',
-                            width: 70,
+                            width: 100,
                             Header: 'Archetype',
                             accessor: 'archetype',
                         },
                         {
                             id: 'localName',
-                            width: 70,
+                            width: 120,
                             Header: 'Local Name',
                             accessor: 'localName',
                         },

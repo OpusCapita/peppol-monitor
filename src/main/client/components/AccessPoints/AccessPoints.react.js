@@ -39,6 +39,13 @@ class AccessPoints extends Components.ContextComponent {
         }
     }
 
+    getDefaultFilter() {
+        if (this.props.accessPointId) {
+            return [{id: '', value: this.props.accessPointId}];
+        }
+        return [];
+    }
+
     updateAccessPoint(accessPoint) {
         this.setState({loading: true});
 
@@ -81,6 +88,7 @@ class AccessPoints extends Components.ContextComponent {
                     loading={loading}
                     data={accessPoints}
                     filterable={true}
+                    defaultFiltered={this.getDefaultFilter()}
                     onFetchData={() => this.loadAccessPoints()}
                     minRows={10}
                     defaultPageSize={10}
