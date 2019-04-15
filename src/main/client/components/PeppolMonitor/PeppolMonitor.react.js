@@ -37,12 +37,7 @@ class PeppolMonitor extends Components.ContextComponent {
 
     isAllHide() {
         const {show} = this.state;
-        Object.keys(show).forEach((p) => {
-            if (show[p]) {
-                return false;
-            }
-        });
-        return true;
+        return Object.keys(show).filter((p) => show[p]).length === 0;
     }
 
     showPage(page, event) {
