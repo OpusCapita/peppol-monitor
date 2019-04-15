@@ -47,6 +47,7 @@ class ProcessTable extends Components.ContextComponent {
         super(props);
 
         this.api = new ApiBase();
+        this.reactTable = React.createRef();
     }
 
     async loadProcesses(tableState) {
@@ -234,6 +235,7 @@ class ProcessTable extends Components.ContextComponent {
                     className="process-list-table"
                     loading={loading}
                     data={processes}
+                    ref={this.reactTable}
                     onFetchData={(state) => this.loadProcesses(state)}
 
                     manual
