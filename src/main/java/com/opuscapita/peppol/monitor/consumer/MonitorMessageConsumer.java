@@ -49,7 +49,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         Message message = messageService.getMessage(messageId);
         if (message == null) {
             message = createMessageEntity(cm);
-            message = messageService.saveMessage(message);
         }
 
         Process process = processService.getProcess(transmissionId);
@@ -112,7 +111,11 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
         logger.debug("Participant: " + participantId + " couldn't found, creating a new one.");
         participant = new Participant(participantId);
-        participant = participantRepository.save(participant);
+        try {
+            participant = participantRepository.save(participant);
+        } catch (Exception e) {
+            logger.debug("Couldn't save the participant (" + participant.getId() + "), reason: " + e.getMessage());
+        }
         return participant.getId();
     }
 
@@ -123,12 +126,18 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
         AccessPoint accessPoint = accessPointRepository.findById(accessPointInfo.getId()).orElse(null);
         if (accessPoint != null) {
-            return accessPoint.getId();
+            logger.debug("AccessPoint: " + accessPointInfo.getId() + " found, updating fields.");
+            accessPoint.update(accessPointInfo);
+        } else {
+            logger.debug("AccessPoint: " + accessPointInfo.getId() + " couldn't found, creating a new one.");
+            accessPoint = new AccessPoint(accessPointInfo);
         }
 
-        logger.debug("AccessPoint: " + accessPointInfo.getId() + " couldn't found, creating a new one.");
-        accessPoint = new AccessPoint(accessPointInfo);
-        accessPoint = accessPointRepository.save(accessPoint);
+        try {
+            accessPoint = accessPointRepository.save(accessPoint);
+        } catch (Exception e) {
+            logger.debug("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
+        }
         return accessPoint.getId();
     }
 

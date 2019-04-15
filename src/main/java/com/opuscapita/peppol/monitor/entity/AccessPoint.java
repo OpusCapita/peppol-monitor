@@ -1,6 +1,7 @@
 package com.opuscapita.peppol.monitor.entity;
 
 import com.opuscapita.peppol.commons.container.metadata.AccessPointInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Column;
@@ -37,6 +38,15 @@ public class AccessPoint {
         this.id = accessPointInfo.getId();
         this.name = accessPointInfo.getName();
         this.subject = accessPointInfo.getSubject();
+    }
+
+    public void update(AccessPointInfo accessPointInfo) {
+        if (StringUtils.isNotBlank(accessPointInfo.getName())) {
+            this.name = accessPointInfo.getName();
+        }
+        if (StringUtils.isNotBlank(accessPointInfo.getSubject())) {
+            this.subject = accessPointInfo.getSubject();
+        }
     }
 
     public String getId() {
