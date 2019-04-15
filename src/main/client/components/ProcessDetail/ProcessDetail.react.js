@@ -265,8 +265,7 @@ class ProcessDetail extends Components.ContextComponent {
                                                     <span>
                                                         <span className={`label label-${this.getHistoryTypeLabelClass(value.level)}`}>
                                                             {(value.level === 'ERROR') ? value.errorType : value.level}
-                                                        </span> from
-                                                        <span className="label label-default">{value.source}</span>
+                                                        </span> from <span className="label label-default">{value.source}</span>
                                                     </span>
                                             },
                                             {

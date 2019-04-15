@@ -41,7 +41,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     @Override
     public void consume(@NotNull ContainerMessage cm) {
-        logger.info("Monitor received the message: " + cm.toKibana());
+        logger.info("Monitor received the message: " + toKibana(cm));
 
         String messageId = cm.getMetadata().getMessageId();
         String transmissionId = cm.getMetadata().getTransmissionId();
@@ -161,6 +161,18 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             return MessageStatus.delivered;
         }
         return MessageStatus.unknown;
+    }
+
+    private String toKibana(ContainerMessage cm) {
+        ContainerMessageMetadata metadata = cm.getMetadata();
+        String result = "[file: {filename}, step: {step}, source: {source}, status: {status}, messageId: {messageId}, transmissionId: {transmissionId}]";
+        result = result.replace("{filename}", "{" + cm.getFileName() + "}");
+        result = result.replace("{step}", "{" + cm.getStep().name() + "}");
+        result = result.replace("{source}", "{" + cm.getSource().name() + "}");
+        result = result.replace("{status}", "{" + cm.getHistory().getLastLog() + "}");
+        result = result.replace("{messageId}", "{" + (metadata == null ? "-" : metadata.getMessageId()) + "}");
+        result = result.replace("{transmissionId}", "{" + (metadata == null ? "-" : metadata.getTransmissionId()) + "}");
+        return result;
     }
 
 }
