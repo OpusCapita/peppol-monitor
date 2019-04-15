@@ -277,10 +277,10 @@ class ProcessDetail extends Components.ContextComponent {
                                         ]}
                                         sorted={[{
                                             id: 'time',
-                                            desc: false
+                                            desc: true
                                         }]}
                                         minRows={5}
-                                        showPagination={false}
+                                        defaultPageSize={100}
                                     />
                                 </div>
                             </div>
