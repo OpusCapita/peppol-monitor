@@ -71,6 +71,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     private Process updateProcessEntity(ContainerMessage cm, Process process) {
         ContainerMessageMetadata metadata = cm.getMetadata();
 
+        if (checkForRaceConditionIssue(cm, process)) {
+            return process;
+        }
+
         process.setFilename(cm.getFileName());
         process.setStatus(extractStatusInfo(cm));
         process.setSource(cm.getSource());
@@ -147,6 +151,24 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             logger.debug("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
         }
         return accessPoint.getId();
+    }
+
+    // a process cannot go backwards, sometimes outbound events come faster than validator events
+    private boolean checkForRaceConditionIssue(ContainerMessage cm, Process process) {
+        if (process.getStatus() == null) {
+            return false;
+        }
+        if ((MessageStatus.delivered.equals(process.getStatus()) || MessageStatus.sending.equals(process.getStatus()))
+                && ProcessStep.VALIDATOR.equals(cm.getStep())) {
+            return true;
+        }
+        if (MessageStatus.validating.equals(process.getStatus()) && ProcessStep.PROCESSOR.equals(cm.getStep())) {
+            return true;
+        }
+        if (MessageStatus.processing.equals(process.getStatus()) && ProcessStep.INBOUND.equals(cm.getStep())) {
+            return true;
+        }
+        return false;
     }
 
     private MessageStatus extractStatusInfo(ContainerMessage cm) {
