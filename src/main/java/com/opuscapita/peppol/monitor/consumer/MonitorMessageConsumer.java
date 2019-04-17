@@ -12,6 +12,7 @@ import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
 import com.opuscapita.peppol.monitor.repository.ProcessService;
 import com.opuscapita.peppol.monitor.util.ProcessHistorySerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,11 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     @Override
     public void consume(@NotNull ContainerMessage cm) {
         logger.info("Monitor received the message: " + toKibana(cm));
+
+        if (cm.getMetadata() == null) {
+            logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
+            return;
+        }
 
         String messageId = cm.getMetadata().getMessageId();
         String transmissionId = cm.getMetadata().getTransmissionId();
@@ -95,15 +101,17 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     }
 
     private Message createMessageEntity(ContainerMessage cm) {
-        ContainerMessageMetadata metadata = cm.getMetadata();
-
         Message message = new Message();
-        message.setMessageId(metadata.getMessageId());
+        message.setMessageId(cm.getMetadata().getMessageId());
         message = messageService.saveMessage(message);
         return message;
     }
 
     private String getParticipant(String participantId) {
+        if (StringUtils.isBlank(participantId)) {
+            return null;
+        }
+
         Participant participant = participantRepository.findById(participantId).orElse(null);
         if (participant != null) {
             return participant.getId();
