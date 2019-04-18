@@ -1,10 +1,10 @@
 import React from 'react';
 import {Containers} from '@opuscapita/service-base-ui';
-import ProcessTable from 'components/ProcessTable';
-import ProcessDetail from 'components/ProcessDetail';
-import AccessPoints from 'components/AccessPoints';
-import ParticipantTable from 'components/ParticipantTable';
-import DocumentTypes from 'components/DocumentTypes';
+import ProcessTable from './components/ProcessTable';
+import ProcessDetail from './components/ProcessDetail';
+import AccessPoints from './components/AccessPoints';
+import ParticipantTable from './components/ParticipantTable';
+import DocumentTypes from './components/DocumentTypes';
 
 import {Route} from 'react-router';
 
