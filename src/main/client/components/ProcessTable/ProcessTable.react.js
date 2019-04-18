@@ -4,7 +4,7 @@ import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import ReactTooltip from 'react-tooltip';
 import {ApiBase} from '../../api';
-import {Link} from "react-router-dom";
+import {Link} from 'react-router-dom';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './ProcessTable.css';
@@ -253,14 +253,13 @@ class ProcessTable extends Components.ContextComponent {
                             accessor: row => row,
                             Cell: ({value}) =>
                                 <span>
-                                    <Link to={`/peppol-monitor/messageDetail/${value.id}`}
-                                          data-tip data-for={`id-tooltip-${value.transmissionId}`}>
+                                    <Link to={`/peppol-monitor/messageDetail/${value.id}`}>
                                         {value.transmissionId}
                                     </Link>
-                                    <ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>
-                                        <p>Message ID: {value.messageId}</p>
-                                        <p>Transmission ID: {value.transmissionId}</p>
-                                    </ReactTooltip>
+                                    {/*<ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>*/}
+                                        {/*<p>Message ID: {value.messageId}</p>*/}
+                                        {/*<p>Transmission ID: {value.transmissionId}</p>*/}
+                                    {/*</ReactTooltip>*/}
                                 </span>
                         },
                         {
