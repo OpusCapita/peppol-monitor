@@ -4,7 +4,6 @@ import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import ReactTooltip from 'react-tooltip';
 import {ApiBase} from '../../api';
-import {Link} from 'react-router-dom';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
 import './ProcessTable.css';
@@ -70,6 +69,11 @@ class ProcessTable extends Components.ContextComponent {
         finally {
             this.setState({loading: false});
         }
+    }
+
+    showProcessDetail(e, id) {
+        e && e.preventDefault();
+        this.context.router.push(`/peppol-monitor/messageDetail/${id}`);
     }
 
     showParticipantLookup(participant) {
@@ -253,13 +257,15 @@ class ProcessTable extends Components.ContextComponent {
                             accessor: row => row,
                             Cell: ({value}) =>
                                 <span>
-                                    <Link to={`/peppol-monitor/messageDetail/${value.id}`}>
+                                    <a href={`/peppol-monitor/messageDetail/${value.id}`} className="btn btn-link"
+                                       data-tip data-for={`id-tooltip-${value.transmissionId}`}
+                                       onClick={(e) => this.showProcessDetail(e, value.id)}>
                                         {value.transmissionId}
-                                    </Link>
-                                    {/*<ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>*/}
-                                        {/*<p>Message ID: {value.messageId}</p>*/}
-                                        {/*<p>Transmission ID: {value.transmissionId}</p>*/}
-                                    {/*</ReactTooltip>*/}
+                                    </a>
+                                    <ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>
+                                        <p>Message ID: {value.messageId}</p>
+                                        <p>Transmission ID: {value.transmissionId}</p>
+                                    </ReactTooltip>
                                 </span>
                         },
                         {
