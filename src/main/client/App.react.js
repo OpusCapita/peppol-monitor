@@ -47,16 +47,13 @@ const accessPointList = (props) => (
 
 const messageList = (props) => (
     <div>
-        <ProcessTable goProcessDetail={(processId) => props.router.push(`/peppol-monitor/messageDetail/${processId}`)}/>
+        <ProcessTable/>
         {menuButton(props.router)}
     </div>
 );
 
 const home = (props) => (
-    <div>
-        <PeppolMonitor/>
-        {menuButton(props.router)}
-    </div>
+    <PeppolMonitor/>
 );
 
 const App = () => (
