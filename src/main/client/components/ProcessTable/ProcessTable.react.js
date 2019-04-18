@@ -256,7 +256,7 @@ class ProcessTable extends Components.ContextComponent {
                             accessor: row => row,
                             Cell: ({value}) =>
                                 <span>
-                                    <a className="btn btn-link" data-tip data-for={`id-tooltip-${value.transmissionId}`}
+                                    <a href="#" className="btn btn-link" data-tip data-for={`id-tooltip-${value.transmissionId}`}
                                        onClick={this.showProcessDetail.bind(this, value.id)}>
                                         {value.transmissionId}
                                     </a>

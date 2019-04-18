@@ -1,5 +1,6 @@
 import React from 'react';
 import {Containers} from '@opuscapita/service-base-ui';
+import PeppolMonitor from './components/PeppolMonitor';
 import ProcessTable from './components/ProcessTable';
 import ProcessDetail from './components/ProcessDetail';
 import AccessPoints from './components/AccessPoints';
@@ -8,57 +9,64 @@ import DocumentTypes from './components/DocumentTypes';
 
 import {Route} from 'react-router';
 
-const menu = (router) => (
-    <ul className="nav nav-tabs">
-        <li><a href="#" onClick={() => router.push('/peppol-monitor/')}>Messages</a></li>
-        <li><a href="#" onClick={() => router.push('/peppol-monitor/accessPoints')}>Access Points</a></li>
-        <li><a href="#" onClick={() => router.push('/peppol-monitor/participants')}>Participants</a></li>
-        <li><a href="#" onClick={() => router.push('/peppol-monitor/documentTypes')}>Document Types</a></li>
-    </ul>
+const menuButton = (router) => (
+    <div className="footer-wrapper">
+        <a className='btn btn-default' href="#" onClick={() => router.push('/peppol-monitor/')}>
+            <span className="icon glyphicon glyphicon-chevron-left"/> Go to Menu
+        </a>
+    </div>
 );
 
 const messageDetail = (props) => (
     <div>
-        {menu(props.router)}
         <ProcessDetail processId={props.params.transmissionId}/>
+        {menuButton(props.router)}
     </div>
 );
 
 const documentTypeList = (props) => (
     <div>
-        {menu(props.router)}
         <DocumentTypes/>
+        {menuButton(props.router)}
     </div>
 );
 
 const participantList = (props) => (
     <div>
-        {menu(props.router)}
         <ParticipantTable/>
+        {menuButton(props.router)}
     </div>
 );
 
 const accessPointList = (props) => (
     <div>
-        {menu(props.router)}
         <AccessPoints/>
+        {menuButton(props.router)}
     </div>
 );
 
 const messageList = (props) => (
     <div>
-        {menu(props.router)}
-        <ProcessTable goProcessDetail={processId => props.router.push(`/detail/${processId}`)}/>
+        <ProcessTable goProcessDetail={(processId) => props.router.push(`/peppol-monitor/messageDetail/${processId}`)}/>
+        {menuButton(props.router)}
+    </div>
+);
+
+const home = (props) => (
+    <div>
+        <PeppolMonitor/>
+        {menuButton(props.router)}
     </div>
 );
 
 const App = () => (
     <Containers.ServiceLayout serviceName="peppol-monitor">
-        <Route path="/" component={messageList}/>
+        <Route path="/" component={home}/>
+        <Route path="/messages" component={messageList}/>
         <Route path="/accessPoints" component={accessPointList}/>
         <Route path="/participants" component={participantList}/>
         <Route path="/documentTypes" component={documentTypeList}/>
-        <Route path="/detail/:transmissionId" components={messageDetail}/>
+        <Route path="/messageDetail/:transmissionId" components={messageDetail}/>
     </Containers.ServiceLayout>
 );
 
