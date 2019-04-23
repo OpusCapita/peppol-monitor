@@ -3,15 +3,15 @@ package com.opuscapita.peppol.monitor.controller;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
-import com.opuscapita.peppol.monitor.controller.dtos.ProcessDto;
-import com.opuscapita.peppol.monitor.controller.dtos.ProcessRequestDto;
-import com.opuscapita.peppol.monitor.controller.dtos.ProcessResponseDto;
+import com.opuscapita.peppol.monitor.controller.dtos.TransmissionDto;
+import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
+import com.opuscapita.peppol.monitor.controller.dtos.TransmissionResponseDto;
 import com.opuscapita.peppol.monitor.entity.AccessPoint;
 import com.opuscapita.peppol.monitor.entity.Participant;
-import com.opuscapita.peppol.monitor.entity.Process;
+import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
-import com.opuscapita.peppol.monitor.repository.ProcessService;
+import com.opuscapita.peppol.monitor.repository.TransmissionService;
 import com.opuscapita.peppol.monitor.reprocess.ReprocessManager;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -37,79 +37,79 @@ public class MonitorRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorRestController.class);
 
-    private final ProcessService processService;
     private final ReprocessManager reprocessManager;
+    private final TransmissionService transmissionService;
     private final ParticipantRepository participantRepository;
     private final AccessPointRepository accessPointRepository;
 
     @Autowired
-    public MonitorRestController(ProcessService processService, ReprocessManager reprocessManager,
+    public MonitorRestController(TransmissionService transmissionService, ReprocessManager reprocessManager,
                                  ParticipantRepository participantRepository, AccessPointRepository accessPointRepository) {
-        this.processService = processService;
         this.reprocessManager = reprocessManager;
+        this.transmissionService = transmissionService;
         this.participantRepository = participantRepository;
         this.accessPointRepository = accessPointRepository;
     }
 
-    @PostMapping("/get-processes")
-    public ProcessResponseDto getProcesses(@RequestBody ProcessRequestDto request) {
-        Page<Process> processes = processService.getProcesses(request);
-        return new ProcessResponseDto(processes.getContent(), processes.getTotalPages());
+    @PostMapping("/get-transmissions")
+    public TransmissionResponseDto getTransmissions(@RequestBody TransmissionRequestDto request) {
+        Page<Transmission> transmissions = transmissionService.getAllTransmissions(request);
+        return new TransmissionResponseDto(transmissions.getContent(), transmissions.getTotalPages());
     }
 
-    @GetMapping("/get-process-by-id/{processId}")
-    public ResponseEntity<?> getProcessById(@PathVariable Long processId) {
-        Process process = processService.getProcess(processId);
-        return wrap(ProcessDto.of(process));
+    @GetMapping("/get-transmission-by-id/{id}")
+    public ResponseEntity<?> getTransmissionById(@PathVariable Long id) {
+        Transmission transmission = transmissionService.getTransmission(id);
+        return wrap(TransmissionDto.of(transmission));
     }
 
-    @GetMapping("/get-process-by-transmissionId/{transmissionId}")
-    public ResponseEntity<?> getProcessByTransmissionId(@PathVariable String transmissionId) {
-        Process process = processService.getProcess(transmissionId);
-        return wrap(ProcessDto.of(process));
+    @GetMapping("/get-transmission-by-transmissionId/{transmissionId}")
+    public ResponseEntity<?> getTransmissionByTransmissionId(@PathVariable String transmissionId) {
+        Transmission transmission = transmissionService.getTransmission(transmissionId);
+        return wrap(TransmissionDto.of(transmission));
     }
 
-    @PostMapping("/upload-file/{processId}")
-    public ResponseEntity<?> uploadFileOfProcess(@PathVariable Long processId, @RequestParam("file") MultipartFile multipartFile) throws IOException {
-        Process process = processService.getProcess(processId);
+    @PostMapping("/upload-file/{transmissionId}")
+    public ResponseEntity<?> uploadFileOfTransmission(@PathVariable Long transmissionId, @RequestParam("file") MultipartFile multipartFile) throws IOException {
+        Transmission transmission = transmissionService.getTransmission(transmissionId);
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            processService.updateFileContent(inputStream, process);
+            transmissionService.updateFileContent(inputStream, transmission);
         }
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/download-file/{processId}")
-    public ResponseEntity<byte[]> downloadFileOfProcess(@PathVariable Long processId) throws IOException {
-        Process process = processService.getProcess(processId);
-        InputStream inputStream = processService.getFileContent(process);
+    @GetMapping("/download-file/{transmissionId}")
+    public ResponseEntity<byte[]> downloadFileOfTransmission(@PathVariable Long transmissionId) throws IOException {
+        Transmission transmission = transmissionService.getTransmission(transmissionId);
+        InputStream inputStream = transmissionService.getFileContent(transmission);
         byte[] rawData = IOUtils.toByteArray(inputStream);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.TEXT_XML);
         header.setContentLength(rawData.length);
-        header.set("Content-Disposition", "attachment; filename=" + FilenameUtils.getName(process.getFilename()));
+        header.set("Content-Disposition", "attachment; filename=" + FilenameUtils.getName(transmission.getFilename()));
         return new ResponseEntity<>(rawData, header, HttpStatus.OK);
     }
 
-    @GetMapping("/reprocess-message/{processId}")
-    public ResponseEntity<?> reprocessMessage(@PathVariable Long processId) throws IOException {
-        Process process = processService.getProcess(processId);
-        if (process == null) {
+    @GetMapping("/reprocess-message/{transmissionId}")
+    public ResponseEntity<?> reprocessMessage(@PathVariable Long transmissionId) throws IOException {
+        Transmission transmission = transmissionService.getTransmission(transmissionId);
+        if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         DocumentLog log = new DocumentLog("Sending REPROCESS request for the message", DocumentLogLevel.INFO);
         log.setSource(ProcessStep.REPROCESSOR);
-        processService.addMessageToHistoryOfProcess(process, log);
+        transmissionService.addMessageToHistoryOfTransmission(transmission, log);
 
-        reprocessManager.reprocessMessage(process);
+        reprocessManager.reprocessMessage(transmission);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/get-history/{messageId}")
     public List<DocumentLog> getMessageHistory(@PathVariable String messageId) {
-        List<Process> processes = processService.getAllProcesses(messageId);
-        return processes.stream().flatMap(process -> process.getLogs().stream()).collect(Collectors.toList());
+        List<Transmission> transmissionList = transmissionService.getAllTransmissions(messageId);
+        return transmissionList.stream().flatMap(t -> t.getLogs().stream()).collect(Collectors.toList());
     }
 
     @GetMapping("/get-access-points")

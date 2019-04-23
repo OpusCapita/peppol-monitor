@@ -2,24 +2,24 @@ package com.opuscapita.peppol.monitor.controller.dtos;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class ProcessRequestDto {
+public class TransmissionRequestDto {
 
-    private ProcessFilterDto filter;
-    private ProcessPaginationDto pagination;
+    private TransmissionFilterDto filter;
+    private TransmissionPaginationDto pagination;
 
-    public ProcessFilterDto getFilter() {
+    public TransmissionFilterDto getFilter() {
         return filter;
     }
 
-    public void setFilter(ProcessFilterDto filter) {
+    public void setFilter(TransmissionFilterDto filter) {
         this.filter = filter;
     }
 
-    public ProcessPaginationDto getPagination() {
+    public TransmissionPaginationDto getPagination() {
         return pagination;
     }
 
-    public void setPagination(ProcessPaginationDto pagination) {
+    public void setPagination(TransmissionPaginationDto pagination) {
         this.pagination = pagination;
     }
 

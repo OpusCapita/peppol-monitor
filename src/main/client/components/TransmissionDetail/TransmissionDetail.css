@@ -1,0 +1,19 @@
+.transmission-detail .form-group {
+	margin-bottom: 0;
+}
+
+.transmission-detail-actions {
+	margin-top: 10px;
+}
+
+.transmission-detail-actions .btn {
+	margin-left: 5px;
+}
+
+.transmission-detail-actions [hidden] {
+	display: none !important;
+}
+
+.transmission-detail-actions .btn-passive {
+	opacity: 0.5;
+}

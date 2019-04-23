@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
-public class ProcessFilterDto {
+public class TransmissionFilterDto {
 
     private String id;
     private String filename;

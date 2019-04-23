@@ -4,13 +4,13 @@ import {Components} from '@opuscapita/service-base-ui';
 import ReactTable from 'react-table';
 import {ApiBase} from '../../api';
 import 'react-table/react-table.css';
-import './ProcessDetail.css';
+import './TransmissionDetail.css';
 
-class ProcessDetail extends Components.ContextComponent {
+class TransmissionDetail extends Components.ContextComponent {
 
     state = {
         loading: false,
-        process: {},
+        transmission: {},
         history: [],
         showHistory: false,
         showInfos: true,
@@ -19,7 +19,7 @@ class ProcessDetail extends Components.ContextComponent {
     };
 
     static propTypes = {
-        processId: PropTypes.string.isRequired,
+        transmissionId: PropTypes.string.isRequired,
     };
 
     constructor(props, context) {
@@ -30,8 +30,8 @@ class ProcessDetail extends Components.ContextComponent {
     componentDidMount() {
         this.setState({loading: true});
 
-        this.api.getProcessById(this.props.processId).then(process => {
-            this.setState({loading: false, process: process});
+        this.api.getTransmissionById(this.props.transmissionId).then(transmission => {
+            this.setState({loading: false, transmission: transmission});
 
         }).catch(e => {
             this.context.showNotification(e.message, 'error', 10);
@@ -50,7 +50,7 @@ class ProcessDetail extends Components.ContextComponent {
         let data = new FormData();
         data.append('file', file);
 
-        this.api.uploadFile(this.props.processId, data).then(() => {
+        this.api.uploadFile(this.props.transmissionId, data).then(() => {
             this.setState({loading: false});
             this.context.showNotification('Successfully updated the file', 'success', 10);
         }).catch(e => {
@@ -61,7 +61,7 @@ class ProcessDetail extends Components.ContextComponent {
 
     downloadFile(event) {
         this.setState({loading: true});
-        this.api.downloadFile(this.props.processId).then((response) => {
+        this.api.downloadFile(this.props.transmissionId).then((response) => {
             this.setState({loading: false});
 
             const filename = response.headers['content-disposition'].split('filename=')[1];
@@ -79,7 +79,7 @@ class ProcessDetail extends Components.ContextComponent {
     reprocessMessage(event) {
         event.preventDefault();
 
-        this.api.reprocessMessage(this.props.processId).then(() => {
+        this.api.reprocessMessage(this.props.transmissionId).then(() => {
             this.setState({loading: false});
             this.context.showNotification('The file is sent for reprocessing', 'info', 10);
         }).catch(e => {
@@ -91,7 +91,7 @@ class ProcessDetail extends Components.ContextComponent {
     loadHistory(e) {
         this.setState({loading: true});
 
-        this.api.getMessageHistory(this.state.process.messageId).then(history => {
+        this.api.getMessageHistory(this.state.transmission.messageId).then(history => {
             this.setState({loading: false, history: history, showHistory: true});
 
         }).catch(e => {
@@ -135,11 +135,11 @@ class ProcessDetail extends Components.ContextComponent {
     }
 
     render() {
-        const {loading, process, showHistory, showInfos, showErrors, showWarnings} = this.state;
+        const {loading, transmission, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
         return (
             <div>
-                <div className="form-horizontal process-detail">
+                <div className="form-horizontal transmission-detail">
                     <div className="row">
                         <div className="col-md-12">
                             <div className="form-group">
@@ -147,7 +147,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Message ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.messageId}</label>
+                                    <label className="control-label">{transmission.messageId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -155,7 +155,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Transmission ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.transmissionId}</label>
+                                    <label className="control-label">{transmission.transmissionId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -163,7 +163,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">File Name</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.filename}</label>
+                                    <label className="control-label">{transmission.filename}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -171,15 +171,15 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Message Status</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.messageStatus}</label>
+                                    <label className="control-label">{transmission.messageStatus}</label>
                                 </div>
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Process Status</label>
+                                    <label className="control-label btn-link">Transmission Status</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.status}</label>
+                                    <label className="control-label">{transmission.status}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -187,7 +187,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Source / Direction</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.source} / {process.direction}</label>
+                                    <label className="control-label">{transmission.source} / {transmission.direction}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -195,7 +195,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Sender / Receiver</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.sender} / {process.receiver}</label>
+                                    <label className="control-label">{transmission.sender} / {transmission.receiver}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -203,7 +203,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Arrived At</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.arrivedAt}</label>
+                                    <label className="control-label">{transmission.arrivedAt}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -211,7 +211,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Profile ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.profileId}</label>
+                                    <label className="control-label">{transmission.profileId}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -219,7 +219,7 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Document Type</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.documentType}</label>
+                                    <label className="control-label">{transmission.documentType}</label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -227,13 +227,13 @@ class ProcessDetail extends Components.ContextComponent {
                                     <label className="control-label btn-link">Document Type ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{process.documentTypeId}</label>
+                                    <label className="control-label">{transmission.documentTypeId}</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="form-submit text-right process-detail-actions">
+                <div className="form-submit text-right transmission-detail-actions">
                     <label className="btn btn-default">
                         Upload<input type="file" hidden onChange={e => this.uploadFile(e)}/>
                     </label>
@@ -248,7 +248,7 @@ class ProcessDetail extends Components.ContextComponent {
                     showHistory &&
                     <div>
                         <h3>Message History</h3>
-                        <div className="form-horizontal process-detail">
+                        <div className="form-horizontal transmission-detail">
                             <div className="row">
                                 <div className="col-md-12">
                                     <ReactTable
@@ -284,7 +284,7 @@ class ProcessDetail extends Components.ContextComponent {
                                 </div>
                             </div>
                         </div>
-                        <div className="form-submit text-right process-detail-actions">
+                        <div className="form-submit text-right transmission-detail-actions">
                             { showInfos
                                 ? <button className="btn btn-info" onClick={() => this.setState({showInfos: false})}>Hide Infos</button>
                                 : <button className="btn btn-info btn-passive" onClick={() => this.setState({showInfos: true})}>Show Infos</button>
@@ -305,4 +305,4 @@ class ProcessDetail extends Components.ContextComponent {
     }
 }
 
-export default ProcessDetail;
+export default TransmissionDetail;

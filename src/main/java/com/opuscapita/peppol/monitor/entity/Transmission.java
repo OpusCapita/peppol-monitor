@@ -13,8 +13,8 @@ import java.util.List;
 
 @Entity
 @DynamicUpdate
-@Table(name = "processes", indexes = {@Index(name = "ix_transmission_id", columnList = "transmission_id")})
-public class Process {
+@Table(name = "transmissions", indexes = {@Index(name = "ix_transmission_id", columnList = "transmission_id")})
+public class Transmission {
 
     @Id
     @Column(name = "id")

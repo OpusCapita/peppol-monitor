@@ -6,9 +6,9 @@ import ReactTooltip from 'react-tooltip';
 import {ApiBase} from '../../api';
 import Select from '@opuscapita/react-select';
 import 'react-table/react-table.css';
-import './ProcessTable.css';
+import './TransmissionTable.css';
 
-class ProcessTable extends Components.ContextComponent {
+class TransmissionTable extends Components.ContextComponent {
 
     static sources = [
         'NETWORK',
@@ -28,7 +28,7 @@ class ProcessTable extends Components.ContextComponent {
 
     state = {
         loading: false,
-        processes: [],
+        transmissionList: [],
         searchValues: {},
         showSearch: true,
         pageCount: -1,
@@ -36,11 +36,11 @@ class ProcessTable extends Components.ContextComponent {
     };
 
     static propTypes = {
-        goProcessDetail: PropTypes.func
+        goTransmissionDetail: PropTypes.func
     };
 
     static defaultProps = {
-        goProcessDetail: () => null
+        goTransmissionDetail: () => null
     };
 
     constructor(props, context) {
@@ -49,7 +49,7 @@ class ProcessTable extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
-    async loadProcesses(tableState) {
+    async loadTransmissionList(tableState) {
         this.setState({loading: true});
         const {pagination, searchValues} = this.state;
 
@@ -60,8 +60,8 @@ class ProcessTable extends Components.ContextComponent {
                 pagination.sorted = tableState.sorted;
             }
 
-            const response = await this.api.getProcesses(pagination, searchValues);
-            this.setState({processes: response.data, pageCount: response.pages});
+            const response = await this.api.getTransmissionList(pagination, searchValues);
+            this.setState({transmissionList: response.data, pageCount: response.pages});
         }
         catch (e) {
             this.context.showNotification(e.message, 'error', 10);
@@ -71,7 +71,7 @@ class ProcessTable extends Components.ContextComponent {
         }
     }
 
-    showProcessDetail(e, id) {
+    showTransmissionDetail(e, id) {
         e && e.preventDefault();
         this.context.router.push(`/peppol-monitor/messageDetail/${id}`);
     }
@@ -82,13 +82,13 @@ class ProcessTable extends Components.ContextComponent {
     }
 
     mapSourcesSelect() {
-        return ProcessTable.sources.map(value => {
+        return TransmissionTable.sources.map(value => {
             return {value: value, label: value};
         });
     }
 
     mapStatusesSelect() {
-        return ProcessTable.statuses.map(value => {
+        return TransmissionTable.statuses.map(value => {
             return {value: value, label: value};
         });
     }
@@ -127,19 +127,19 @@ class ProcessTable extends Components.ContextComponent {
             statuses: []
         };
 
-        this.setState({searchValues}, () => this.loadProcesses());
+        this.setState({searchValues}, () => this.loadTransmissionList());
     }
 
     render() {
         const {i18n} = this.context;
-        const {loading, processes, pageCount, searchValues, showSearch} = this.state;
+        const {loading, transmissionList, pageCount, searchValues, showSearch} = this.state;
 
         return (
             <div>
                 {
                     showSearch &&
                     <div>
-                        <div className="form-horizontal process-search">
+                        <div className="form-horizontal transmission-search">
                             <div className="row">
                                 <div className="col-md-6">
                                     <div className="form-group">
@@ -225,17 +225,17 @@ class ProcessTable extends Components.ContextComponent {
                         </div>
                         <div className="form-submit text-right">
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadProcesses()}>Filter</button>
+                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
                         </div>
                         <hr/>
                     </div>
                 }
 
                 <ReactTable
-                    className="process-list-table"
+                    className="transmission-list-table"
                     loading={loading}
-                    data={processes}
-                    onFetchData={(state) => this.loadProcesses(state)}
+                    data={transmissionList}
+                    onFetchData={(state) => this.loadTransmissionList(state)}
 
                     manual
                     minRows={10}
@@ -259,7 +259,7 @@ class ProcessTable extends Components.ContextComponent {
                                 <span>
                                     <a href={`/peppol-monitor/messageDetail/${value.id}`} className="btn btn-link"
                                        data-tip data-for={`id-tooltip-${value.transmissionId}`}
-                                       onClick={(e) => this.showProcessDetail(e, value.id)}>
+                                       onClick={(e) => this.showTransmissionDetail(e, value.id)}>
                                         {value.transmissionId}
                                     </a>
                                     <ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>
@@ -329,4 +329,4 @@ class ProcessTable extends Components.ContextComponent {
     }
 }
 
-export default ProcessTable;
+export default TransmissionTable;

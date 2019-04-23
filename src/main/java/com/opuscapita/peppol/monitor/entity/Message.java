@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * A message is a virtual representation of a physical document
- * It has process list, defined for each process of the document
+ * It has transmission list, defined for each transmission of the document to the AP flow
  */
 @Entity
 @DynamicUpdate
@@ -25,11 +25,11 @@ public class Message {
     private String messageId;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ElementCollection(targetClass = Process.class)
-    private List<Process> processes;
+    @ElementCollection(targetClass = Transmission.class)
+    private List<Transmission> transmissionList;
 
     public Message() {
-        this.processes = new ArrayList<>();
+        this.transmissionList = new ArrayList<>();
     }
 
     public Long getId() {
@@ -48,15 +48,15 @@ public class Message {
         this.messageId = messageId;
     }
 
-    public List<Process> getProcesses() {
-        return processes;
+    public List<Transmission> getTransmissionList() {
+        return transmissionList;
     }
 
-    public void setProcesses(List<Process> processes) {
-        this.processes = processes;
+    public void setTransmissionList(List<Transmission> transmissionList) {
+        this.transmissionList = transmissionList;
     }
 
-    public Process getLastProcess() {
-        return this.processes.stream().max(Comparator.comparingLong(Process::getId)).orElse(null);
+    public Transmission getLastTransmission() {
+        return this.transmissionList.stream().max(Comparator.comparingLong(Transmission::getId)).orElse(null);
     }
 }

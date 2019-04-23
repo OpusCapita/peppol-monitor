@@ -1,8 +1,8 @@
 package com.opuscapita.peppol.monitor.repository;
 
-import com.opuscapita.peppol.monitor.controller.dtos.ProcessFilterDto;
-import com.opuscapita.peppol.monitor.controller.dtos.ProcessPaginationDto;
-import com.opuscapita.peppol.monitor.entity.Process;
+import com.opuscapita.peppol.monitor.controller.dtos.TransmissionFilterDto;
+import com.opuscapita.peppol.monitor.controller.dtos.TransmissionPaginationDto;
+import com.opuscapita.peppol.monitor.entity.Transmission;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -11,10 +11,10 @@ import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProcessFilterSpecification {
+public class TransmissionFilterSpecification {
 
-    public static Specification<Process> filter(ProcessFilterDto filterDto, List<ProcessPaginationDto.SortingDto> sortingDtos) {
-        return (Specification<Process>) (root, query, criteriaBuilder) -> {
+    public static Specification<Transmission> filter(TransmissionFilterDto filterDto, List<TransmissionPaginationDto.SortingDto> sortingDtos) {
+        return (Specification<Transmission>) (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.isNotBlank(filterDto.getId())) {
@@ -63,7 +63,7 @@ public class ProcessFilterSpecification {
 
             if (sortingDtos != null && !sortingDtos.isEmpty()) {
                 List<Order> orderList = new ArrayList<>();
-                for (ProcessPaginationDto.SortingDto sortingDto : sortingDtos) {
+                for (TransmissionPaginationDto.SortingDto sortingDto : sortingDtos) {
                     orderList.add(sortingDto.getDesc()
                             ? criteriaBuilder.desc(root.get(sortingDto.getId()))
                             : criteriaBuilder.asc(root.get(sortingDto.getId()))

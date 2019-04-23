@@ -6,9 +6,9 @@ import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.Message;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
-import com.opuscapita.peppol.monitor.entity.Process;
+import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.repository.MessageService;
-import com.opuscapita.peppol.monitor.repository.ProcessService;
+import com.opuscapita.peppol.monitor.repository.TransmissionService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +30,7 @@ public class MonitorMessageConsumerTest {
     private MessageService messageService;
 
     @Autowired
-    private ProcessService processService;
+    private TransmissionService processService;
 
     @Autowired
     private MonitorMessageConsumer consumer;
@@ -52,7 +52,7 @@ public class MonitorMessageConsumerTest {
         Message notExists1 = messageService.getMessage(messageId);
         assertNull(notExists1);
 
-        Process notExists2 = processService.getProcess(transmissionId);
+        Transmission notExists2 = processService.getTransmission(transmissionId);
         assertNull(notExists2);
 
         consumer.consume(cm);
@@ -60,7 +60,7 @@ public class MonitorMessageConsumerTest {
         Message exists1 = messageService.getMessage(messageId);
         assertNotNull(exists1);
 
-        Process exists2 = processService.getProcess(transmissionId);
+        Transmission exists2 = processService.getTransmission(transmissionId);
         assertNotNull(exists2);
         assertEquals(exists2.getFilename(), cm.getFileName());
         assertEquals(exists2.getStatus(), MessageStatus.failed);
@@ -70,8 +70,8 @@ public class MonitorMessageConsumerTest {
 
         Message updated = messageService.getMessage(messageId);
         assertNotNull(updated);
-        assertEquals(updated.getProcesses().size(), 1);
-        assertEquals(updated.getProcesses().get(0).getProfileId(), cm.getMetadata().getProfileTypeIdentifier());
+        assertEquals(updated.getTransmissionList().size(), 1);
+        assertEquals(updated.getTransmissionList().get(0).getProfileId(), cm.getMetadata().getProfileTypeIdentifier());
     }
 
 }

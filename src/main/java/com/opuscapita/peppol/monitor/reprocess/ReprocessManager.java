@@ -4,7 +4,7 @@ import com.opuscapita.peppol.commons.auth.AuthorizationService;
 import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
-import com.opuscapita.peppol.monitor.entity.Process;
+import com.opuscapita.peppol.monitor.entity.Transmission;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,27 +34,27 @@ public class ReprocessManager {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public void reprocessMessage(Process process) throws IOException {
-        logger.debug("Message reprocess requested for process: " + process.getTransmissionId());
-        String endpoint = getEndpoint(process.getFilename(), process.getSource());
-        logger.info("Sending reprocess request to endpoint: " + endpoint + " for file: " + process.getFilename());
+    public void reprocessMessage(Transmission transmission) throws IOException {
+        logger.debug("Message reprocess requested for transmission: " + transmission.getTransmissionId());
+        String endpoint = getEndpoint(transmission.getFilename(), transmission.getSource());
+        logger.info("Sending reprocess request to endpoint: " + endpoint + " for file: " + transmission.getFilename());
 
         HttpHeaders headers = new HttpHeaders();
         authService.setAuthorizationHeader(headers);
         headers.set("Transfer-Encoding", "chunked");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(process), headers);
+        HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(transmission), headers);
 
         try {
             ResponseEntity<String> result = restTemplate.exchange(endpoint, HttpMethod.PUT, entity, String.class);
             logger.debug("Reprocess request successfully sent, got response: " + result.toString());
         } catch (Exception e) {
-            throw new IOException("Error occurred while trying to send the REPROCESS request for file: " + process.getFilename(), e);
+            throw new IOException("Error occurred while trying to send the REPROCESS request for file: " + transmission.getFilename(), e);
         }
     }
 
-    private InputStreamResource getFileContent(Process process) throws StorageException {
-        InputStream content = storage.get(process.getFilename());
+    private InputStreamResource getFileContent(Transmission transmission) throws StorageException {
+        InputStream content = storage.get(transmission.getFilename());
         return new InputStreamResource(content);
     }
 

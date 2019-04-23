@@ -1,8 +1,8 @@
 import React from 'react';
 import {Containers} from '@opuscapita/service-base-ui';
 import PeppolMonitor from './components/PeppolMonitor';
-import ProcessTable from './components/ProcessTable';
-import ProcessDetail from './components/ProcessDetail';
+import TransmissionTable from './components/TransmissionTable';
+import TransmissionDetail from './components/TransmissionDetail';
 import AccessPoints from './components/AccessPoints';
 import ParticipantTable from './components/ParticipantTable';
 import DocumentTypes from './components/DocumentTypes';
@@ -19,7 +19,7 @@ const menuButton = (router) => (
 
 const messageDetail = (props) => (
     <div>
-        <ProcessDetail processId={props.params.transmissionId}/>
+        <TransmissionDetail transmissionId={props.params.transmissionId}/>
         {menuButton(props.router)}
     </div>
 );
@@ -47,7 +47,7 @@ const accessPointList = (props) => (
 
 const messageList = (props) => (
     <div>
-        <ProcessTable/>
+        <TransmissionTable/>
         {menuButton(props.router)}
     </div>
 );

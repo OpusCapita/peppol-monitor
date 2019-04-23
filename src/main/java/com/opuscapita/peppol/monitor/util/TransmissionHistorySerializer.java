@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ProcessHistorySerializer {
+public class TransmissionHistorySerializer {
 
     private final Gson gson = new GsonBuilder().disableHtmlEscaping().setVersion(1.0).create();
 

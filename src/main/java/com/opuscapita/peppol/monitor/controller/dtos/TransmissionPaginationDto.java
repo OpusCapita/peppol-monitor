@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
-public class ProcessPaginationDto {
+public class TransmissionPaginationDto {
 
     private Integer page;
     private Integer pageSize;
