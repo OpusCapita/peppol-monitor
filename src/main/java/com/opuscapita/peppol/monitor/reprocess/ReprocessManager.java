@@ -8,6 +8,7 @@ import com.opuscapita.peppol.monitor.entity.Transmission;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -28,6 +29,7 @@ public class ReprocessManager {
     private final RestTemplate restTemplate;
     private final AuthorizationService authService;
 
+    @Autowired
     public ReprocessManager(Storage storage, AuthorizationService authService, RestTemplateBuilder restTemplateBuilder) {
         this.storage = storage;
         this.authService = authService;
@@ -46,7 +48,7 @@ public class ReprocessManager {
         HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(transmission), headers);
 
         try {
-            ResponseEntity<String> result = restTemplate.exchange(endpoint, HttpMethod.PUT, entity, String.class);
+            ResponseEntity<String> result = restTemplate.exchange(endpoint, HttpMethod.POST, entity, String.class);
             logger.debug("Reprocess request successfully sent, got response: " + result.toString());
         } catch (Exception e) {
             throw new IOException("Error occurred while trying to send the REPROCESS request for file: " + transmission.getFilename(), e);
