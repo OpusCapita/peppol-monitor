@@ -138,6 +138,7 @@ class TransmissionTable extends Components.ContextComponent {
 
         return (
             <div>
+                <h3>Transmission List</h3>
                 {
                     showSearch &&
                     <div>

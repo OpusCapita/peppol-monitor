@@ -50,6 +50,7 @@ class DocumentTypes extends Components.ContextComponent {
 
         return (
             <div>
+                <h3>Supported Document Types</h3>
                 <ReactTable
                     className="document-types-table"
                     loading={loading}

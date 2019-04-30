@@ -139,6 +139,7 @@ class TransmissionDetail extends Components.ContextComponent {
 
         return (
             <div>
+                <h3>Transmission Details</h3>
                 <div className="form-horizontal transmission-detail">
                     <div className="row">
                         <div className="col-md-12">

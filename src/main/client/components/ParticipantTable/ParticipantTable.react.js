@@ -37,6 +37,7 @@ class ParticipantTable extends Components.ContextComponent {
 
         return (
             <div>
+                <h3>Participant List</h3>
                 <ReactTable
                     className="participants-table"
                     loading={loading}

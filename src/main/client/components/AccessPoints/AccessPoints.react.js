@@ -83,6 +83,7 @@ class AccessPoints extends Components.ContextComponent {
 
         return (
             <div>
+                <h3>Access Points</h3>
                 <ReactTable
                     className="access-points-table"
                     loading={loading}
