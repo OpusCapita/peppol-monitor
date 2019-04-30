@@ -58,6 +58,8 @@ class TransmissionTable extends Components.ContextComponent {
                 pagination.page = tableState.page;
                 pagination.pageSize = tableState.pageSize;
                 pagination.sorted = tableState.sorted;
+            } else {
+                pagination.page = 0;
             }
 
             const response = await this.api.getTransmissionList(pagination, searchValues);
