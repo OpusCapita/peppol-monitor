@@ -24,6 +24,13 @@ const messageDetail = (props) => (
     </div>
 );
 
+const systemStatus = (props) => (
+    <div>
+        <h3>Work in Progress</h3>
+        {menuButton(props.router)}
+    </div>
+);
+
 const documentTypeList = (props) => (
     <div>
         <DocumentTypes/>
@@ -45,6 +52,13 @@ const accessPointList = (props) => (
     </div>
 );
 
+const validator = (props) => (
+    <div>
+        <h3>Work in Progress</h3>
+        {menuButton(props.router)}
+    </div>
+);
+
 const messageList = (props) => (
     <div>
         <TransmissionTable/>
@@ -60,9 +74,11 @@ const App = () => (
     <Containers.ServiceLayout serviceName="peppol-monitor">
         <Route path="/" component={home}/>
         <Route path="/messages" component={messageList}/>
+        <Route path="/validator" component={validator}/>
         <Route path="/accessPoints" component={accessPointList}/>
         <Route path="/participants" component={participantList}/>
         <Route path="/documentTypes" component={documentTypeList}/>
+        <Route path="/systemStatus" component={systemStatus}/>
         <Route path="/messageDetail/:transmissionId" components={messageDetail}/>
     </Containers.ServiceLayout>
 );
