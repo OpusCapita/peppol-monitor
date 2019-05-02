@@ -4,6 +4,7 @@ import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.container.metadata.AccessPointInfo;
 import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
+import com.opuscapita.peppol.commons.queue.MessageQueue;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.monitor.entity.*;
 import com.opuscapita.peppol.monitor.entity.Transmission;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,6 +26,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorMessageConsumer.class);
 
+    @Value("${peppol.mlr-reporter.queue.in.name}")
+    private String mlrQueue;
+
+    private MessageQueue messageQueue;
     private MessageService messageService;
     private TransmissionService transmissionService;
     private AccessPointRepository accessPointRepository;
@@ -31,9 +37,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     private TransmissionHistorySerializer historySerializer;
 
     @Autowired
-    public MonitorMessageConsumer(MessageService messageService, TransmissionService transmissionService,
+    public MonitorMessageConsumer(MessageQueue messageQueue, MessageService messageService, TransmissionService transmissionService,
                                   AccessPointRepository accessPointRepository, ParticipantRepository participantRepository,
                                   TransmissionHistorySerializer historySerializer) {
+        this.messageQueue = messageQueue;
         this.messageService = messageService;
         this.historySerializer = historySerializer;
         this.transmissionService = transmissionService;
@@ -42,7 +49,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     }
 
     @Override
-    public void consume(@NotNull ContainerMessage cm) {
+    public void consume(@NotNull ContainerMessage cm) throws Exception {
         logger.info("Monitor received the message: " + toKibana(cm));
 
         if (cm.getMetadata() == null) {
@@ -65,8 +72,12 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             transmission = updateTransmissionEntity(cm, transmission);
         }
         transmissionService.saveTransmission(transmission);
-
         logger.info("Monitor saved the message: " + cm.getFileName());
+
+        if (cm.isOutbound()) {
+            messageQueue.convertAndSend(mlrQueue, cm);
+            logger.debug("Monitor send the message to mlr-reporter: " + cm.getFileName());
+        }
     }
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
