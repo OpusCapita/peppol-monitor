@@ -11,7 +11,7 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     componentDidMount() {
-        const page = new URLSearchParams(this.props.location.search).get("r");
+        const page = this.context.router.location.query.r;
 
         if (page) {
             this.showPage(page)
