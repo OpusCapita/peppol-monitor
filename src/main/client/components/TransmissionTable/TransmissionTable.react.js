@@ -260,7 +260,7 @@ class TransmissionTable extends Components.ContextComponent {
                             accessor: row => row,
                             Cell: ({value}) =>
                                 <span>
-                                    <a href={`/peppol-monitor/messageDetail/${value.id}`} className="btn btn-link"
+                                    <a href={`/peppol-monitor?r=messageDetail/${value.id}`} className="btn btn-link"
                                        data-tip data-for={`id-tooltip-${value.transmissionId}`}
                                        onClick={(e) => this.showTransmissionDetail(e, value.id)}>
                                         {value.transmissionId}
