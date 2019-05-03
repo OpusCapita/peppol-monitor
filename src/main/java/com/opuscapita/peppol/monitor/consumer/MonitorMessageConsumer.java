@@ -7,7 +7,6 @@ import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.queue.MessageQueue;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.monitor.entity.*;
-import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
@@ -83,10 +82,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
         ContainerMessageMetadata metadata = cm.getMetadata();
 
-        if (checkForRaceConditionIssue(cm, transmission)) {
-            return transmission;
-        }
-
         transmission.setFilename(cm.getFileName());
         transmission.setStatus(extractStatusInfo(cm));
         transmission.setSource(cm.getSource());
@@ -94,7 +89,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         transmission.setSender(getParticipant(metadata.getSenderId()));
         transmission.setReceiver(getParticipant(metadata.getRecipientId()));
         transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
-        transmission.setDocumentType(null); // need to find a way to set this
+        transmission.setDocumentType(getValidationRule(metadata));
         transmission.setDocumentTypeId(metadata.getDocumentTypeIdentifier());
         transmission.setProfileId(metadata.getProfileTypeIdentifier());
         transmission.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs()));
@@ -121,6 +116,13 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         message.setMessageId(cm.getMetadata().getMessageId());
         message = messageService.saveMessage(message);
         return message;
+    }
+
+    private String getValidationRule(ContainerMessageMetadata metadata) {
+        if (metadata != null && metadata.getValidationRule() != null) {
+            return metadata.getValidationRule().toString();
+        }
+        return null;
     }
 
     private String getParticipant(String participantId) {
@@ -163,24 +165,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             logger.debug("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
         }
         return accessPoint.getId();
-    }
-
-    // a transmission cannot go backwards, sometimes outbound events come faster than validator events
-    private boolean checkForRaceConditionIssue(ContainerMessage cm, Transmission transmission) {
-        if (transmission.getStatus() == null) {
-            return false;
-        }
-        if ((MessageStatus.delivered.equals(transmission.getStatus()) || MessageStatus.sending.equals(transmission.getStatus()))
-                && ProcessStep.VALIDATOR.equals(cm.getStep())) {
-            return true;
-        }
-        if (MessageStatus.validating.equals(transmission.getStatus()) && ProcessStep.PROCESSOR.equals(cm.getStep())) {
-            return true;
-        }
-        if (MessageStatus.processing.equals(transmission.getStatus()) && ProcessStep.INBOUND.equals(cm.getStep())) {
-            return true;
-        }
-        return false;
     }
 
     private MessageStatus extractStatusInfo(ContainerMessage cm) {

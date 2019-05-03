@@ -217,7 +217,7 @@ class TransmissionDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Document Type</label>
+                                    <label className="control-label btn-link">Validation Rule</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
                                     <label className="control-label">{transmission.documentType}</label>
