@@ -32,10 +32,6 @@
     "oc-db-init": {
       "populate-test-data": "true"
     },
-    "limit-cpu": "0.3",
-    "limit-memory": "1200M",
-    "reserve-cpu": "0.1",
-    "reserve-memory": "900M",
     "oc-service-user-create-override": "true"
   }
 }
