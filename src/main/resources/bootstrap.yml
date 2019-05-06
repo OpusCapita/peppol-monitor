@@ -3,7 +3,7 @@ spring:
     name: peppol-monitor
   cloud:
     consul:
-      host: consul
+      host: consul.service.consul
       port: 8500
       config:
         enabled: true
