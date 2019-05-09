@@ -44,10 +44,11 @@ class StandaloneValidator extends Components.ContextComponent {
         return (
             <div>
                 <h3>Standalone Validator</h3>
-                <label className="btn btn-default">
-                    Upload<input type="file" hidden onChange={e => this.uploadFile(e)}/>
+                <label className="btn btn-default upload-btn">
+                    Select the document for validation!
+                    <input type="file" hidden onChange={e => this.uploadFile(e)}/>
                 </label>
-                <label>Work In Progress</label>
+                <h4 className="text-center">Work In Progress</h4>
             </div>
         );
     }
