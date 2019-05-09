@@ -25,6 +25,10 @@ class ApiBase {
         return this.ajax.get(`/peppol-monitor/api/download-file/${transmissionId}`).responseType('blob').catch(ApiError.getErrorFromResponse);
     }
 
+    validateFile(data) {
+        return this.ajax.post(`/peppol-validator/api/validate-file`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
     reprocessMessage(transmissionId) {
         return this.ajax.get(`/peppol-monitor/api/reprocess-message/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }

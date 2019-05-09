@@ -16,9 +16,7 @@ class StandaloneValidator extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
-    uploadFile(event) {
-        return null; // WIP
-
+    validateFile(event) {
         const file = event.target.files[0];
         if (file.type !== 'text/xml') {
             this.context.showNotification('Please select an XML file', 'error', 10);
@@ -29,9 +27,8 @@ class StandaloneValidator extends Components.ContextComponent {
         let data = new FormData();
         data.append('file', file);
 
-        this.api.uploadFile(this.props.transmissionId, data).then(() => {
-            this.setState({loading: false});
-            this.context.showNotification('Successfully updated the file', 'success', 10);
+        this.api.validateFile(data).then((response) => {
+            this.setState({loading: false, result: response});
         }).catch(e => {
             this.setState({loading: false});
             this.context.showNotification(e.message, 'error', 10);
@@ -46,9 +43,9 @@ class StandaloneValidator extends Components.ContextComponent {
                 <h3>Standalone Validator</h3>
                 <label className="btn btn-default upload-btn">
                     Select the document for validation!
-                    <input type="file" hidden onChange={e => this.uploadFile(e)}/>
+                    <input type="file" hidden onChange={e => this.validateFile(e)}/>
                 </label>
-                <h4 className="text-center">Work In Progress</h4>
+                <h4 className="text-center">{JSON.stringify(result, null, 4)}</h4>
             </div>
         );
     }
