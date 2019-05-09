@@ -12,5 +12,6 @@ label.upload-btn [hidden] {
 }
 
 .doc-type-label {
-    font-size: 20px;
+    font-size: 2em;
+    text-align: center;
 }
