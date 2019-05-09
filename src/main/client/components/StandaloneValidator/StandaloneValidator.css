@@ -1,0 +1,12 @@
+label.upload-btn {
+    display: block;
+    width: 50%;
+    margin: auto;
+    height: 50px;
+    padding-top: 12px;
+    font-size: 16px;
+}
+
+label.upload-btn [hidden] {
+    display: none !important;
+}
