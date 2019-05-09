@@ -47,7 +47,7 @@ class StandaloneValidator extends Components.ContextComponent {
             return [];
         }
 
-        return history.filter(log => {
+        return result.messages.filter(log => {
             if (!showInfos && log.level === 'INFO') {
                 return false;
             }
@@ -59,6 +59,19 @@ class StandaloneValidator extends Components.ContextComponent {
             }
             return true;
         });
+    }
+
+    getTypeLabelClass(level) {
+        switch (level) {
+            case 'INFO':
+                return 'info';
+            case 'WARNING':
+                return 'warning';
+            case 'ERROR':
+                return 'danger';
+            default:
+                return 'default';
+        }
     }
 
     render() {
@@ -95,7 +108,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                                 accessor: log => log,
                                                 Cell: ({value}) =>
                                                     <span>
-                                                        <span className={`label label-${this.getHistoryTypeLabelClass(value.level)}`}>
+                                                        <span className={`label label-${this.getTypeLabelClass(value.level)}`}>
                                                             {(value.level === 'ERROR') ? value.errorType : value.level}
                                                         </span>
                                                     </span>
