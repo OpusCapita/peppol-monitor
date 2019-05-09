@@ -10,3 +10,7 @@ label.upload-btn {
 label.upload-btn [hidden] {
     display: none !important;
 }
+
+.doc-type-label {
+    font-size: 20px;
+}
