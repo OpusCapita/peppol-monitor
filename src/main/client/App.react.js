@@ -6,6 +6,7 @@ import TransmissionDetail from './components/TransmissionDetail';
 import AccessPoints from './components/AccessPoints';
 import ParticipantTable from './components/ParticipantTable';
 import DocumentTypes from './components/DocumentTypes';
+import StandaloneValidator from './components/StandaloneValidator';
 
 import {Route} from 'react-router';
 
@@ -54,7 +55,7 @@ const accessPointList = (props) => (
 
 const validator = (props) => (
     <div>
-        <h3>Work in Progress</h3>
+        <StandaloneValidator/>
         {menuButton(props.router)}
     </div>
 );
