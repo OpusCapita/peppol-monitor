@@ -95,7 +95,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                 </div>
                             </div>
                             <div className="row">
-                                <div className="col-md-10 col-md-offset-1">
+                                <div className="col-md-11">
                                     <ReactTable
                                         className="message-detail-history-table"
                                         data={this.getMessages()}
@@ -103,7 +103,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                         columns={[
                                             {
                                                 id: 'type',
-                                                width: 170,
+                                                width: 110,
                                                 Header: 'Type',
                                                 accessor: log => log,
                                                 Cell: ({value}) =>
