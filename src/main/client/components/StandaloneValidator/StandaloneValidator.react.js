@@ -92,7 +92,9 @@ class StandaloneValidator extends Components.ContextComponent {
                     <div className="form-horizontal transmission-detail">
                         <div className="row">
                             <div className="col-md-10 col-md-offset-1">
-                                <div className="doc-type-label">({result.rule.id}) {result.rule.description}</div>
+                                <div className="doc-type-label">
+                                    {(result && result.rule) ? '(' + result.rule.id + ') ' + result.rule.description : 'Doc Type'}
+                                </div>
                             </div>
                         </div>
                         <div className="row">
