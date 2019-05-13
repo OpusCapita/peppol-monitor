@@ -48,6 +48,6 @@
   },
   "scripts": {
     "watch": "webpack --watch -d",
-    "build": "cross-env NODE_ENV=production npx webpack -p --config ./webpack.config.js --profile --colors --bail",
+    "build": "cross-env NODE_ENV=production npx webpack -p --config ./webpack.config.js --profile --colors --bail"
   }
 }
