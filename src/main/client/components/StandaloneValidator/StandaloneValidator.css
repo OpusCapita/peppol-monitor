@@ -5,6 +5,8 @@ label.upload-btn {
     height: 100px;
     padding-top: 35px;
     font-size: 16px;
+    border-style: dashed;
+    border-radius: 10px;
 }
 
 label.upload-btn [hidden] {
