@@ -47,7 +47,7 @@ class SystemStatus extends Components.ContextComponent {
                         return (
                             <div key={i} className="row status-line">
                                 <div className="col-md-4 col-md-offset-1">{service}</div>
-                                <div className="col-md-7 text-right" style="color: green;">{results[service]}</div>
+                                <div className="col-md-7 text-right">{results[service]}</div>
                             </div>
                         )
                     })
