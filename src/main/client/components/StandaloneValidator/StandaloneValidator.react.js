@@ -42,11 +42,11 @@ class StandaloneValidator extends Components.ContextComponent {
     getMessages() {
         const {result, showInfos, showErrors, showWarnings} = this.state;
 
-        if (!result) {
+        if (!result || !result.messages) {
             return []
         }
 
-        if (!result.messages) {
+        if (result.messages.length === 0) {
             return [{time: 1, level: "INFO", message: "Validation SUCCESSFUL!"}];
         }
 
@@ -57,10 +57,7 @@ class StandaloneValidator extends Components.ContextComponent {
             if (!showErrors && log.level === 'ERROR') {
                 return false;
             }
-            if (!showWarnings && log.level === 'WARNING') {
-                return false;
-            }
-            return true;
+            return !(!showWarnings && log.level === 'WARNING');
         });
     }
 
@@ -106,7 +103,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                     columns={[
                                         {
                                             id: 'type',
-                                            width: 110,
+                                            width: 80,
                                             Header: 'Type',
                                             accessor: log => log,
                                             Cell: ({value}) =>
@@ -118,7 +115,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                         },
                                         {
                                             id: 'code',
-                                            width: 100,
+                                            width: 120,
                                             Header: 'Code',
                                             accessor: log => log,
                                             Cell: ({value}) =>
