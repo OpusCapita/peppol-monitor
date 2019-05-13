@@ -47,8 +47,8 @@ class StandaloneValidator extends Components.ContextComponent {
             return []
         }
 
-        if (result.messages.length === 0) {
-            return [{time: 1, level: "INFO", message: "Validation SUCCESSFUL!"}];
+        if (result.messages.filter(log => log.level === 'ERROR').length === 0) {
+            return [{time: 1, level: "SUCCESS", message: "Validation SUCCESSFUL!"}];
         }
 
         return result.messages.filter(log => {
@@ -70,6 +70,8 @@ class StandaloneValidator extends Components.ContextComponent {
                 return 'warning';
             case 'ERROR':
                 return 'danger';
+            case 'SUCCESS':
+                return 'success';
             default:
                 return 'default';
         }
@@ -132,7 +134,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                     ]}
                                     sorted={[{
                                         id: 'time',
-                                        desc: true
+                                        desc: false
                                     }]}
                                     minRows={5}
                                     defaultPageSize={100}
