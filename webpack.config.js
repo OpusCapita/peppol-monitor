@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const Visualizer = require('webpack-visualizer-plugin');
 
 module.exports = {
     entry: ['babel-polyfill', './src/main/client/index.js'],
@@ -18,18 +19,30 @@ module.exports = {
         dns: 'empty'
     },
 
+    bail: true,
+
     plugins: [
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|de/),
-        new webpack.NoEmitOnErrorsPlugin()
+        new webpack.NoEmitOnErrorsPlugin(),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': '"production"'
+        }),
+        new webpack.optimize.OccurrenceOrderPlugin(true),
+        /*new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor'
+        }),*/
+        new Visualizer({
+            filename: './statistics.html'
+        })
     ],
 
     resolve: {
-        modules: ['./node_modules', 'node_modules'],
+        modules: [process.env.NODE_PATH, 'node_modules'],
         extensions: ['.js']
     },
 
     resolveLoader: {
-        modules: ['./node_modules', 'node_modules'],
+        modules: [process.env.NODE_PATH, 'node_modules'],
         extensions: ['.js']
     },
 
@@ -45,15 +58,14 @@ module.exports = {
             },
             {
                 test: /.jsx?$/,
+                loader: 'babel-loader',
                 include: [
-                    path.join(__dirname, 'local'),
                     path.join(__dirname, 'src')
                 ],
-                loader: 'babel-loader',
                 options: {
-                    compact: false,
+                    compact: true,
                     presets: [
-                        ['env', { 'targets': { 'node': 8, 'uglify': true }, 'modules': false }],
+                        ['env', {'targets': {'node': 8, 'uglify': true}, 'modules': false}],
                         'stage-0',
                         'react'
                     ],

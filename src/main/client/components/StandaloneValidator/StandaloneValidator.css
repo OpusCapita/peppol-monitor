@@ -1,10 +1,12 @@
 label.upload-btn {
     display: block;
     width: 50%;
-    margin: auto;
-    height: 50px;
-    padding-top: 12px;
+    margin: 20px auto 40px;
+    height: 100px;
+    padding-top: 35px;
     font-size: 16px;
+    border-style: dashed;
+    border-radius: 10px;
 }
 
 label.upload-btn [hidden] {
@@ -14,4 +16,5 @@ label.upload-btn [hidden] {
 .doc-type-label {
     font-size: 2em;
     text-align: center;
+    margin: 30px;
 }
