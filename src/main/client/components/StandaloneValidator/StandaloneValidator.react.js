@@ -32,6 +32,7 @@ class StandaloneValidator extends Components.ContextComponent {
         data.append('file', file);
 
         this.api.validateFile(data).then((response) => {
+            response.filename = file.name;
             this.setState({loading: false, result: response});
         }).catch(e => {
             this.setState({loading: false});
@@ -79,13 +80,13 @@ class StandaloneValidator extends Components.ContextComponent {
 
         return (
             <div>
-                <h3>Standalone Validator</h3>
+                <h2>Standalone Validator</h2>
                 <label className="btn btn-default upload-btn">
                     Select the document for validation!
                     <input type="file" hidden onChange={e => this.validateFile(e)}/>
                 </label>
                 <div>
-                    <h3>Validation Result</h3>
+                    <h3 className="text-center">{(result && result.filename) ? result.filename : 'File Name'}</h3>
                     <div className="form-horizontal transmission-detail">
                         <div className="row">
                             <div className="col-md-10 col-md-offset-1">
@@ -115,7 +116,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                         },
                                         {
                                             id: 'code',
-                                            width: 120,
+                                            width: 130,
                                             Header: 'Code',
                                             accessor: log => log,
                                             Cell: ({value}) =>
