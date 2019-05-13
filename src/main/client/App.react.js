@@ -6,6 +6,7 @@ import TransmissionDetail from './components/TransmissionDetail';
 import AccessPoints from './components/AccessPoints';
 import ParticipantTable from './components/ParticipantTable';
 import DocumentTypes from './components/DocumentTypes';
+import SystemStatus from './components/SystemStatus';
 import StandaloneValidator from './components/StandaloneValidator';
 
 import {Route} from 'react-router';
@@ -27,7 +28,7 @@ const messageDetail = (props) => (
 
 const systemStatus = (props) => (
     <div>
-        <h3>Work in Progress</h3>
+        <SystemStatus/>
         {menuButton(props.router)}
     </div>
 );

@@ -1,0 +1,7 @@
+.status-line {
+    font-size: 25px;
+    line-height: 2.5em;
+    border-bottom: 1px solid #DDD;
+    font-variant: all-petite-caps;
+    text-shadow: 1px 1px #CCC;
+}
