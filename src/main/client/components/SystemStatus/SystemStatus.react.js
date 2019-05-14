@@ -27,7 +27,13 @@ class SystemStatus extends Components.ContextComponent {
         for (var serviceName in this.state.results) {
             this.api.getStatus(serviceName).then(result => {
                 const {results} = this.state;
-                results[serviceName] = result;
+
+                if (result && result.statusCode && result.body) {
+                    results[serviceName] = result.statusCode + ': ' + result.body.message;
+                } else {
+                    results[serviceName] = "500: Unknown Exception"
+                }
+
                 this.setState({results: results});
 
             }).catch(e => {
