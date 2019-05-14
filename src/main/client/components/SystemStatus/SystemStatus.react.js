@@ -25,21 +25,23 @@ class SystemStatus extends Components.ContextComponent {
 
     componentDidMount() {
         for (var serviceName in this.state.results) {
-            this.api.getStatus(serviceName).then(result => {
-                const {results} = this.state;
-
-                if (result && result.statusCode && result.body) {
-                    results[serviceName] = result.statusCode + ': ' + result.body.message;
-                } else {
-                    results[serviceName] = "500: Unknown Exception"
-                }
-
-                this.setState({results: results});
-
-            }).catch(e => {
-                this.context.showNotification(e.message, 'error', 10);
-            });
+            if (this.state.results.hasOwnProperty(serviceName)) {
+                fetchServiceStatus(serviceName);
+            }
         }
+    }
+
+    fetchServiceStatus(serviceName) {
+        this.api.getStatus(serviceName).then(result => {
+            const {results} = this.state;
+            results[serviceName] = (result && result.statusCode && result.body) ? result.statusCode + ': ' + result.body.message : "500: Unknown Exception";
+            this.setState({results: results});
+
+        }).catch(e => {
+            const {results} = this.state;
+            results[serviceName] = (e && e.code && e.message) ? e.code + ': ' + e.message : "500: Unknown Exception";
+            this.setState({results: results});
+        });
     }
 
     render() {
@@ -51,7 +53,7 @@ class SystemStatus extends Components.ContextComponent {
                 {
                     Object.keys(results).map((service, i) => {
                         return (
-                            <div key={i} className="row status-line">
+                            <div key={i} className={results[service].startsWith("2") ? 'row status-line green' : 'row status-line red'}>
                                 <div className="col-md-4 col-md-offset-1">{service}</div>
                                 <div className="col-md-7 text-right">{results[service]}</div>
                             </div>

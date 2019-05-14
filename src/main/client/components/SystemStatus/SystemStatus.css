@@ -5,3 +5,11 @@
     font-variant: all-petite-caps;
     text-shadow: 1px 1px #CCC;
 }
+
+.status-line.green {
+    background-color: #f0f7f0;
+}
+
+.status-line.red {
+    background-color: #f2dedf;
+}
