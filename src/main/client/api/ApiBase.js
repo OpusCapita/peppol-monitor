@@ -54,7 +54,7 @@ class ApiBase {
     }
 
     getStatus(serviceName) {
-        return this.ajax.get(`${serviceName}/api/health/check`).catch(ApiError.getErrorFromResponse);
+        return this.ajax.get(`/${serviceName}/api/health/check`).catch(ApiError.getErrorFromResponse);
     }
 }
 
