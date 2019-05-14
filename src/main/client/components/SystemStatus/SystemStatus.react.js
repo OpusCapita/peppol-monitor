@@ -34,7 +34,21 @@ class SystemStatus extends Components.ContextComponent {
     fetchServiceStatus(serviceName) {
         this.api.getStatus(serviceName).then(result => {
             const {results} = this.state;
-            results[serviceName] = (result && result.statusCode && result.body) ? result.statusCode + ': ' + result.body.message : "500: Unknown Exception";
+
+            if (result && result.statusCode) {
+                results[serviceName] = result.statusCode + ': ';
+            } else {
+                results[serviceName] = '500: ';
+            }
+
+            if (result && result.body) {
+                results[serviceName] += result.body.message;
+            } else if (results[serviceName].startsWith("2")) {
+                results[serviceName] += 'OK!';
+            } else {
+                results[serviceName] += 'Unknown Exception';
+            }
+
             this.setState({results: results});
 
         }).catch(e => {
@@ -54,12 +68,12 @@ class SystemStatus extends Components.ContextComponent {
                     Object.keys(results).map((service, i) => {
                         return (
                             <div key={i} className={
-                                    results[service].startsWith("...") ? 'row status-line' :
-                                        (results[service].startsWith("2") ? 'row status-line green' :
-                                            'row status-line red')
-                                }>
-                                <div className="col-md-4 col-md-offset-1">{service}</div>
-                                <div className="col-md-7 text-right">{results[service]}</div>
+                                results[service].startsWith("...") ? 'row status-line' :
+                                    (results[service].startsWith("2") ? 'row status-line green' :
+                                        'row status-line red')
+                            }>
+                                <div className="col-md-4">{service}</div>
+                                <div className="col-md-8 text-right">{results[service]}</div>
                             </div>
                         )
                     })
