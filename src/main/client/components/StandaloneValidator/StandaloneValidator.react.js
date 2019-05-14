@@ -33,6 +33,9 @@ class StandaloneValidator extends Components.ContextComponent {
 
         this.api.validateFile(data).then((response) => {
             response.filename = file.name;
+            if (response.messages && response.messages.filter(log => log.level === 'ERROR').length === 0) {
+                response.messages.push({time: 1, level: "SUCCESS", message: "Validation SUCCESSFUL!"});
+            }
             this.setState({loading: false, result: response});
         }).catch(e => {
             this.setState({loading: false});
@@ -45,10 +48,6 @@ class StandaloneValidator extends Components.ContextComponent {
 
         if (!result || !result.messages) {
             return []
-        }
-
-        if (result.messages.filter(log => log.level === 'ERROR').length === 0) {
-            return [{time: 1, level: "SUCCESS", message: "Validation SUCCESSFUL!"}];
         }
 
         return result.messages.filter(log => {
