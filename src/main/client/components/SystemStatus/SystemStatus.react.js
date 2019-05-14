@@ -26,7 +26,7 @@ class SystemStatus extends Components.ContextComponent {
     componentDidMount() {
         for (var serviceName in this.state.results) {
             if (this.state.results.hasOwnProperty(serviceName)) {
-                fetchServiceStatus(serviceName);
+                this.fetchServiceStatus(serviceName);
             }
         }
     }
@@ -53,7 +53,11 @@ class SystemStatus extends Components.ContextComponent {
                 {
                     Object.keys(results).map((service, i) => {
                         return (
-                            <div key={i} className={results[service].startsWith("2") ? 'row status-line green' : 'row status-line red'}>
+                            <div key={i} className={
+                                    results[service].startsWith("...") ? 'row status-line' :
+                                        (results[service].startsWith("2") ? 'row status-line green' :
+                                            'row status-line red')
+                                }>
                                 <div className="col-md-4 col-md-offset-1">{service}</div>
                                 <div className="col-md-7 text-right">{results[service]}</div>
                             </div>
