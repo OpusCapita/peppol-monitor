@@ -10,6 +10,7 @@ class StandaloneValidator extends Components.ContextComponent {
     state = {
         loading: false,
         result: {},
+        expanded: {},
         showInfos: true,
         showErrors: true,
         showWarnings: true,
@@ -22,7 +23,7 @@ class StandaloneValidator extends Components.ContextComponent {
 
     validateFile(event) {
         const file = event.target.files[0];
-        if (file.type !== 'text/xml') {
+        if (file && file.type !== 'text/xml') {
             this.context.showNotification('Please select an XML file', 'error', 10);
             return;
         }
@@ -104,6 +105,43 @@ class StandaloneValidator extends Components.ContextComponent {
                                     loading={loading}
                                     columns={[
                                         {
+                                            expander: true,
+                                            Header: () => <strong> </strong>,
+                                            width: 35,
+                                            Expander: ({isExpanded, ...rest}) => {
+                                                if (rest.original.validationError && rest.original.validationError.identifier) {
+                                                    return (
+                                                        <div>
+                                                            { isExpanded
+                                                                ? (<span className="glyphicon glyphicon-chevron-down"/>)
+                                                                : (<span className="glyphicon glyphicon-chevron-right"/>)
+                                                            }
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            },
+                                            getProps: (state, rowInfo, column) => {
+                                                if (rowInfo) {
+                                                    if (!(rowInfo.original.validationError && rowInfo.original.validationError.identifier)) {
+                                                        return {
+                                                            onClick: () => {}
+                                                        };
+                                                    }
+                                                }
+                                                return {
+                                                    className: "show-pointer"
+                                                };
+                                            },
+                                            style: {
+                                                fontSize: 15,
+                                                padding: "0",
+                                                margin: "auto",
+                                                textAlign: "center",
+                                                userSelect: "none"
+                                            }
+                                        },
+                                        {
                                             id: 'type',
                                             width: 80,
                                             Header: 'Type',
@@ -117,7 +155,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                         },
                                         {
                                             id: 'code',
-                                            width: 130,
+                                            width: 160,
                                             Header: 'Code',
                                             accessor: log => log,
                                             Cell: ({value}) =>
@@ -128,15 +166,65 @@ class StandaloneValidator extends Components.ContextComponent {
                                         {
                                             id: 'message',
                                             Header: 'Message',
-                                            accessor: 'message',
+                                            accessor: log => log,
+                                            Cell: ({value}) =>
+                                                <span>
+                                                    {(value.validationError && value.validationError.identifier) ? value.validationError.text : value.message}
+                                                </span>
                                         }
                                     ]}
                                     sorted={[{
                                         id: 'time',
                                         desc: false
                                     }]}
+                                    onExpandedChange={(expanded, index, event) => {
+                                        this.setState({expanded});
+                                    }}
+                                    expanded={this.state.expanded}
                                     minRows={5}
                                     defaultPageSize={100}
+                                    SubComponent={row => {
+                                        return (
+                                            <div className="form-horizontal message-detail">
+                                                <div className="row">
+                                                    <div className="col-md-12">
+                                                        <div className="form-group">
+                                                            <div className="col-md-1">
+                                                                <label className="control-label btn-link">Identifier</label>
+                                                            </div>
+                                                            <div className="col-md-11">
+                                                                <label className="control-label">{row.original.validationError.identifier}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <div className="col-md-1">
+                                                                <label className="control-label btn-link">Flag</label>
+                                                            </div>
+                                                            <div className="col-md-11">
+                                                                <label className="control-label">{row.original.validationError.flag}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <div className="col-md-1">
+                                                                <label className="control-label btn-link">Test</label>
+                                                            </div>
+                                                            <div className="col-md-11">
+                                                                <label className="control-label">{row.original.validationError.test}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <div className="col-md-1">
+                                                                <label className="control-label btn-link">Location</label>
+                                                            </div>
+                                                            <div className="col-md-11">
+                                                                <label className="control-label">{row.original.validationError.location}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }}
                                 />
                             </div>
                         </div>

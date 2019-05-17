@@ -10,6 +10,7 @@ gradle-app.setting
 *.war
 *.ear
 *.class
+*.env
 
 # Avoid ignoring this jar files
 !gradle-wrapper.jar
