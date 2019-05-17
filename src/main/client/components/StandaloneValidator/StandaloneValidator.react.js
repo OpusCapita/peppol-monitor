@@ -106,10 +106,10 @@ class StandaloneValidator extends Components.ContextComponent {
                                     columns={[
                                         {
                                             expander: true,
-                                            Header: () => <strong>&bnsp;</strong>,
+                                            Header: () => <strong> </strong>,
                                             width: 50,
                                             Expander: ({isExpanded, ...rest}) => {
-                                                if (value.validationError && value.validationError.identifier) {
+                                                if (rest.original.validationError && rest.original.validationError.identifier) {
                                                     return (
                                                         <div>
                                                             {isExpanded ? (
@@ -124,7 +124,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                             },
                                             getProps: (state, rowInfo, column) => {
                                                 if (rowInfo) {
-                                                    if (!(value.validationError && value.validationError.identifier)) {
+                                                    if (!(rowInfo.original.validationError && rowInfo.original.validationError.identifier)) {
                                                         return {
                                                             onClick: () => {}
                                                         };
