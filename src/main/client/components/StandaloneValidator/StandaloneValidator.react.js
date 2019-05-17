@@ -10,6 +10,7 @@ class StandaloneValidator extends Components.ContextComponent {
     state = {
         loading: false,
         result: {},
+        expanded: {},
         showInfos: true,
         showErrors: true,
         showWarnings: true,
@@ -104,6 +105,43 @@ class StandaloneValidator extends Components.ContextComponent {
                                     loading={loading}
                                     columns={[
                                         {
+                                            expander: true,
+                                            Header: () => <strong>&bnsp;</strong>,
+                                            width: 50,
+                                            Expander: ({isExpanded, ...rest}) => {
+                                                if (value.validationError && value.validationError.identifier) {
+                                                    return (
+                                                        <div>
+                                                            {isExpanded ? (
+                                                                <span className="glyphicon glyphicon-plus"/>
+                                                            ) : (
+                                                                <span className="glyphicon glyphicon-minus"/>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            },
+                                            getProps: (state, rowInfo, column) => {
+                                                if (rowInfo) {
+                                                    if (!(value.validationError && value.validationError.identifier)) {
+                                                        return {
+                                                            onClick: () => {}
+                                                        };
+                                                    }
+                                                }
+                                                return {
+                                                    className: "show-pointer"
+                                                };
+                                            },
+                                            style: {
+                                                fontSize: 25,
+                                                padding: "0",
+                                                textAlign: "center",
+                                                userSelect: "none"
+                                            }
+                                        },
+                                        {
                                             id: 'type',
                                             width: 80,
                                             Header: 'Type',
@@ -128,15 +166,35 @@ class StandaloneValidator extends Components.ContextComponent {
                                         {
                                             id: 'message',
                                             Header: 'Message',
-                                            accessor: 'message',
+                                            accessor: log => log,
+                                            Cell: ({value}) =>
+                                                <span>
+                                                    {(value.validationError && value.validationError.identifier) ? value.validationError.text : value.message}
+                                                </span>
                                         }
                                     ]}
                                     sorted={[{
                                         id: 'time',
                                         desc: false
                                     }]}
+                                    onExpandedChange={(expanded, index, event) => {
+                                        this.setState({expanded});
+                                    }}
+                                    expanded={this.state.expanded}
                                     minRows={5}
                                     defaultPageSize={100}
+                                    SubComponent={row => {
+                                        let err = rowInfo.original.validationError;
+                                        return (
+                                            <ul>
+                                                <li><b>Identifier:</b> err.identifier</li>
+                                                <li><b>Test:</b> err.test</li>
+                                                <li><b>Flag:</b> err.flag</li>
+                                                <li><b>Location:</b> err.location</li>
+                                                <li><b>Text:</b> err.text</li>
+                                            </ul>
+                                        );
+                                    }}
                                 />
                             </div>
                         </div>
