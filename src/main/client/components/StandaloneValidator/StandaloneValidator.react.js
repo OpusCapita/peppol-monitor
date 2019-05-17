@@ -189,34 +189,34 @@ class StandaloneValidator extends Components.ContextComponent {
                                                 <div className="row">
                                                     <div className="col-md-12">
                                                         <div className="form-group">
-                                                            <div className="col-sm-3">
+                                                            <div className="col-md-1">
                                                                 <label className="control-label btn-link">Identifier</label>
                                                             </div>
-                                                            <div className="offset-md-1 col-md-8">
+                                                            <div className="col-md-11">
                                                                 <label className="control-label">{row.original.validationError.identifier}</label>
                                                             </div>
                                                         </div>
                                                         <div className="form-group">
-                                                            <div className="col-sm-3">
+                                                            <div className="col-md-1">
                                                                 <label className="control-label btn-link">Flag</label>
                                                             </div>
-                                                            <div className="offset-md-1 col-md-8">
+                                                            <div className="col-md-11">
                                                                 <label className="control-label">{row.original.validationError.flag}</label>
                                                             </div>
                                                         </div>
                                                         <div className="form-group">
-                                                            <div className="col-sm-3">
+                                                            <div className="col-md-1">
                                                                 <label className="control-label btn-link">Test</label>
                                                             </div>
-                                                            <div className="offset-md-1 col-md-8">
+                                                            <div className="col-md-11">
                                                                 <label className="control-label">{row.original.validationError.test}</label>
                                                             </div>
                                                         </div>
                                                         <div className="form-group">
-                                                            <div className="col-sm-3">
+                                                            <div className="col-md-1">
                                                                 <label className="control-label btn-link">Location</label>
                                                             </div>
-                                                            <div className="offset-md-1 col-md-8">
+                                                            <div className="col-md-11">
                                                                 <label className="control-label">{row.original.validationError.location}</label>
                                                             </div>
                                                         </div>
