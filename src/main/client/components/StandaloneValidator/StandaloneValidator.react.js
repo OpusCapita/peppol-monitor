@@ -107,14 +107,14 @@ class StandaloneValidator extends Components.ContextComponent {
                                         {
                                             expander: true,
                                             Header: () => <strong> </strong>,
-                                            width: 50,
+                                            width: 35,
                                             Expander: ({isExpanded, ...rest}) => {
                                                 if (rest.original.validationError && rest.original.validationError.identifier) {
                                                     return (
                                                         <div>
                                                             { isExpanded
-                                                                ? (<span className="glyphicon glyphicon-chevron-right"/>)
-                                                                : (<span className="glyphicon glyphicon-chevron-down"/>)
+                                                                ? (<span className="glyphicon glyphicon-chevron-down"/>)
+                                                                : (<span className="glyphicon glyphicon-chevron-right"/>)
                                                             }
                                                         </div>
                                                     );
@@ -155,7 +155,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                         },
                                         {
                                             id: 'code',
-                                            width: 130,
+                                            width: 160,
                                             Header: 'Code',
                                             accessor: log => log,
                                             Cell: ({value}) =>
@@ -184,15 +184,45 @@ class StandaloneValidator extends Components.ContextComponent {
                                     minRows={5}
                                     defaultPageSize={100}
                                     SubComponent={row => {
-                                        let err = row.original.validationError;
                                         return (
-                                            <ul>
-                                                <li><b>Identifier:</b> err.identifier</li>
-                                                <li><b>Test:</b> err.test</li>
-                                                <li><b>Flag:</b> err.flag</li>
-                                                <li><b>Location:</b> err.location</li>
-                                                <li><b>Text:</b> err.text</li>
-                                            </ul>
+                                            <div className="form-horizontal message-detail">
+                                                <div className="row">
+                                                    <div className="col-md-12">
+                                                        <div className="form-group">
+                                                            <div className="col-sm-3">
+                                                                <label className="control-label btn-link">Identifier</label>
+                                                            </div>
+                                                            <div className="offset-md-1 col-md-8">
+                                                                <label className="control-label">{row.original.validationError.identifier}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <div className="col-sm-3">
+                                                                <label className="control-label btn-link">Flag</label>
+                                                            </div>
+                                                            <div className="offset-md-1 col-md-8">
+                                                                <label className="control-label">{row.original.validationError.flag}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <div className="col-sm-3">
+                                                                <label className="control-label btn-link">Test</label>
+                                                            </div>
+                                                            <div className="offset-md-1 col-md-8">
+                                                                <label className="control-label">{row.original.validationError.test}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <div className="col-sm-3">
+                                                                <label className="control-label btn-link">Location</label>
+                                                            </div>
+                                                            <div className="offset-md-1 col-md-8">
+                                                                <label className="control-label">{row.original.validationError.location}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         );
                                     }}
                                 />

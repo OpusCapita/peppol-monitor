@@ -18,3 +18,7 @@ label.upload-btn [hidden] {
     text-align: center;
     margin: 30px;
 }
+
+.form-horizontal.message-detail {
+    padding: 15px 45px;
+}
