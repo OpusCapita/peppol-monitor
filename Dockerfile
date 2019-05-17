@@ -1,6 +1,6 @@
 ## using multistage docker build for speed
 ## temp container to build
-FROM openjdk:8-jdk-alpine AS TEMP_BUILD_IMAGE
+FROM openjdk:8 AS TEMP_BUILD_IMAGE
 
 ENV APP_HOME=/usr/app/
 ENV NODE_ENV=development NODE_PATH=$APP_HOME/node_modules
@@ -26,7 +26,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew build || return 0
 
 ## actual container
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8
 LABEL author="Ibrahim Bilge <Ibrahim.Bilge@opuscapita.com>"
 
 ENV APP_HOME=/usr/app/
