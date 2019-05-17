@@ -23,7 +23,7 @@ class StandaloneValidator extends Components.ContextComponent {
 
     validateFile(event) {
         const file = event.target.files[0];
-        if (file.type !== 'text/xml') {
+        if (file && file.type !== 'text/xml') {
             this.context.showNotification('Please select an XML file', 'error', 10);
             return;
         }
@@ -112,11 +112,10 @@ class StandaloneValidator extends Components.ContextComponent {
                                                 if (rest.original.validationError && rest.original.validationError.identifier) {
                                                     return (
                                                         <div>
-                                                            {isExpanded ? (
-                                                                <span className="glyphicon glyphicon-plus"/>
-                                                            ) : (
-                                                                <span className="glyphicon glyphicon-minus"/>
-                                                            )}
+                                                            { isExpanded
+                                                                ? (<span className="glyphicon glyphicon-chevron-right"/>)
+                                                                : (<span className="glyphicon glyphicon-chevron-down"/>)
+                                                            }
                                                         </div>
                                                     );
                                                 }
@@ -135,8 +134,9 @@ class StandaloneValidator extends Components.ContextComponent {
                                                 };
                                             },
                                             style: {
-                                                fontSize: 25,
+                                                fontSize: 15,
                                                 padding: "0",
+                                                margin: "auto",
                                                 textAlign: "center",
                                                 userSelect: "none"
                                             }
@@ -184,7 +184,7 @@ class StandaloneValidator extends Components.ContextComponent {
                                     minRows={5}
                                     defaultPageSize={100}
                                     SubComponent={row => {
-                                        let err = rowInfo.original.validationError;
+                                        let err = row.original.validationError;
                                         return (
                                             <ul>
                                                 <li><b>Identifier:</b> err.identifier</li>
