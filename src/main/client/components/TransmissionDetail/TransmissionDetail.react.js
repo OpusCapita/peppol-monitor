@@ -260,7 +260,7 @@ class TransmissionDetail extends Components.ContextComponent {
                                         columns={[
                                             {
                                                 id: 'type',
-                                                width: 170,
+                                                width: 185,
                                                 Header: 'Type from Source',
                                                 accessor: log => log,
                                                 Cell: ({value}) =>
@@ -272,7 +272,7 @@ class TransmissionDetail extends Components.ContextComponent {
                                             },
                                             {
                                                 id: 'time',
-                                                width: 170,
+                                                width: 125,
                                                 accessor: log => log,
                                                 Header: 'Time',
                                                 Cell: ({value}) => <span className="label label-none">{i18n.formatDateTime(value.time)}</span>
