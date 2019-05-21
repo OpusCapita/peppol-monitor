@@ -323,7 +323,7 @@ class TransmissionTable extends Components.ContextComponent {
                         {
                             accessor: 'arrivedAt',
                             Header: 'Arrived At',
-                            Cell: props => <span>{i18n.formatDate(props.value)}</span>
+                            Cell: props => <span>{i18n.formatDateTime(props.value)}</span>
                         }
                     ]}
                 />

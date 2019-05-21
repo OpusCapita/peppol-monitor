@@ -2,6 +2,12 @@
 	margin-bottom: 0;
 }
 
+.transmission-detail .label.label-none {
+	border: none;
+	background: transparent;
+	color: #666;
+}
+
 .transmission-detail-actions {
 	margin-top: 10px;
 }
