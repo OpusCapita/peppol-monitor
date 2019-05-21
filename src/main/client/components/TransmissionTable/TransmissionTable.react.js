@@ -287,6 +287,7 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'status',
+                            width: 75,
                             accessor: 'status',
                             Header: 'Status',
                             Cell: ({value}) =>
@@ -294,6 +295,7 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'sender',
+                            width: 150,
                             accessor: 'sender',
                             Header: 'Sender',
                             Cell: ({value}) =>
@@ -303,6 +305,7 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'receiver',
+                            width: 150,
                             accessor: 'receiver',
                             Header: 'Receiver',
                             Cell: ({value}) =>
@@ -311,16 +314,20 @@ class TransmissionTable extends Components.ContextComponent {
                                 </a>
                         },
                         {
+                            width: 100,
                             accessor: 'accessPoint',
                             Header: 'Access Point'
                         },
                         {
                             id: 'source',
+                            width: 100,
                             accessor: 'source',
                             Header: 'Source',
                             Cell: ({value}) => <span className="well">{value}</span>
                         },
                         {
+                            id: 'arrivedAt',
+                            width: 150,
                             accessor: 'arrivedAt',
                             Header: 'Arrived At',
                             Cell: props => <span>{i18n.formatDateTime(props.value)}</span>
