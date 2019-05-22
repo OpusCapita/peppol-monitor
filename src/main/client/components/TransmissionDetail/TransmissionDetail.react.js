@@ -135,6 +135,7 @@ class TransmissionDetail extends Components.ContextComponent {
     }
 
     render() {
+        const {i18n} = this.context;
         const {loading, transmission, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
         return (
@@ -259,7 +260,7 @@ class TransmissionDetail extends Components.ContextComponent {
                                         columns={[
                                             {
                                                 id: 'type',
-                                                width: 200,
+                                                width: 185,
                                                 Header: 'Type from Source',
                                                 accessor: log => log,
                                                 Cell: ({value}) =>
@@ -268,6 +269,13 @@ class TransmissionDetail extends Components.ContextComponent {
                                                             {(value.level === 'ERROR') ? value.errorType : value.level}
                                                         </span> from <span className="label label-default">{value.source}</span>
                                                     </span>
+                                            },
+                                            {
+                                                id: 'time',
+                                                width: 125,
+                                                accessor: log => log,
+                                                Header: 'Time',
+                                                Cell: ({value}) => <span className="label label-none">{i18n.formatDateTime(value.time)}</span>
                                             },
                                             {
                                                 id: 'message',
