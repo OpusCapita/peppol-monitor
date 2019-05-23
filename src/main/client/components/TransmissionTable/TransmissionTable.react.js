@@ -73,6 +73,42 @@ class TransmissionTable extends Components.ContextComponent {
         }
     }
 
+    async bulkReprocess() {
+        const {loading, transmissionList} = this.state;
+        const {showNotification, showModalDialog, hideModalDialog} = this.context;
+
+        const onConfirmationClick = (btn) => {
+            hideModalDialog();
+
+            if(btn === 'yes') {
+                this.setState({loading: true});
+
+                setTimeout(() => {
+                    const transmissionIds = transmissionList.map(t => t.id).join("-");
+                    this.api.reprocessMessages(transmissionIds).then(() => {
+                        this.setState({loading: false});
+                        this.context.showNotification('Reprocessing of the messages has been started', 'info', 3);
+                    }).catch(e => {
+                        this.setState({loading: false});
+                        this.context.showNotification(e.message, 'error', 10);
+                    });
+
+                }, 500);
+            }
+        }
+
+        const modalTitle = "Bulk Reprocess";
+        const modalText = `${transmissionList.length} messages will be reprocessed in the background. `;
+        const warnCount = transmissionList.filter(t => t.status !== 'failed').length;
+        if (warnCount > 0) {
+            modalText += `Note that ${warnCount} of them did NOT failed. `;
+        }
+        modalText += "Do you want to continue?";
+
+        const modalButtons = { no : 'No', yes : 'Yes' };
+        showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
+    }
+
     showTransmissionDetail(e, id) {
         e && e.preventDefault();
         this.context.router.push(`/peppol-monitor/messageDetail/${id}`);
@@ -229,6 +265,7 @@ class TransmissionTable extends Components.ContextComponent {
                         <div className="form-submit text-right">
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
                             <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
+                            <button className="btn btn-danger float-left" onClick={() => this.bulkReprocess()}>Reprocess</button>
                         </div>
                         <hr/>
                     </div>

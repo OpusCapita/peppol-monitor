@@ -5,8 +5,10 @@ import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionFilterDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
+import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.util.TransmissionHistorySerializer;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,8 +79,27 @@ public class TransmissionServiceImpl implements TransmissionService {
     }
 
     @Override
-    public InputStream getFileContent(Transmission transmission) throws StorageException {
-        return storage.get(transmission.getFilename());
+    public InputStream getFileContent(String path) throws StorageException {
+        return storage.get(path);
+    }
+
+    @Override
+    public String getMlrPath(Transmission transmission) {
+        String extension = "";
+        if (transmission.getLogs().stream().anyMatch(DocumentLog::isValidationError)) {
+            extension = "re";
+        } else if (transmission.getLogs().stream().anyMatch(DocumentLog::isError)) {
+            extension = "er";
+        } else if (transmission.getStatus().equals(MessageStatus.sending)) {
+            extension = "ab";
+        } else if (transmission.getStatus().equals(MessageStatus.delivered)) {
+            extension = "ap";
+        }
+
+        String pathName = FilenameUtils.getFullPath(transmission.getFilename());
+        String baseName = FilenameUtils.getBaseName(transmission.getFilename());
+        String fileName = baseName + "-" + extension + "-mlr.xml";
+        return pathName + fileName;
     }
 
     @Override
