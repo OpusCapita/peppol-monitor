@@ -99,7 +99,7 @@ class TransmissionTable extends Components.ContextComponent {
 
         const modalTitle = "Bulk Reprocess";
         const warnCount = transmissionList.filter(t => t.status !== 'failed').length;
-        const modalText = `${transmissionList.length} messages will be reprocessed in the background.${(warnCount > 0) ? ` Note that ${warnCount} of them did NOT failed.` : ' '}Do you want to continue?`;
+        const modalText = `${transmissionList.length} messages will be reprocessed in the background.${(warnCount > 0) ? ` Note that ${warnCount} of them did NOT failed.` : ' '}\n\nDo you want to continue?`;
         const modalButtons = {no: 'No', yes: 'Yes'};
 
         showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
