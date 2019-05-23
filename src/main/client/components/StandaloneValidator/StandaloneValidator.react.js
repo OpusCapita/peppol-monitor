@@ -24,7 +24,7 @@ class StandaloneValidator extends Components.ContextComponent {
     validateFile(event) {
         const file = event.target.files[0];
         if (file && file.type !== 'text/xml') {
-            this.context.showNotification('Please select an XML file', 'error', 10);
+            this.context.showNotification('Please select an XML file', 'error', 3);
             return;
         }
 

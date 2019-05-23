@@ -26,7 +26,9 @@ public interface TransmissionService {
 
     Page<Transmission> getAllTransmissions(TransmissionRequestDto request);
 
-    InputStream getFileContent(Transmission transmission) throws StorageException;
+    InputStream getFileContent(String path) throws StorageException;
+
+    String getMlrPath(Transmission transmission) throws StorageException;
 
     void updateFileContent(InputStream content, Transmission transmission) throws StorageException;
 

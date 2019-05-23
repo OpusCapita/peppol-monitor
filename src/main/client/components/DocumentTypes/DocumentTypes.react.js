@@ -42,7 +42,7 @@ class DocumentTypes extends Components.ContextComponent {
         el.select();
         document.execCommand('copy');
         document.body.removeChild(el);
-        this.context.showNotification('Value copied to clipboard', 'info', 2);
+        this.context.showNotification('Value copied to clipboard', 'info', 1);
     }
 
     render() {

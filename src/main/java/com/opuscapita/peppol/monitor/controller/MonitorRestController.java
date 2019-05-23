@@ -81,18 +81,49 @@ public class MonitorRestController {
     @GetMapping("/download-file/{transmissionId}")
     public ResponseEntity<byte[]> downloadFileOfTransmission(@PathVariable Long transmissionId) throws IOException {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
-        InputStream inputStream = transmissionService.getFileContent(transmission);
+        InputStream inputStream = transmissionService.getFileContent(transmission.getFilename());
+        return wrapFileToDownload(inputStream, FilenameUtils.getName(transmission.getFilename()));
+    }
+
+    @GetMapping("/download-mlr/{transmissionId}")
+    public ResponseEntity<byte[]> downloadMlrOfTransmission(@PathVariable Long transmissionId) throws IOException {
+        Transmission transmission = transmissionService.getTransmission(transmissionId);
+        String mlrPath = transmissionService.getMlrPath(transmission);
+        InputStream inputStream = transmissionService.getFileContent(mlrPath);
+        return wrapFileToDownload(inputStream, FilenameUtils.getName(mlrPath));
+    }
+
+    private ResponseEntity<byte[]> wrapFileToDownload(InputStream inputStream, String filename) throws IOException {
         byte[] rawData = IOUtils.toByteArray(inputStream);
 
         HttpHeaders header = new HttpHeaders();
         header.setContentType(MediaType.TEXT_XML);
         header.setContentLength(rawData.length);
-        header.set("Content-Disposition", "attachment; filename=" + FilenameUtils.getName(transmission.getFilename()));
+        header.set("Content-Disposition", "attachment; filename=" + filename);
         return new ResponseEntity<>(rawData, header, HttpStatus.OK);
     }
 
     @GetMapping("/reprocess-message/{transmissionId}")
     public ResponseEntity<?> reprocessMessage(@PathVariable Long transmissionId) throws IOException {
+        return reprocessSingleMessage(transmissionId);
+    }
+
+    @GetMapping("/reprocess-messages/{transmissionIds}")
+    public ResponseEntity<?> reprocessMessages(@PathVariable String transmissionIds) {
+        new Thread(() -> {
+            for (String transmissionId : transmissionIds.split("-")) {
+                try {
+                    reprocessSingleMessage(Long.parseLong(transmissionId));
+                } catch (IOException e) {
+                    logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
+                }
+            }
+        }).start();
+
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<?> reprocessSingleMessage(Long transmissionId) throws IOException {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
