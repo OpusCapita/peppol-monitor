@@ -80,7 +80,7 @@ class TransmissionTable extends Components.ContextComponent {
         const onConfirmationClick = (btn) => {
             hideModalDialog();
 
-            if(btn === 'yes') {
+            if (btn === 'yes') {
                 this.setState({loading: true});
 
                 setTimeout(() => {
@@ -98,14 +98,10 @@ class TransmissionTable extends Components.ContextComponent {
         }
 
         const modalTitle = "Bulk Reprocess";
-        const modalText = `${transmissionList.length} messages will be reprocessed in the background. `;
         const warnCount = transmissionList.filter(t => t.status !== 'failed').length;
-        if (warnCount > 0) {
-            modalText += `Note that ${warnCount} of them did NOT failed. `;
-        }
-        modalText += "Do you want to continue?";
+        const modalText = `${transmissionList.length} messages will be reprocessed in the background.${(warnCount > 0) ? ` Note that ${warnCount} of them did NOT failed.` : ' '}Do you want to continue?`;
+        const modalButtons = {no: 'No', yes: 'Yes'};
 
-        const modalButtons = { no : 'No', yes : 'Yes' };
         showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
     }
 
@@ -116,7 +112,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     showParticipantLookup(participant) {
         const parts = participant.split(":");
-        window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`,'_blank');
+        window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`, '_blank');
     }
 
     mapSourcesSelect() {
