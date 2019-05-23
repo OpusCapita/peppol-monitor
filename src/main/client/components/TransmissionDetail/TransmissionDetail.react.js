@@ -42,7 +42,7 @@ class TransmissionDetail extends Components.ContextComponent {
     uploadFile(event) {
         const file = event.target.files[0];
         if (file.type !== 'text/xml') {
-            this.context.showNotification('Please select an XML file', 'error', 10);
+            this.context.showNotification('Please select an XML file', 'error', 3);
             return;
         }
 
@@ -52,7 +52,7 @@ class TransmissionDetail extends Components.ContextComponent {
 
         this.api.uploadFile(this.props.transmissionId, data).then(() => {
             this.setState({loading: false});
-            this.context.showNotification('Successfully updated the file', 'success', 10);
+            this.context.showNotification('Successfully updated the file', 'success', 3);
         }).catch(e => {
             this.setState({loading: false});
             this.context.showNotification(e.message, 'error', 10);
@@ -76,12 +76,29 @@ class TransmissionDetail extends Components.ContextComponent {
         });
     }
 
+    downloadMlr(event) {
+        this.setState({loading: true});
+        this.api.downloadMlr(this.props.transmissionId).then((response) => {
+            this.setState({loading: false});
+
+            const filename = response.headers['content-disposition'].split('filename=')[1];
+            let url = window.URL.createObjectURL(response.body);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+        }).catch(e => {
+            this.setState({loading: false});
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
     reprocessMessage(event) {
         event.preventDefault();
 
         this.api.reprocessMessage(this.props.transmissionId).then(() => {
             this.setState({loading: false});
-            this.context.showNotification('The file is sent for reprocessing', 'info', 10);
+            this.context.showNotification('The file is sent for reprocessing', 'info', 3);
         }).catch(e => {
             this.setState({loading: false});
             this.context.showNotification(e.message, 'error', 10);
@@ -135,6 +152,7 @@ class TransmissionDetail extends Components.ContextComponent {
     }
 
     render() {
+        const {i18n} = this.context;
         const {loading, transmission, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
         return (
@@ -239,6 +257,10 @@ class TransmissionDetail extends Components.ContextComponent {
                         Upload<input type="file" hidden onChange={e => this.uploadFile(e)}/>
                     </label>
                     <button className="btn btn-default" onClick={e => this.downloadFile(e)}>Download</button>
+                    {
+                        (transmission.direction === 'OUT' && transmission.status === 'failed') &&
+                        <button className="btn btn-default" onClick={e => this.downloadMlr(e)}>MLR</button>
+                    }
                     <button className="btn btn-danger" onClick={e => this.reprocessMessage(e)}>Reprocess</button>
                     { showHistory
                         ? <button className="btn btn-primary" onClick={e => this.hideHistory(e)}>Hide History</button>
@@ -259,7 +281,7 @@ class TransmissionDetail extends Components.ContextComponent {
                                         columns={[
                                             {
                                                 id: 'type',
-                                                width: 200,
+                                                width: 185,
                                                 Header: 'Type from Source',
                                                 accessor: log => log,
                                                 Cell: ({value}) =>
@@ -268,6 +290,13 @@ class TransmissionDetail extends Components.ContextComponent {
                                                             {(value.level === 'ERROR') ? value.errorType : value.level}
                                                         </span> from <span className="label label-default">{value.source}</span>
                                                     </span>
+                                            },
+                                            {
+                                                id: 'time',
+                                                width: 125,
+                                                accessor: log => log,
+                                                Header: 'Time',
+                                                Cell: ({value}) => <span className="label label-none">{i18n.formatDateTime(value.time)}</span>
                                             },
                                             {
                                                 id: 'message',

@@ -73,6 +73,38 @@ class TransmissionTable extends Components.ContextComponent {
         }
     }
 
+    async bulkReprocess() {
+        const {loading, transmissionList} = this.state;
+        const {showNotification, showModalDialog, hideModalDialog} = this.context;
+
+        const onConfirmationClick = (btn) => {
+            hideModalDialog();
+
+            if (btn === 'yes') {
+                this.setState({loading: true});
+
+                setTimeout(() => {
+                    const transmissionIds = transmissionList.map(t => t.id).join("-");
+                    this.api.reprocessMessages(transmissionIds).then(() => {
+                        this.setState({loading: false});
+                        this.context.showNotification('Reprocessing of the messages has been started', 'info', 3);
+                    }).catch(e => {
+                        this.setState({loading: false});
+                        this.context.showNotification(e.message, 'error', 10);
+                    });
+
+                }, 500);
+            }
+        }
+
+        const modalTitle = "Bulk Reprocess";
+        const warnCount = transmissionList.filter(t => t.status !== 'failed').length;
+        const modalText = `${transmissionList.length} messages will be reprocessed in the background.${(warnCount > 0) ? ` Note that ${warnCount} of them did NOT failed.` : ' '}\n\nDo you want to continue?`;
+        const modalButtons = {no: 'No', yes: 'Yes'};
+
+        showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
+    }
+
     showTransmissionDetail(e, id) {
         e && e.preventDefault();
         this.context.router.push(`/peppol-monitor/messageDetail/${id}`);
@@ -80,7 +112,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     showParticipantLookup(participant) {
         const parts = participant.split(":");
-        window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`,'_blank');
+        window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`, '_blank');
     }
 
     mapSourcesSelect() {
@@ -229,6 +261,7 @@ class TransmissionTable extends Components.ContextComponent {
                         <div className="form-submit text-right">
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
                             <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
+                            <button className="btn btn-danger float-left" onClick={() => this.bulkReprocess()}>Reprocess</button>
                         </div>
                         <hr/>
                     </div>
@@ -287,6 +320,7 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'status',
+                            width: 75,
                             accessor: 'status',
                             Header: 'Status',
                             Cell: ({value}) =>
@@ -294,6 +328,7 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'sender',
+                            width: 150,
                             accessor: 'sender',
                             Header: 'Sender',
                             Cell: ({value}) =>
@@ -303,6 +338,7 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'receiver',
+                            width: 150,
                             accessor: 'receiver',
                             Header: 'Receiver',
                             Cell: ({value}) =>
@@ -311,19 +347,23 @@ class TransmissionTable extends Components.ContextComponent {
                                 </a>
                         },
                         {
+                            width: 100,
                             accessor: 'accessPoint',
                             Header: 'Access Point'
                         },
                         {
                             id: 'source',
+                            width: 100,
                             accessor: 'source',
                             Header: 'Source',
                             Cell: ({value}) => <span className="well">{value}</span>
                         },
                         {
+                            id: 'arrivedAt',
+                            width: 150,
                             accessor: 'arrivedAt',
                             Header: 'Arrived At',
-                            Cell: props => <span>{i18n.formatDate(props.value)}</span>
+                            Cell: props => <span>{i18n.formatDateTime(props.value)}</span>
                         }
                     ]}
                 />
