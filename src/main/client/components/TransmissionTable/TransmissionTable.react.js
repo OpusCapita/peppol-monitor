@@ -214,10 +214,10 @@ class TransmissionTable extends Components.ContextComponent {
                                             <label className="control-label">Start Date</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <Components.DatePicker className="form-control"
-                                                dateFormat={ i18n.dateTimeFormat }
-                                                onChange={ val => this.handleSearchFormChange('startDate', val) }
-                                                value={ searchValues.startDate && new Date(searchValues.startDate) }
+                                            <Components.DatePicker showIcon={false}
+                                                dateFormat={i18n.dateTimeFormat}
+                                                onChange={val => this.handleSearchFormChange('startDate', val)}
+                                                value={searchValues.startDate && new Date(searchValues.startDate)}
                                             />
                                         </div>
                                     </div>
@@ -274,10 +274,10 @@ class TransmissionTable extends Components.ContextComponent {
                                             <label className="control-label">End Date</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <Components.DatePicker className="form-control"
-                                                dateFormat={ i18n.dateTimeFormat }
-                                                onChange={ val => this.handleSearchFormChange('endDate', val) }
-                                                value={ searchValues.endDate && new Date(searchValues.endDate) }
+                                            <Components.DatePicker showIcon={false}
+                                                dateFormat={i18n.dateTimeFormat}
+                                                onChange={val => this.handleSearchFormChange('endDate', val)}
+                                                value={searchValues.endDate && new Date(searchValues.endDate)}
                                             />
                                         </div>
                                     </div>
