@@ -46,15 +46,15 @@ class TransmissionDetail extends Components.ContextComponent {
             return;
         }
 
-        this.setState({loading: true});
+
         let data = new FormData();
         data.append('file', file);
-
+        this.context.showSpinner();
         this.api.uploadFile(this.props.transmissionId, data).then(() => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
             this.context.showNotification('Successfully updated the file', 'success', 3);
         }).catch(e => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
             this.context.showNotification(e.message, 'error', 10);
         });
     }
@@ -96,11 +96,12 @@ class TransmissionDetail extends Components.ContextComponent {
     reprocessMessage(event) {
         event.preventDefault();
 
+        this.context.showSpinner();
         this.api.reprocessMessage(this.props.transmissionId).then(() => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
             this.context.showNotification('The file is sent for reprocessing', 'info', 3);
         }).catch(e => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
             this.context.showNotification(e.message, 'error', 10);
         });
     }
