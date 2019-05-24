@@ -4,6 +4,7 @@ import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.Date;
 import java.util.List;
 
 public class TransmissionFilterDto {
@@ -12,6 +13,8 @@ public class TransmissionFilterDto {
     private String filename;
     private String participant;
     private String accessPoint;
+    private Date startDate;
+    private Date endDate;
     private List<Source> sources;
     private List<MessageStatus> statuses;
 
@@ -45,6 +48,22 @@ public class TransmissionFilterDto {
 
     public void setAccessPoint(String accessPoint) {
         this.accessPoint = accessPoint;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public List<Source> getSources() {

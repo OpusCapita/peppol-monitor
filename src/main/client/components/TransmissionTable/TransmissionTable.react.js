@@ -158,7 +158,9 @@ class TransmissionTable extends Components.ContextComponent {
             participant: '',
             accessPoint: '',
             sources: [],
-            statuses: []
+            statuses: [],
+            startDate: '',
+            endDate: ''
         };
 
         this.setState({searchValues}, () => this.loadTransmissionList());
@@ -207,6 +209,18 @@ class TransmissionTable extends Components.ContextComponent {
                                                    onChange={e => this.handleSearchFormChange('participant', e.target.value)}/>
                                         </div>
                                     </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Start Date</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Components.DatePicker className="form-control"
+                                                dateFormat={ i18n.dateTimeFormat }
+                                                onChange={ val => this.handleSearchFormChange('startDate', val) }
+                                                value={ searchValues.startDate && new Date(searchValues.startDate) }
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="col-md-6">
                                     <div className="form-group">
@@ -253,6 +267,18 @@ class TransmissionTable extends Components.ContextComponent {
                                                 isMulti={true}
                                                 noOptionsMessage={() => 'No Results'}
                                                 options={this.mapStatusesSelect()}/>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">End Date</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Components.DatePicker className="form-control"
+                                                dateFormat={ i18n.dateTimeFormat }
+                                                onChange={ val => this.handleSearchFormChange('endDate', val) }
+                                                value={ searchValues.endDate && new Date(searchValues.endDate) }
+                                            />
                                         </div>
                                     </div>
                                 </div>
