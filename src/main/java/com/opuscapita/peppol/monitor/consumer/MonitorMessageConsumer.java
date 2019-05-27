@@ -119,7 +119,14 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     private Message createMessageEntity(ContainerMessage cm) {
         Message message = new Message();
         message.setMessageId(cm.getMetadata().getMessageId());
-        message = messageService.saveMessage(message);
+
+        try {
+            message = messageService.saveMessage(message);
+        } catch (Exception e) {
+            logger.error("Error occurred while saving the message: " + cm.getFileName() + ", reason: " + e.getMessage());
+            message = messageService.getMessage(cm.getMetadata().getMessageId());
+        }
+
         return message;
     }
 
