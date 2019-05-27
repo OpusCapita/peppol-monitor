@@ -70,8 +70,13 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         } else {
             transmission = updateTransmissionEntity(cm, transmission);
         }
-        transmissionService.saveTransmission(transmission);
-        logger.info("Monitor saved the message: " + cm.getFileName());
+
+        try {
+            transmissionService.saveTransmission(transmission);
+            logger.info("Monitor saved the message: " + cm.getFileName());
+        } catch (Exception e) {
+            logger.error("Error occurred while saving the message: " + cm.getFileName() + ", reason: " + e.getMessage());
+        }
 
         if (cm.isOutbound()) {
             messageQueue.convertAndSend(mlrQueue, cm);
