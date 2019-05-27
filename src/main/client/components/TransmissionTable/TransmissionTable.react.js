@@ -158,7 +158,9 @@ class TransmissionTable extends Components.ContextComponent {
             participant: '',
             accessPoint: '',
             sources: [],
-            statuses: []
+            statuses: [],
+            startDate: '',
+            endDate: ''
         };
 
         this.setState({searchValues}, () => this.loadTransmissionList());
@@ -183,8 +185,8 @@ class TransmissionTable extends Components.ContextComponent {
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.id}
-                                                   placeholder={"e7a85712-21ae-4d8b-a2de-c012a39bbb12"}
-                                                   onChange={e => this.handleSearchFormChange('id', e.target.value)}/>
+                                                   onChange={e => this.handleSearchFormChange('id', e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="form-group">
@@ -193,8 +195,8 @@ class TransmissionTable extends Components.ContextComponent {
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.filename}
-                                                   placeholder={"logger_5723_0000000001703094.xml"}
-                                                   onChange={e => this.handleSearchFormChange('filename', e.target.value)}/>
+                                                   onChange={e => this.handleSearchFormChange('filename', e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="form-group">
@@ -203,8 +205,21 @@ class TransmissionTable extends Components.ContextComponent {
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.participant}
-                                                   placeholder={"9908:919779446"}
-                                                   onChange={e => this.handleSearchFormChange('participant', e.target.value)}/>
+                                                   onChange={e => this.handleSearchFormChange('participant', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Start Date</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Components.DatePicker
+                                                showIcon={false}
+                                                dateFormat={i18n.dateTimeFormat}
+                                                onChange={e => this.handleSearchFormChange('startDate', e.date)}
+                                                value={searchValues.startDate && new Date(searchValues.startDate)}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -215,8 +230,8 @@ class TransmissionTable extends Components.ContextComponent {
                                         </div>
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.accessPoint}
-                                                   placeholder={"PNO000104"}
-                                                   onChange={e => this.handleSearchFormChange('accessPoint', e.target.value)}/>
+                                                   onChange={e => this.handleSearchFormChange('accessPoint', e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="form-group">
@@ -224,17 +239,14 @@ class TransmissionTable extends Components.ContextComponent {
                                             <label className="control-label">Source</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <Select
-                                                className="react-select"
-                                                placeholder="NETWORK"
-                                                value={searchValues.sources && searchValues.sources.map(src => ({
-                                                    label: src,
-                                                    value: src
-                                                }))}
-                                                onChange={value => this.handleSearchFormChange('sources', value)}
-                                                isMulti={true}
-                                                noOptionsMessage={() => 'No Results'}
-                                                options={this.mapSourcesSelect()}/>
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapSourcesSelect()}
+                                                    onChange={value => this.handleSearchFormChange('sources', value)}
+                                                    value={searchValues.sources && searchValues.sources.map(src => ({
+                                                        label: src,
+                                                        value: src
+                                                    }))}
+                                            />
                                         </div>
                                     </div>
                                     <div className="form-group">
@@ -242,17 +254,27 @@ class TransmissionTable extends Components.ContextComponent {
                                             <label className="control-label">Status</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <Select
-                                                className="react-select"
-                                                placeholder="failed"
-                                                value={searchValues.statuses && searchValues.statuses.map(sts => ({
-                                                    label: sts,
-                                                    value: sts
-                                                }))}
-                                                onChange={value => this.handleSearchFormChange('statuses', value)}
-                                                isMulti={true}
-                                                noOptionsMessage={() => 'No Results'}
-                                                options={this.mapStatusesSelect()}/>
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapStatusesSelect()}
+                                                    onChange={value => this.handleSearchFormChange('statuses', value)}
+                                                    value={searchValues.statuses && searchValues.statuses.map(sts => ({
+                                                        label: sts,
+                                                        value: sts
+                                                    }))}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">End Date</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Components.DatePicker
+                                                showIcon={false}
+                                                dateFormat={i18n.dateTimeFormat}
+                                                onChange={e => this.handleSearchFormChange('endDate', e.date)}
+                                                value={searchValues.endDate && new Date(searchValues.endDate)}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -298,7 +320,8 @@ class TransmissionTable extends Components.ContextComponent {
                                        onClick={(e) => this.showTransmissionDetail(e, value.id)}>
                                         {value.transmissionId}
                                     </a>
-                                    <ReactTooltip className="sticky" id={`id-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>
+                                    <ReactTooltip id={`id-tooltip-${value.transmissionId}`}
+                                                  className="sticky" effect="solid" delayHide={100}>
                                         <p>Message ID: {value.messageId}</p>
                                         <p>Transmission ID: {value.transmissionId}</p>
                                     </ReactTooltip>
@@ -313,7 +336,8 @@ class TransmissionTable extends Components.ContextComponent {
                                     <span data-tip data-for={`name-tooltip-${value.transmissionId}`}>
                                         {value.filename.split('/').pop()}
                                     </span>
-                                    <ReactTooltip className="sticky" id={`name-tooltip-${value.transmissionId}`} effect="solid" delayHide={100}>
+                                    <ReactTooltip id={`name-tooltip-${value.transmissionId}`}
+                                                  className="sticky" effect="solid" delayHide={100}>
                                         {value.filename}
                                     </ReactTooltip>
                                 </span>
