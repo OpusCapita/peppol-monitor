@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TransmissionFilterSpecification {
@@ -59,6 +60,20 @@ public class TransmissionFilterSpecification {
                         criteriaBuilder.in(root.get("status")).value(filterDto.getStatuses())
                 );
                 predicates.add(statusPredicate);
+            }
+
+            if (filterDto.getStartDate() != null) {
+                Predicate datePredicate = criteriaBuilder.and(
+                        criteriaBuilder.greaterThan(root.<Date>get("arrivedAt"), filterDto.getStartDate())
+                );
+                predicates.add(datePredicate);
+            }
+
+            if (filterDto.getEndDate() != null) {
+                Predicate datePredicate = criteriaBuilder.and(
+                        criteriaBuilder.lessThan(root.<Date>get("arrivedAt"), filterDto.getEndDate())
+                );
+                predicates.add(datePredicate);
             }
 
             if (sortingDtos != null && !sortingDtos.isEmpty()) {
