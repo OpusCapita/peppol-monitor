@@ -7,6 +7,7 @@ import com.opuscapita.peppol.monitor.controller.dtos.TransmissionDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionResponseDto;
 import com.opuscapita.peppol.monitor.entity.AccessPoint;
+import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Participant;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
@@ -101,6 +102,21 @@ public class MonitorRestController {
         header.setContentLength(rawData.length);
         header.set("Content-Disposition", "attachment; filename=" + filename);
         return new ResponseEntity<>(rawData, header, HttpStatus.OK);
+    }
+
+    @GetMapping("/mark-fixed-message/{transmissionId}")
+    public ResponseEntity<?> markAsFixedMessage(@PathVariable Long transmissionId) {
+        Transmission transmission = transmissionService.getTransmission(transmissionId);
+        if (transmission == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        DocumentLog log = new DocumentLog("Message marked as fixed", DocumentLogLevel.INFO);
+        log.setSource(ProcessStep.WEB);
+        transmission.setStatus(MessageStatus.fixed);
+        transmissionService.addMessageToHistoryOfTransmission(transmission, log);
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/reprocess-message/{transmissionId}")

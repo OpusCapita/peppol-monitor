@@ -93,6 +93,19 @@ class TransmissionDetail extends Components.ContextComponent {
         });
     }
 
+    markAsFixed(event) {
+        event.preventDefault();
+
+        this.context.showSpinner();
+        this.api.markAsFixedMessage(this.props.transmissionId).then(() => {
+            this.context.hideSpinner();
+            this.context.showNotification('The transmission is marked as fixed', 'info', 3);
+        }).catch(e => {
+            this.context.hideSpinner();
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
     reprocessMessage(event) {
         event.preventDefault();
 
@@ -263,6 +276,7 @@ class TransmissionDetail extends Components.ContextComponent {
                         <button className="btn btn-default" onClick={e => this.downloadMlr(e)}>MLR</button>
                     }
                     <button className="btn btn-danger" onClick={e => this.reprocessMessage(e)}>Reprocess</button>
+                    <button className="btn btn-success" onClick={e => this.markAsFixed(e)}>Mark as Fixed</button>
                     { showHistory
                         ? <button className="btn btn-primary" onClick={e => this.hideHistory(e)}>Hide History</button>
                         : <button className="btn btn-primary" onClick={e => this.loadHistory(e)}>Show History</button>
