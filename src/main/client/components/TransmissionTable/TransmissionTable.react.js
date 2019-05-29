@@ -61,31 +61,19 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     saveStateToLocalStorage() {
-        const setValue = (key) => {
-            localStorage.setItem("transmissionTable_" + key, JSON.stringify(this.state[key]));
-        };
-
-        setValue("totalCount");
-        setValue("pagination");
-        setValue("searchValues");
+        localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
     }
 
     loadStateFromLocalStorage() {
-        const getValue = (key) => {
-            let value = localStorage.getItem("transmissionTable_" + key);
-            try {
-                value = JSON.parse(value);
-            } catch (e) {
-            }
+        let searchValues = localStorage.getItem("transmissionTable_searchValues");
+        try {
+            searchValues = JSON.parse(searchValues);
+        } catch (e) {
+        }
 
-            if (value) {
-                this.setState({[key]: value});
-            }
-        };
-
-        getValue("totalCount");
-        getValue("pagination");
-        getValue("searchValues");
+        if (searchValues) {
+            this.setState({searchValues}, () => this.loadTransmissionList());
+        }
     }
 
     async loadTransmissionList(tableState) {
@@ -455,7 +443,7 @@ class TransmissionTable extends Components.ContextComponent {
                     ]}
                 />
                 <div className="text-center media">
-                    <p>{`${pagination.page * pagination.pageSize} to ${pagination.page * pagination.pageSize + pagination.pageSize} of ${totalCount} transmissions`}</p>
+                    <p>{`${pagination.page * pagination.pageSize} to ${Math.min((pagination.page * pagination.pageSize + pagination.pageSize), totalCount)} of ${totalCount} transmissions`}</p>
                 </div>
             </div>
         );
