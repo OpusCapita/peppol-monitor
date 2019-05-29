@@ -68,17 +68,16 @@ class TransmissionTable extends Components.ContextComponent {
 
     loadStateFromLocalStorage() {
         const getValue = (key) => {
-            let value = localStorage.getItem(key);
+            let value = localStorage.getItem("transmissionTable_" + key);
             try {
-                return JSON.parse(value);
+                value = JSON.parse(value);
             } catch (e) {
-                return value;
+            }
+
+            if (value) {
+                this.setState({[key]: value});
             }
         }
-
-        this.setState({totalCount: getValue("transmissionTable_totalCount")});
-        this.setState({pagination: getValue("transmissionTable_pagination")});
-        this.setState({searchValues: getValue("transmissionTable_searchValues")});
     }
 
     async loadTransmissionList(tableState) {
@@ -337,8 +336,11 @@ class TransmissionTable extends Components.ContextComponent {
                         </div>
                         <div className="form-submit text-right">
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
-                            <button className="btn btn-danger float-left" onClick={() => this.bulkReprocess()}>Reprocess</button>
+                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter
+                            </button>
+                            <button className="btn btn-danger float-left"
+                                    onClick={() => this.bulkReprocess()}>Reprocess
+                            </button>
                         </div>
                         <hr/>
                     </div>
