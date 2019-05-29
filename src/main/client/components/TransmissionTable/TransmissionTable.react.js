@@ -61,9 +61,13 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     saveStateToLocalStorage() {
-        localStorage.setItem("transmissionTable_totalCount", this.state.totalCount);
-        localStorage.setItem("transmissionTable_pagination", JSON.stringify(this.state.pagination));
-        localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
+        const setValue = (key) => {
+            localStorage.setItem("transmissionTable_" + key, JSON.stringify(this.state[key]));
+        };
+
+        setValue("totalCount");
+        setValue("pagination");
+        setValue("searchValues");
     }
 
     loadStateFromLocalStorage() {
@@ -77,7 +81,11 @@ class TransmissionTable extends Components.ContextComponent {
             if (value) {
                 this.setState({[key]: value});
             }
-        }
+        };
+
+        getValue("totalCount");
+        getValue("pagination");
+        getValue("searchValues");
     }
 
     async loadTransmissionList(tableState) {
@@ -354,7 +362,7 @@ class TransmissionTable extends Components.ContextComponent {
 
                     manual
                     minRows={10}
-                    pages={Math.floor(totalCount / (pagination.pageSize || 10))}
+                    pages={Math.ceil(totalCount / (pagination.pageSize || 10))}
                     defaultPageSize={10}
                     pageSizeOptions={[5, 10, 20, 50]}
                     defaultSorted={[{id: 'arrivedAt', desc: true}]}
