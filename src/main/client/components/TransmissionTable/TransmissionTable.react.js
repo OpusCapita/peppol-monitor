@@ -63,7 +63,7 @@ class TransmissionTable extends Components.ContextComponent {
     saveStateToLocalStorage() {
         const setValue = (key) => {
             localStorage.setItem("transmissionTable_" + key, JSON.stringify(this.state[key]));
-        }
+        };
 
         setValue("totalCount");
         setValue("pagination");
@@ -81,7 +81,7 @@ class TransmissionTable extends Components.ContextComponent {
             if (value) {
                 this.setState({[key]: value});
             }
-        }
+        };
 
         getValue("totalCount");
         getValue("pagination");
