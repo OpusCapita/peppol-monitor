@@ -33,12 +33,18 @@ public class TransmissionFilterSpecification {
                 predicates.add(filenamePredicate);
             }
 
-            if (StringUtils.isNotBlank(filterDto.getParticipant())) {
-                Predicate participantPredicate = criteriaBuilder.and(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("sender"), "%" + filterDto.getParticipant() + "%"),
-                        criteriaBuilder.like(root.get("receiver"), "%" + filterDto.getParticipant() + "%")
-                ));
-                predicates.add(participantPredicate);
+            if (StringUtils.isNotBlank(filterDto.getSender())) {
+                Predicate senderPredicate = criteriaBuilder.and(
+                        criteriaBuilder.like(root.get("sender"), "%" + filterDto.getSender() + "%")
+                );
+                predicates.add(senderPredicate);
+            }
+
+            if (StringUtils.isNotBlank(filterDto.getReceiver())) {
+                Predicate receiverPredicate = criteriaBuilder.and(
+                        criteriaBuilder.like(root.get("receiver"), "%" + filterDto.getReceiver() + "%")
+                );
+                predicates.add(receiverPredicate);
             }
 
             if (StringUtils.isNotBlank(filterDto.getAccessPoint())) {
@@ -46,6 +52,13 @@ public class TransmissionFilterSpecification {
                         criteriaBuilder.like(root.get("accessPoint"), "%" + filterDto.getAccessPoint() + "%")
                 );
                 predicates.add(accessPointPredicate);
+            }
+
+            if (StringUtils.isNotBlank(filterDto.getHistory())) {
+                Predicate historyPredicate = criteriaBuilder.and(
+                        criteriaBuilder.like(root.get("rawHistory"), "%" + filterDto.getHistory() + "%")
+                );
+                predicates.add(historyPredicate);
             }
 
             if (filterDto.getSources() != null && !filterDto.getSources().isEmpty()) {

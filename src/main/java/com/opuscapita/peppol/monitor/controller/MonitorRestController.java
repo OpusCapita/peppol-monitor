@@ -10,6 +10,7 @@ import com.opuscapita.peppol.monitor.entity.AccessPoint;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Participant;
 import com.opuscapita.peppol.monitor.entity.Transmission;
+import com.opuscapita.peppol.monitor.mlrreport.MlrReportManager;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
 import com.opuscapita.peppol.monitor.repository.TransmissionService;
@@ -38,14 +39,16 @@ public class MonitorRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorRestController.class);
 
+    private final MlrReportManager mlrManager;
     private final ReprocessManager reprocessManager;
     private final TransmissionService transmissionService;
     private final ParticipantRepository participantRepository;
     private final AccessPointRepository accessPointRepository;
 
     @Autowired
-    public MonitorRestController(TransmissionService transmissionService, ReprocessManager reprocessManager,
+    public MonitorRestController(MlrReportManager mlrManager, TransmissionService transmissionService, ReprocessManager reprocessManager,
                                  ParticipantRepository participantRepository, AccessPointRepository accessPointRepository) {
+        this.mlrManager = mlrManager;
         this.reprocessManager = reprocessManager;
         this.transmissionService = transmissionService;
         this.participantRepository = participantRepository;
@@ -55,7 +58,7 @@ public class MonitorRestController {
     @PostMapping("/get-transmissions")
     public TransmissionResponseDto getTransmissions(@RequestBody TransmissionRequestDto request) {
         Page<Transmission> transmissions = transmissionService.getAllTransmissions(request);
-        return new TransmissionResponseDto(transmissions.getContent(), transmissions.getTotalPages());
+        return new TransmissionResponseDto(transmissions.getContent(), transmissions.getTotalElements());
     }
 
     @GetMapping("/get-transmission-by-id/{id}")
@@ -104,6 +107,17 @@ public class MonitorRestController {
         return new ResponseEntity<>(rawData, header, HttpStatus.OK);
     }
 
+    @GetMapping("/send-mlr/{transmissionId}")
+    public ResponseEntity<?> sendMlrOfTransmission(@PathVariable Long transmissionId) throws Exception {
+        Transmission transmission = transmissionService.getTransmission(transmissionId);
+        if (transmission == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        mlrManager.sendToMlrReporter(transmission);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/mark-fixed-message/{transmissionId}")
     public ResponseEntity<?> markAsFixedMessage(@PathVariable Long transmissionId) {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
@@ -147,6 +161,7 @@ public class MonitorRestController {
 
         DocumentLog log = new DocumentLog("Sending REPROCESS request for the message", DocumentLogLevel.INFO);
         log.setSource(ProcessStep.REPROCESSOR);
+        transmission.setStatus(MessageStatus.fixed);
         transmissionService.addMessageToHistoryOfTransmission(transmission, log);
 
         reprocessManager.reprocessMessage(transmission);

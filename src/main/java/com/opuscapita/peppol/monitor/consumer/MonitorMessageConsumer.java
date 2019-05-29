@@ -4,9 +4,9 @@ import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.container.metadata.AccessPointInfo;
 import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
-import com.opuscapita.peppol.commons.queue.MessageQueue;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
 import com.opuscapita.peppol.monitor.entity.*;
+import com.opuscapita.peppol.monitor.mlrreport.MlrReportManager;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,10 +24,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorMessageConsumer.class);
 
-    @Value("${peppol.mlr-reporter.queue.in.name}")
-    private String mlrQueue;
-
-    private MessageQueue messageQueue;
+    private MlrReportManager mlrManager;
     private MessageService messageService;
     private TransmissionService transmissionService;
     private AccessPointRepository accessPointRepository;
@@ -36,10 +32,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     private TransmissionHistorySerializer historySerializer;
 
     @Autowired
-    public MonitorMessageConsumer(MessageQueue messageQueue, MessageService messageService, TransmissionService transmissionService,
-                                  AccessPointRepository accessPointRepository, ParticipantRepository participantRepository,
-                                  TransmissionHistorySerializer historySerializer) {
-        this.messageQueue = messageQueue;
+    public MonitorMessageConsumer(MlrReportManager mlrManager, MessageService messageService,
+                                  TransmissionService transmissionService, AccessPointRepository accessPointRepository,
+                                  ParticipantRepository participantRepository, TransmissionHistorySerializer historySerializer) {
+        this.mlrManager = mlrManager;
         this.messageService = messageService;
         this.historySerializer = historySerializer;
         this.transmissionService = transmissionService;
@@ -70,18 +66,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         } else {
             transmission = updateTransmissionEntity(cm, transmission);
         }
+        transmissionService.saveTransmission(transmission);
 
-        try {
-            transmissionService.saveTransmission(transmission);
-            logger.info("Monitor saved the message: " + cm.getFileName());
-        } catch (Exception e) {
-            logger.error("Error occurred while saving the message: " + cm.getFileName() + ", reason: " + e.getMessage());
-        }
-
-        if (cm.isOutbound()) {
-            messageQueue.convertAndSend(mlrQueue, cm);
-            logger.debug("Monitor send the message to mlr-reporter: " + cm.getFileName());
-        }
+        // finally send message to mlr-reporter
+        mlrManager.sendToMlrReporter(cm);
     }
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
@@ -119,14 +107,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     private Message createMessageEntity(ContainerMessage cm) {
         Message message = new Message();
         message.setMessageId(cm.getMetadata().getMessageId());
-
-        try {
-            message = messageService.saveMessage(message);
-        } catch (Exception e) {
-            logger.error("Error occurred while saving the message: " + cm.getFileName() + ", reason: " + e.getMessage());
-            message = messageService.getMessage(cm.getMetadata().getMessageId());
-        }
-
+        message = messageService.saveMessage(message);
         return message;
     }
 

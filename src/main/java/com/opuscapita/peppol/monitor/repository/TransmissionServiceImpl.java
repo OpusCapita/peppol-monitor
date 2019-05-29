@@ -9,6 +9,8 @@ import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.util.TransmissionHistorySerializer;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 @Component
 public class TransmissionServiceImpl implements TransmissionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TransmissionServiceImpl.class);
+
     private final Storage storage;
     private final TransmissionRepository repository;
     private final TransmissionHistorySerializer historySerializer;
@@ -36,7 +40,14 @@ public class TransmissionServiceImpl implements TransmissionService {
 
     @Override
     public Transmission saveTransmission(Transmission transmission) {
-        return repository.save(transmission);
+        try {
+            transmission = repository.save(transmission);
+            logger.info("Monitor saved the message: " + transmission.getFilename());
+        } catch (Exception e) {
+            logger.error("Error occurred while saving the message: " + transmission.getFilename() + ", reason: " + e.getMessage());
+        }
+
+        return transmission;
     }
 
     @Override

@@ -60,9 +60,9 @@ class TransmissionDetail extends Components.ContextComponent {
     }
 
     downloadFile(event) {
-        this.setState({loading: true});
+        this.context.showSpinner();
         this.api.downloadFile(this.props.transmissionId).then((response) => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
 
             const filename = response.headers['content-disposition'].split('filename=')[1];
             let url = window.URL.createObjectURL(response.body);
@@ -71,15 +71,26 @@ class TransmissionDetail extends Components.ContextComponent {
             a.download = filename;
             a.click();
         }).catch(e => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
+    sendMlr(event) {
+        this.context.showSpinner();
+        this.api.sendMlr(this.props.transmissionId).then((response) => {
+            this.context.hideSpinner();
+            this.context.showNotification('The request is sent to mlr-reporter', 'info', 3);
+        }).catch(e => {
+            this.context.hideSpinner();
             this.context.showNotification(e.message, 'error', 10);
         });
     }
 
     downloadMlr(event) {
-        this.setState({loading: true});
+        this.context.showSpinner();
         this.api.downloadMlr(this.props.transmissionId).then((response) => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
 
             const filename = response.headers['content-disposition'].split('filename=')[1];
             let url = window.URL.createObjectURL(response.body);
@@ -88,7 +99,7 @@ class TransmissionDetail extends Components.ContextComponent {
             a.download = filename;
             a.click();
         }).catch(e => {
-            this.setState({loading: false});
+            this.context.hideSpinner();
             this.context.showNotification(e.message, 'error', 10);
         });
     }
@@ -108,15 +119,32 @@ class TransmissionDetail extends Components.ContextComponent {
 
     reprocessMessage(event) {
         event.preventDefault();
+        const {transmission} = this.state;
+        const {showNotification, showModalDialog, hideModalDialog, showSpinner, hideSpinner} = this.context;
 
-        this.context.showSpinner();
-        this.api.reprocessMessage(this.props.transmissionId).then(() => {
-            this.context.hideSpinner();
-            this.context.showNotification('The file is sent for reprocessing', 'info', 3);
-        }).catch(e => {
-            this.context.hideSpinner();
-            this.context.showNotification(e.message, 'error', 10);
-        });
+        const onConfirmationClick = (btn) => {
+            hideModalDialog();
+
+            if (btn === 'yes') {
+                showSpinner();
+
+                setTimeout(() => {
+                    this.api.reprocessMessage(this.props.transmissionId).then(() => {
+                        hideSpinner();
+                        this.context.showNotification('The file is sent for reprocessing', 'info', 3);
+                    }).catch(e => {
+                        hideSpinner();
+                        this.context.showNotification(e.message, 'error', 10);
+                    });
+                }, 500);
+            }
+        }
+
+        const modalTitle = "Reprocess";
+        const modalText = `Message will be reprocessed in the background. This transmission will be marked as fixed and a new transmission will be created.${(transmission.status !== 'failed') ? `\n\nNote that this transmission is NOT failed.` : ''}\n\nDo you want to continue?`;
+        const modalButtons = {no: 'No', yes: 'Yes'};
+
+        showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
     }
 
     loadHistory(e) {
@@ -267,13 +295,17 @@ class TransmissionDetail extends Components.ContextComponent {
                     </div>
                 </div>
                 <div className="form-submit text-right transmission-detail-actions">
-                    <label className="btn btn-default">
-                        Upload<input type="file" hidden onChange={e => this.uploadFile(e)}/>
-                    </label>
-                    <button className="btn btn-default" onClick={e => this.downloadFile(e)}>Download</button>
+                    {/*<label className="btn btn-default">*/}
+                        {/*Upload<input type="file" hidden onChange={e => this.uploadFile(e)}/>*/}
+                    {/*</label>*/}
+                    <button className="btn btn-default" onClick={e => this.downloadFile(e)}>Download File</button>
                     {
-                        (transmission.direction === 'OUT' && transmission.status === 'failed') &&
-                        <button className="btn btn-default" onClick={e => this.downloadMlr(e)}>MLR</button>
+                        (transmission.direction === 'OUT') &&
+                        <button className="btn btn-default" onClick={e => this.downloadMlr(e)}>Download MLR</button>
+                    }
+                    {
+                        (transmission.direction === 'OUT') &&
+                        <button className="btn btn-default" onClick={e => this.sendMlr(e)}>Send MLR</button>
                     }
                     <button className="btn btn-danger" onClick={e => this.reprocessMessage(e)}>Reprocess</button>
                     <button className="btn btn-success" onClick={e => this.markAsFixed(e)}>Mark as Fixed</button>
