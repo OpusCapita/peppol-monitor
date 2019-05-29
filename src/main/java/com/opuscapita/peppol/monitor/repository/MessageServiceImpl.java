@@ -1,6 +1,8 @@
 package com.opuscapita.peppol.monitor.repository;
 
 import com.opuscapita.peppol.monitor.entity.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -9,6 +11,8 @@ import java.util.List;
 
 @Component
 public class MessageServiceImpl implements MessageService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MessageServiceImpl.class);
 
     private final MessageRepository repository;
 
@@ -19,7 +23,14 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Message saveMessage(Message message) {
-        return repository.save(message);
+        try {
+            message = repository.save(message);
+        } catch (Exception e) {
+            logger.error("Error occurred while saving the message, reason: " + e.getMessage());
+            message = getMessage(message.getMessageId());
+        }
+
+        return message;
     }
 
     @Override

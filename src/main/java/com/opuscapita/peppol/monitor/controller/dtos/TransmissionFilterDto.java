@@ -11,10 +11,12 @@ public class TransmissionFilterDto {
 
     private String id;
     private String filename;
-    private String participant;
+    private String sender;
+    private String receiver;
     private String accessPoint;
     private Date startDate;
     private Date endDate;
+    private String history;
     private List<Source> sources;
     private List<MessageStatus> statuses;
 
@@ -34,12 +36,20 @@ public class TransmissionFilterDto {
         this.filename = filename;
     }
 
-    public String getParticipant() {
-        return participant;
+    public String getSender() {
+        return sender;
     }
 
-    public void setParticipant(String participant) {
-        this.participant = participant;
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 
     public String getAccessPoint() {
@@ -64,6 +74,14 @@ public class TransmissionFilterDto {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public String getHistory() {
+        return history;
+    }
+
+    public void setHistory(String history) {
+        this.history = history;
     }
 
     public List<Source> getSources() {

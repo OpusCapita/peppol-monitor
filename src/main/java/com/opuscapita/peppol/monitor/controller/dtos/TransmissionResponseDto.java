@@ -7,20 +7,20 @@ import java.util.stream.Collectors;
 
 public class TransmissionResponseDto {
 
-    private Integer pages;
+    private Long totalCount;
     private List<TransmissionDto> data;
 
-    public TransmissionResponseDto(List<Transmission> transmissionList, Integer pages) {
-        this.pages = pages;
+    public TransmissionResponseDto(List<Transmission> transmissionList, Long totalCount) {
+        this.totalCount = totalCount;
         this.data = transmissionList.stream().map(TransmissionDto::of).collect(Collectors.toList());
     }
 
-    public Integer getPages() {
-        return pages;
+    public Long getTotalCount() {
+        return totalCount;
     }
 
-    public void setPages(Integer pages) {
-        this.pages = pages;
+    public void setTotalCount(Long totalCount) {
+        this.totalCount = totalCount;
     }
 
     public List<TransmissionDto> getData() {
