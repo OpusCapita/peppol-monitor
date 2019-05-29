@@ -366,20 +366,16 @@ class TransmissionTable extends Components.ContextComponent {
                     columns={[
                         {
                             id: 'transmissionId',
-                            Header: 'Transmission ID',
+                            Header: ' ',
+                            width: 50,
                             accessor: row => row,
                             Cell: ({value}) =>
                                 <span>
-                                    <a href={`/peppol-monitor?r=messageDetail/${value.id}`} className="btn btn-link"
-                                       data-tip data-for={`id-tooltip-${value.transmissionId}`}
-                                       onClick={(e) => this.showTransmissionDetail(e, value.id)}>
-                                        {value.transmissionId}
+                                    <a href={`/peppol-monitor?r=messageDetail/${value.id}`}
+                                       onClick={(e) => this.showTransmissionDetail(e, value.id)}
+                                       className="btn btn-link detail-link">
+                                        <span className="glyphicon glyphicon-open-file"></span>
                                     </a>
-                                    <ReactTooltip id={`id-tooltip-${value.transmissionId}`}
-                                                  className="sticky" effect="solid" delayHide={100}>
-                                        <p>Message ID: {value.messageId}</p>
-                                        <p>Transmission ID: {value.transmissionId}</p>
-                                    </ReactTooltip>
                                 </span>
                         },
                         {
@@ -393,7 +389,9 @@ class TransmissionTable extends Components.ContextComponent {
                                     </span>
                                     <ReactTooltip id={`name-tooltip-${value.transmissionId}`}
                                                   className="sticky" effect="solid" delayHide={100}>
-                                        {value.filename}
+                                        <p>Message ID: {value.messageId}</p>
+                                        <p>Transmission ID: {value.transmissionId}</p>
+                                        <p>Full Path: {value.filename}</p>
                                     </ReactTooltip>
                                 </span>
                         },
