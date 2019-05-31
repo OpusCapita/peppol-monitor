@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,15 @@ public class TransmissionServiceImpl implements TransmissionService {
     @Override
     public Transmission getTransmission(String transmissionId) {
         return repository.findByTransmissionId(transmissionId);
+    }
+
+    @Override
+    public Transmission getByFilename(String filename) {
+        List<Transmission> transmissions = repository.findByFilename(filename);
+        if (transmissions == null || transmissions.isEmpty()) {
+            return null;
+        }
+        return transmissions.stream().max(Comparator.comparing(Transmission::getId)).orElse(null);
     }
 
     @Override
