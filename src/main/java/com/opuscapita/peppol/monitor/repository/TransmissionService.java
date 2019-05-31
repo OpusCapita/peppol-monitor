@@ -18,6 +18,8 @@ public interface TransmissionService {
 
     Transmission getTransmission(String transmissionId);
 
+    Transmission getByFilename(String filename);
+
     List<Transmission> getAllTransmissions(String messageId);
 
     List<Transmission> filterTransmissions(TransmissionFilterDto filterDto);

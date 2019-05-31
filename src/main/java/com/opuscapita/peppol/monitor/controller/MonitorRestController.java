@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,9 @@ import java.util.stream.Collectors;
 public class MonitorRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorRestController.class);
+
+    @Value("${manual-operation}")
+    private String filenames;
 
     private final MlrReportManager mlrManager;
     private final ReprocessManager reprocessManager;
@@ -165,6 +169,20 @@ public class MonitorRestController {
         transmissionService.addMessageToHistoryOfTransmission(transmission, log);
 
         reprocessManager.reprocessMessage(transmission);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/manual-operation/{operationName}")
+    public ResponseEntity<?> manualOperation(@PathVariable String operationName) throws Exception {
+        String[] list = filenames.split("\\n");
+        for (String filename : list) {
+            Transmission transmission = transmissionService.getByFilename(filename);
+            if (transmission != null) {
+                if (operationName.equals("send-mlr")) {
+                    mlrManager.sendToMlrReporter(transmission);
+                }
+            }
+        }
         return ResponseEntity.ok().build();
     }
 
