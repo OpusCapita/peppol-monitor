@@ -40,7 +40,7 @@ public class MonitorRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorRestController.class);
 
-    @Value("${manual-operation}")
+    @Value("${manual-operation:''}")
     private String filenames;
 
     private final MlrReportManager mlrManager;
