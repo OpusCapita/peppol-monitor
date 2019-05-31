@@ -75,7 +75,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     async loadTransmissionList(tableState) {
         this.setState({loading: true});
-        const {pagination, searchValues} = this.state;
+        let {pagination, searchValues} = this.state;
 
         if (init) {
             searchValues = this.loadStateFromLocalStorage() || searchValues;
