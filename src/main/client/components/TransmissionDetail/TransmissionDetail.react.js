@@ -377,6 +377,11 @@ class TransmissionDetail extends Components.ContextComponent {
                         </div>
                     </div>
                 }
+                <div className="footer-wrapper">
+                    <a className='btn btn-default' href="#" onClick={() => router.push('/peppol-monitor?r=messages')}>
+                        <span className="icon glyphicon glyphicon-chevron-left"/> Go to List
+                    </a>
+                </div>
             </div>
         );
     }
