@@ -28,6 +28,7 @@ class TransmissionTable extends Components.ContextComponent {
     ];
 
     state = {
+        init: true,
         loading: false,
         transmissionList: [],
         searchValues: {},
@@ -50,35 +51,35 @@ class TransmissionTable extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
-    // componentDidMount() {
-    //     this.loadStateFromLocalStorage();
-    //     window.addEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
-    // }
-    //
-    // componentWillUnmount() {
-    //     window.removeEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
-    //     this.saveStateToLocalStorage();
-    // }
-    //
-    // saveStateToLocalStorage() {
-    //     localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
-    // }
-    //
-    // loadStateFromLocalStorage() {
-    //     let searchValues = localStorage.getItem("transmissionTable_searchValues");
-    //     try {
-    //         searchValues = JSON.parse(searchValues);
-    //     } catch (e) {
-    //     }
-    //
-    //     if (searchValues) {
-    //         this.setState({searchValues}, () => this.loadTransmissionList());
-    //     }
-    // }
+    componentDidMount() {
+        window.addEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
+        this.saveStateToLocalStorage();
+    }
+
+    saveStateToLocalStorage() {
+        localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
+    }
+
+    loadStateFromLocalStorage() {
+        this.setState({init: false});
+        try {
+            return JSON.parse(localStorage.getItem("transmissionTable_searchValues"));
+        } catch (e) {
+            return undefined;
+        }
+    }
 
     async loadTransmissionList(tableState) {
         this.setState({loading: true});
-        const {pagination, searchValues} = this.state;
+        let {pagination, searchValues} = this.state;
+
+        if (init) {
+            searchValues = this.loadStateFromLocalStorage() || searchValues;
+        }
 
         try {
             if (tableState) {
