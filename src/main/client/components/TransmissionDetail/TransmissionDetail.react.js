@@ -194,7 +194,7 @@ class TransmissionDetail extends Components.ContextComponent {
     }
 
     render() {
-        const {i18n} = this.context;
+        const {i18n, router} = this.context;
         const {loading, transmission, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
         return (
