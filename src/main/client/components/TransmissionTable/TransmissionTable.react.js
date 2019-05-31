@@ -50,31 +50,31 @@ class TransmissionTable extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
-    componentDidMount() {
-        this.loadStateFromLocalStorage();
-        window.addEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
-        this.saveStateToLocalStorage();
-    }
-
-    saveStateToLocalStorage() {
-        localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
-    }
-
-    loadStateFromLocalStorage() {
-        let searchValues = localStorage.getItem("transmissionTable_searchValues");
-        try {
-            searchValues = JSON.parse(searchValues);
-        } catch (e) {
-        }
-
-        if (searchValues) {
-            this.setState({searchValues}, () => this.loadTransmissionList());
-        }
-    }
+    // componentDidMount() {
+    //     this.loadStateFromLocalStorage();
+    //     window.addEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
+    // }
+    //
+    // componentWillUnmount() {
+    //     window.removeEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
+    //     this.saveStateToLocalStorage();
+    // }
+    //
+    // saveStateToLocalStorage() {
+    //     localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
+    // }
+    //
+    // loadStateFromLocalStorage() {
+    //     let searchValues = localStorage.getItem("transmissionTable_searchValues");
+    //     try {
+    //         searchValues = JSON.parse(searchValues);
+    //     } catch (e) {
+    //     }
+    //
+    //     if (searchValues) {
+    //         this.setState({searchValues}, () => this.loadTransmissionList());
+    //     }
+    // }
 
     async loadTransmissionList(tableState) {
         this.setState({loading: true});
