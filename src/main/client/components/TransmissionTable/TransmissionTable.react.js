@@ -67,19 +67,21 @@ class TransmissionTable extends Components.ContextComponent {
     loadStateFromLocalStorage() {
         this.setState({init: false});
         try {
-            return JSON.parse(localStorage.getItem("transmissionTable_searchValues"));
+            const searchValues = JSON.parse(localStorage.getItem("transmissionTable_searchValues"));
+            if (searchValues) {
+                this.setState({searchValues});
+            }
         } catch (e) {
-            return undefined;
         }
     }
 
     async loadTransmissionList(tableState) {
-        this.setState({loading: true});
-        let {init, pagination, searchValues} = this.state;
-
-        if (init) {
-            searchValues = this.loadStateFromLocalStorage() || searchValues;
+        if (this.state.init) {
+            this.loadStateFromLocalStorage();
         }
+
+        this.setState({loading: true});
+        let {pagination, searchValues} = this.state;
 
         try {
             if (tableState) {
