@@ -23,6 +23,7 @@ class TransmissionTable extends Components.ContextComponent {
         'processing',
         'validating',
         'sending',
+        'fixed',
         'delivered'
     ];
 
@@ -31,7 +32,7 @@ class TransmissionTable extends Components.ContextComponent {
         transmissionList: [],
         searchValues: {},
         showSearch: true,
-        pageCount: -1,
+        totalCount: -1,
         pagination: {},
     };
 
@@ -49,6 +50,32 @@ class TransmissionTable extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
+    // componentDidMount() {
+    //     this.loadStateFromLocalStorage();
+    //     window.addEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
+    // }
+    //
+    // componentWillUnmount() {
+    //     window.removeEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
+    //     this.saveStateToLocalStorage();
+    // }
+    //
+    // saveStateToLocalStorage() {
+    //     localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
+    // }
+    //
+    // loadStateFromLocalStorage() {
+    //     let searchValues = localStorage.getItem("transmissionTable_searchValues");
+    //     try {
+    //         searchValues = JSON.parse(searchValues);
+    //     } catch (e) {
+    //     }
+    //
+    //     if (searchValues) {
+    //         this.setState({searchValues}, () => this.loadTransmissionList());
+    //     }
+    // }
+
     async loadTransmissionList(tableState) {
         this.setState({loading: true});
         const {pagination, searchValues} = this.state;
@@ -63,7 +90,7 @@ class TransmissionTable extends Components.ContextComponent {
             }
 
             const response = await this.api.getTransmissionList(pagination, searchValues);
-            this.setState({transmissionList: response.data, pageCount: response.pages});
+            this.setState({transmissionList: response.data, totalCount: response.totalCount});
         }
         catch (e) {
             this.context.showNotification(e.message, 'error', 10);
@@ -130,6 +157,7 @@ class TransmissionTable extends Components.ContextComponent {
     getStatusLabelClass(status) {
         switch (status) {
             case 'delivered':
+            case 'fixed':
                 return 'success';
             case 'unknown':
                 return 'warning';
@@ -155,8 +183,10 @@ class TransmissionTable extends Components.ContextComponent {
         const searchValues = {
             id: '',
             filename: '',
-            participant: '',
+            sender: '',
+            receiver: '',
             accessPoint: '',
+            history: '',
             sources: [],
             statuses: [],
             startDate: '',
@@ -168,7 +198,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     render() {
         const {i18n} = this.context;
-        const {loading, transmissionList, pageCount, searchValues, showSearch} = this.state;
+        const {loading, transmissionList, pagination, totalCount, searchValues, showSearch} = this.state;
 
         return (
             <div>
@@ -201,11 +231,21 @@ class TransmissionTable extends Components.ContextComponent {
                                     </div>
                                     <div className="form-group">
                                         <div className="col-sm-3">
-                                            <label className="control-label">Participant</label>
+                                            <label className="control-label">History</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.participant}
-                                                   onChange={e => this.handleSearchFormChange('participant', e.target.value)}
+                                            <input type="text" className="form-control" value={searchValues.history}
+                                                   onChange={e => this.handleSearchFormChange('history', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Sender</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <input type="text" className="form-control" value={searchValues.sender}
+                                                   onChange={e => this.handleSearchFormChange('sender', e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -266,6 +306,16 @@ class TransmissionTable extends Components.ContextComponent {
                                     </div>
                                     <div className="form-group">
                                         <div className="col-sm-3">
+                                            <label className="control-label">Receiver</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <input type="text" className="form-control" value={searchValues.receiver}
+                                                   onChange={e => this.handleSearchFormChange('receiver', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
                                             <label className="control-label">End Date</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
@@ -282,8 +332,11 @@ class TransmissionTable extends Components.ContextComponent {
                         </div>
                         <div className="form-submit text-right">
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
-                            <button className="btn btn-danger float-left" onClick={() => this.bulkReprocess()}>Reprocess</button>
+                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter
+                            </button>
+                            <button className="btn btn-danger float-left"
+                                    onClick={() => this.bulkReprocess()}>Reprocess
+                            </button>
                         </div>
                         <hr/>
                     </div>
@@ -297,7 +350,7 @@ class TransmissionTable extends Components.ContextComponent {
 
                     manual
                     minRows={10}
-                    pages={pageCount}
+                    pages={Math.ceil(totalCount / (pagination.pageSize || 10))}
                     defaultPageSize={10}
                     pageSizeOptions={[5, 10, 20, 50]}
                     defaultSorted={[{id: 'arrivedAt', desc: true}]}
@@ -311,20 +364,16 @@ class TransmissionTable extends Components.ContextComponent {
                     columns={[
                         {
                             id: 'transmissionId',
-                            Header: 'Transmission ID',
+                            Header: ' ',
+                            width: 50,
                             accessor: row => row,
                             Cell: ({value}) =>
                                 <span>
-                                    <a href={`/peppol-monitor?r=messageDetail/${value.id}`} className="btn btn-link"
-                                       data-tip data-for={`id-tooltip-${value.transmissionId}`}
-                                       onClick={(e) => this.showTransmissionDetail(e, value.id)}>
-                                        {value.transmissionId}
+                                    <a href={`/peppol-monitor?r=messageDetail/${value.id}`}
+                                       onClick={(e) => this.showTransmissionDetail(e, value.id)}
+                                       className="btn btn-link detail-link">
+                                        <span className="glyphicon glyphicon-open-file"></span>
                                     </a>
-                                    <ReactTooltip id={`id-tooltip-${value.transmissionId}`}
-                                                  className="sticky" effect="solid" delayHide={100}>
-                                        <p>Message ID: {value.messageId}</p>
-                                        <p>Transmission ID: {value.transmissionId}</p>
-                                    </ReactTooltip>
                                 </span>
                         },
                         {
@@ -338,7 +387,9 @@ class TransmissionTable extends Components.ContextComponent {
                                     </span>
                                     <ReactTooltip id={`name-tooltip-${value.transmissionId}`}
                                                   className="sticky" effect="solid" delayHide={100}>
-                                        {value.filename}
+                                        <p>Message ID: {value.messageId}</p>
+                                        <p>Transmission ID: {value.transmissionId}</p>
+                                        <p>Full Path: {value.filename}</p>
                                     </ReactTooltip>
                                 </span>
                         },
@@ -391,6 +442,9 @@ class TransmissionTable extends Components.ContextComponent {
                         }
                     ]}
                 />
+                <div className="text-center media">
+                    <p>{`${pagination.page * pagination.pageSize} to ${Math.min((pagination.page * pagination.pageSize + pagination.pageSize), totalCount)} of ${totalCount} transmissions`}</p>
+                </div>
             </div>
         );
     }

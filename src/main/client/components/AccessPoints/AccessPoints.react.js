@@ -51,10 +51,11 @@ class AccessPoints extends Components.ContextComponent {
 
         this.api.updateAccessPoint(accessPoint).then(() => {
             this.setState({loading: false});
+            this.context.showNotification('The access point record updated', 'success', 3);
 
         }).catch(e => {
-            this.context.showNotification(e.message, 'error', 10);
             this.setState({loading: false});
+            this.context.showNotification(e.message, 'error', 10);
         });
     }
 

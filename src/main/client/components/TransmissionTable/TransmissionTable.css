@@ -24,6 +24,15 @@
     border-radius: 5px;
 }
 
+.transmission-list-table .detail-link {
+    padding: 0;
+    margin: 0 auto;
+}
+
+.transmission-list-table .detail-link .glyphicon {
+    font-size: 20px;
+}
+
 .transmission-list-table .sticky {
     pointer-events: auto !important;
 }

@@ -22,7 +22,6 @@ const menuButton = (router) => (
 const messageDetail = (props) => (
     <div>
         <TransmissionDetail transmissionId={props.params.transmissionId}/>
-        {menuButton(props.router)}
     </div>
 );
 
