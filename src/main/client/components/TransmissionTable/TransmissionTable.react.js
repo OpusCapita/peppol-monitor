@@ -406,13 +406,13 @@ class TransmissionTable extends Components.ContextComponent {
                             </button>
                             <div className="btn-group float-left" role="group">
                                 <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="">
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Bulk Operations
                                 </button>
                                 <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                     <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Reprocess</a>
-                                    <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Mark as Fixed</a>
-                                    <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Send MLR</a></div>
+                                    <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
+                                    <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
                             </div>
 
                         </div>
