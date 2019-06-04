@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RefreshScope
@@ -207,6 +208,12 @@ public class MonitorRestController {
     public ResponseEntity<?> getAccessPoints() {
         List<AccessPoint> accessPoints = accessPointRepository.findAll();
         return wrap(accessPoints);
+    }
+
+    @GetMapping("/get-access-point/{accessPointId}")
+    public ResponseEntity<?> getAccessPoint(@PathVariable String accessPointId) {
+        Optional<AccessPoint> accessPoint = accessPointRepository.findById(accessPointId);
+        return wrap(accessPoint.orElse(null));
     }
 
     @PostMapping("/update-access-point")
