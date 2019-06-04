@@ -18,6 +18,8 @@ public class TransmissionDto {
     public String sender;
     public String receiver;
     public String accessPoint;
+    public String invoiceNumber;
+    public String invoiceDate;
     public Source source;
     public ProcessFlow direction;
     public String documentType;
@@ -34,6 +36,8 @@ public class TransmissionDto {
         dto.id = transmission.getId();
         dto.messageId = transmission.getMessage().getMessageId();
         dto.accessPoint = transmission.getAccessPoint();
+        dto.invoiceNumber = transmission.getInvoiceNumber();
+        dto.invoiceDate = transmission.getInvoiceDate();
         dto.source = transmission.getSource();
         dto.direction = transmission.getDirection();
         dto.transmissionId = transmission.getTransmissionId();

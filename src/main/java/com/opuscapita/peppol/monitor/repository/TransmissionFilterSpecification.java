@@ -54,6 +54,13 @@ public class TransmissionFilterSpecification {
                 predicates.add(accessPointPredicate);
             }
 
+            if (StringUtils.isNotBlank(filterDto.getInvoiceNumber())) {
+                Predicate invoiceNumberPredicate = criteriaBuilder.and(
+                        criteriaBuilder.like(root.get("invoiceNumber"), "%" + filterDto.getInvoiceNumber() + "%")
+                );
+                predicates.add(invoiceNumberPredicate);
+            }
+
             if (StringUtils.isNotBlank(filterDto.getHistory())) {
                 Predicate historyPredicate = criteriaBuilder.and(
                         criteriaBuilder.like(root.get("rawHistory"), "%" + filterDto.getHistory() + "%")

@@ -2,7 +2,6 @@ package com.opuscapita.peppol.monitor.repository;
 
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.storage.StorageException;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionFilterDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import org.springframework.data.domain.Page;
@@ -21,10 +20,6 @@ public interface TransmissionService {
     Transmission getByFilename(String filename);
 
     List<Transmission> getAllTransmissions(String messageId);
-
-    List<Transmission> filterTransmissions(TransmissionFilterDto filterDto);
-
-    List<Transmission> getAllTransmissions(int pageNumber, int pageSize);
 
     Page<Transmission> getAllTransmissions(TransmissionRequestDto request);
 

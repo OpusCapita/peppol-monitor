@@ -16,6 +16,8 @@ public interface TransmissionRepository extends JpaRepository<Transmission, Long
 
     List<Transmission> findByFilename(String filename);
 
+    List<Transmission> findByInvoiceNumber(String invoiceNumber);
+
     List<Transmission> findByMessageMessageId(String messageId);
 
 }

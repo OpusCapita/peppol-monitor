@@ -2,6 +2,7 @@ package com.opuscapita.peppol.monitor.consumer;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.container.metadata.AccessPointInfo;
+import com.opuscapita.peppol.commons.container.metadata.ContainerBusinessMetadata;
 import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.queue.consume.ContainerMessageConsumer;
@@ -74,17 +75,21 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
         ContainerMessageMetadata metadata = cm.getMetadata();
+        ContainerBusinessMetadata business = metadata.getBusinessMetadata();
+        business = business == null ? new ContainerBusinessMetadata() : business;
 
         transmission.setFilename(cm.getFileName());
         transmission.setStatus(extractStatusInfo(cm));
         transmission.setSource(cm.getSource());
         transmission.setDirection(cm.getFlow());
-        transmission.setSender(getParticipant(metadata.getSenderId()));
-        transmission.setReceiver(getParticipant(metadata.getRecipientId()));
+        transmission.setSender(getParticipant(metadata.getSenderId(), business.getSenderName()));
+        transmission.setReceiver(getParticipant(metadata.getRecipientId(), business.getReceiverName()));
         transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
         transmission.setDocumentType(getValidationRule(metadata));
         transmission.setDocumentTypeId(metadata.getDocumentTypeIdentifier());
         transmission.setProfileId(metadata.getProfileTypeIdentifier());
+        transmission.setInvoiceNumber(business.getDocumentId());
+        transmission.setInvoiceDate(business.getIssueDate());
         transmission.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs()));
 
         return transmission;
@@ -118,18 +123,21 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         return null;
     }
 
-    private String getParticipant(String participantId) {
+    private String getParticipant(String participantId, String participantName) {
         if (StringUtils.isBlank(participantId)) {
             return null;
         }
 
         Participant participant = participantRepository.findById(participantId).orElse(null);
-        if (participant != null) {
-            return participant.getId();
+        if (participant == null) {
+            logger.debug("Participant: " + participantId + " couldn't found, creating a new one.");
+            participant = new Participant(participantId);
         }
 
-        logger.debug("Participant: " + participantId + " couldn't found, creating a new one.");
-        participant = new Participant(participantId);
+        if (StringUtils.isNotBlank(participantName)) {
+            participant.setName(participantName);
+        }
+
         try {
             participant = participantRepository.save(participant);
         } catch (Exception e) {

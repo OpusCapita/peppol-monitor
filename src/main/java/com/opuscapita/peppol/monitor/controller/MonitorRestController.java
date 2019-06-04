@@ -103,16 +103,6 @@ public class MonitorRestController {
         return wrapFileToDownload(inputStream, FilenameUtils.getName(mlrPath));
     }
 
-    private ResponseEntity<byte[]> wrapFileToDownload(InputStream inputStream, String filename) throws IOException {
-        byte[] rawData = IOUtils.toByteArray(inputStream);
-
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.TEXT_XML);
-        header.setContentLength(rawData.length);
-        header.set("Content-Disposition", "attachment; filename=" + filename);
-        return new ResponseEntity<>(rawData, header, HttpStatus.OK);
-    }
-
     @GetMapping("/send-mlr/{transmissionId}")
     public ResponseEntity<?> sendMlrOfTransmission(@PathVariable Long transmissionId) throws Exception {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
@@ -126,6 +116,25 @@ public class MonitorRestController {
 
     @GetMapping("/mark-fixed-message/{transmissionId}")
     public ResponseEntity<?> markAsFixedMessage(@PathVariable Long transmissionId) {
+        return markAsFixedSingleMessage(transmissionId);
+    }
+
+    @GetMapping("/mark-fixed-messages/{transmissionIds}")
+    public ResponseEntity<?> markAsFixedMessages(@PathVariable String transmissionIds) {
+        new Thread(() -> {
+            for (String transmissionId : transmissionIds.split("-")) {
+                try {
+                    markAsFixedSingleMessage(Long.parseLong(transmissionId));
+                } catch (Exception e) {
+                    logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
+                }
+            }
+        }).start();
+
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<?> markAsFixedSingleMessage(Long transmissionId) {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -210,6 +219,16 @@ public class MonitorRestController {
     public ResponseEntity<?> getParticipants() {
         List<Participant> participants = participantRepository.findAll();
         return wrap(participants);
+    }
+
+    private ResponseEntity<byte[]> wrapFileToDownload(InputStream inputStream, String filename) throws IOException {
+        byte[] rawData = IOUtils.toByteArray(inputStream);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.TEXT_XML);
+        header.setContentLength(rawData.length);
+        header.set("Content-Disposition", "attachment; filename=" + filename);
+        return new ResponseEntity<>(rawData, header, HttpStatus.OK);
     }
 
     private <T> ResponseEntity<T> wrap(T body) {

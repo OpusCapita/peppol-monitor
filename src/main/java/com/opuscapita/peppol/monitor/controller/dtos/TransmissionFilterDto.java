@@ -14,6 +14,7 @@ public class TransmissionFilterDto {
     private String sender;
     private String receiver;
     private String accessPoint;
+    private String invoiceNumber;
     private Date startDate;
     private Date endDate;
     private String history;
@@ -58,6 +59,14 @@ public class TransmissionFilterDto {
 
     public void setAccessPoint(String accessPoint) {
         this.accessPoint = accessPoint;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
     }
 
     public Date getStartDate() {
