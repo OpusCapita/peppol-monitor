@@ -3,6 +3,10 @@
     vertical-align: middle;
 }
 
+.form-submit {
+    overflow: inherit;
+}
+
 .form-submit .btn.float-left {
     float: left;
 }
