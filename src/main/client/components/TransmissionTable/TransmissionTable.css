@@ -7,6 +7,16 @@
     float: left;
 }
 
+.form-submit .btn-group.float-left {
+    float: left;
+}
+
+.form-submit .btn-group .dropdown-item {
+    display: block;
+    font-size: 16px;
+    padding: 5px 10px;
+}
+
 .transmission-list-table .label + .label {
     margin-left: 3px;
 }

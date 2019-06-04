@@ -10,6 +10,7 @@ import java.util.List;
 public class TransmissionFilterDto {
 
     private String id;
+    private String messageId;
     private String filename;
     private String sender;
     private String receiver;
@@ -27,6 +28,14 @@ public class TransmissionFilterDto {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public String getFilename() {

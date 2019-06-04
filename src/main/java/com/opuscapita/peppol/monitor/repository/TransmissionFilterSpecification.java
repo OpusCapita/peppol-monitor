@@ -19,11 +19,17 @@ public class TransmissionFilterSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.isNotBlank(filterDto.getId())) {
-                Predicate idPredicate = criteriaBuilder.and(criteriaBuilder.or(
-                        criteriaBuilder.like(root.get("transmissionId"), "%" + filterDto.getId() + "%"),
-                        criteriaBuilder.like(root.join("message").get("messageId"), "%" + filterDto.getId() + "%")
-                ));
+                Predicate idPredicate = criteriaBuilder.and(
+                        criteriaBuilder.like(root.get("transmissionId"), "%" + filterDto.getId() + "%")
+                );
                 predicates.add(idPredicate);
+            }
+
+            if (StringUtils.isNotBlank(filterDto.getMessageId())) {
+                Predicate messageIdPredicate = criteriaBuilder.and(
+                        criteriaBuilder.like(root.join("message").get("messageId"), "%" + filterDto.getMessageId() + "%")
+                );
+                predicates.add(messageIdPredicate);
             }
 
             if (StringUtils.isNotBlank(filterDto.getFilename())) {

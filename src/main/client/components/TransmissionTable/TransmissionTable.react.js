@@ -104,8 +104,8 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     async bulkReprocess() {
-        const {loading, transmissionList} = this.state;
-        const {showNotification, showModalDialog, hideModalDialog} = this.context;
+        const {transmissionList} = this.state;
+        const {showModalDialog, hideModalDialog} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
@@ -129,10 +129,55 @@ class TransmissionTable extends Components.ContextComponent {
 
         const modalTitle = "Bulk Reprocess";
         const warnCount = transmissionList.filter(t => t.status !== 'failed').length;
-        const modalText = `${transmissionList.length} messages will be reprocessed in the background.${(warnCount > 0) ? ` Note that ${warnCount} of them did NOT failed.` : ' '}\n\nDo you want to continue?`;
+        const modalText = `${transmissionList.length} transmissions will be reprocessed in the background.${(warnCount > 0) ? ` Note that ${warnCount} of them did NOT failed.` : ' '}\n\nDo you want to continue?`;
         const modalButtons = {no: 'No', yes: 'Yes'};
 
         showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
+    }
+
+    async bulkSendMlr() {
+        const {transmissionList} = this.state;
+        const {showModalDialog, hideModalDialog} = this.context;
+
+        const onConfirmationClick = (btn) => {
+            hideModalDialog();
+
+            if (btn === 'yes') {
+                this.setState({loading: true});
+
+                setTimeout(() => {
+                    const transmissionIds = transmissionList.map(t => t.id).join("-");
+                    this.api.sendMlrs(transmissionIds).then(() => {
+                        this.setState({loading: false});
+                        this.context.showNotification('MLR sending operation of the messages has been started', 'info', 3);
+                    }).catch(e => {
+                        this.setState({loading: false});
+                        this.context.showNotification(e.message, 'error', 10);
+                    });
+
+                }, 500);
+            }
+        }
+
+        const modalTitle = "Bulk Send MLR";
+        const modalText = `${transmissionList.length} transmissions will be processed in the background. New MLR report will be created for each one according to its status and will be send to the owner\n\nDo you want to continue?`;
+        const modalButtons = {no: 'No', yes: 'Yes'};
+
+        showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
+    }
+
+    async bulkMarkAsFixed() {
+        const {transmissionList} = this.state;
+        this.setState({loading: true});
+
+        const transmissionIds = transmissionList.map(t => t.id).join("-");
+        this.api.markAsFixedMessages(transmissionIds).then(() => {
+            this.setState({loading: false});
+            this.context.showNotification('Marking operation of the messages as fixed has been started', 'info', 3);
+        }).catch(e => {
+            this.setState({loading: false});
+            this.context.showNotification(e.message, 'error', 10);
+        });
     }
 
     showTransmissionDetail(e, id) {
@@ -185,10 +230,12 @@ class TransmissionTable extends Components.ContextComponent {
     resetSearch() {
         const searchValues = {
             id: '',
+            messageId: '',
             filename: '',
             sender: '',
             receiver: '',
             accessPoint: '',
+            invoiceNumber: '',
             history: '',
             sources: [],
             statuses: [],
@@ -234,11 +281,26 @@ class TransmissionTable extends Components.ContextComponent {
                                     </div>
                                     <div className="form-group">
                                         <div className="col-sm-3">
-                                            <label className="control-label">History</label>
+                                            <label className="control-label">Invoice Number</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.history}
-                                                   onChange={e => this.handleSearchFormChange('history', e.target.value)}
+                                            <input type="text" className="form-control" value={searchValues.invoiceNumber}
+                                                   onChange={e => this.handleSearchFormChange('invoiceNumber', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Source</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapSourcesSelect()}
+                                                    onChange={value => this.handleSearchFormChange('sources', value)}
+                                                    value={searchValues.sources && searchValues.sources.map(src => ({
+                                                        label: src,
+                                                        value: src
+                                                    }))}
                                             />
                                         </div>
                                     </div>
@@ -269,6 +331,16 @@ class TransmissionTable extends Components.ContextComponent {
                                 <div className="col-md-6">
                                     <div className="form-group">
                                         <div className="col-sm-3">
+                                            <label className="control-label">Message ID</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <input type="text" className="form-control" value={searchValues.messageId}
+                                                   onChange={e => this.handleSearchFormChange('messageId', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
                                             <label className="control-label">Access Point</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
@@ -279,16 +351,11 @@ class TransmissionTable extends Components.ContextComponent {
                                     </div>
                                     <div className="form-group">
                                         <div className="col-sm-3">
-                                            <label className="control-label">Source</label>
+                                            <label className="control-label">History</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapSourcesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('sources', value)}
-                                                    value={searchValues.sources && searchValues.sources.map(src => ({
-                                                        label: src,
-                                                        value: src
-                                                    }))}
+                                            <input type="text" className="form-control" value={searchValues.history}
+                                                   onChange={e => this.handleSearchFormChange('history', e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -337,9 +404,17 @@ class TransmissionTable extends Components.ContextComponent {
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
                             <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter
                             </button>
-                            <button className="btn btn-danger float-left"
-                                    onClick={() => this.bulkReprocess()}>Reprocess
-                            </button>
+                            <div className="btn-group float-left" role="group">
+                                <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="">
+                                    Bulk Operations
+                                </button>
+                                <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Reprocess</a>
+                                    <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Mark as Fixed</a>
+                                    <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Send MLR</a></div>
+                            </div>
+
                         </div>
                         <hr/>
                     </div>
@@ -403,6 +478,11 @@ class TransmissionTable extends Components.ContextComponent {
                             Header: 'Status',
                             Cell: ({value}) =>
                                 <span className={`label label-${this.getStatusLabelClass(value)}`}>{value}</span>
+                        },
+                        {
+                            width: 150,
+                            accessor: 'invoiceNumber',
+                            Header: 'Invoice Number'
                         },
                         {
                             id: 'sender',

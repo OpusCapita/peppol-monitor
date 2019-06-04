@@ -33,12 +33,20 @@ class ApiBase {
         return this.ajax.get(`/peppol-monitor/api/send-mlr/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
+    sendMlrs(transmissionIds) {
+        return this.ajax.get(`/peppol-monitor/api/send-mlrs/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
     validateFile(data) {
         return this.ajax.post(`/peppol-validator/api/validate-file`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     markAsFixedMessage(transmissionId) {
         return this.ajax.get(`/peppol-monitor/api/mark-fixed-message/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
+    markAsFixedMessages(transmissionIds) {
+        return this.ajax.get(`/peppol-monitor/api/mark-fixed-messages/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     reprocessMessage(transmissionId) {

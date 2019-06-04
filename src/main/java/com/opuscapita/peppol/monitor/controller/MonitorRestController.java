@@ -106,6 +106,25 @@ public class MonitorRestController {
 
     @GetMapping("/send-mlr/{transmissionId}")
     public ResponseEntity<?> sendMlrOfTransmission(@PathVariable Long transmissionId) throws Exception {
+        return sendMlrOfSingleTransmission(transmissionId);
+    }
+
+    @GetMapping("/send-mlrs/{transmissionIds}")
+    public ResponseEntity<?> sendMlrOfTransmissions(@PathVariable String transmissionIds) {
+        new Thread(() -> {
+            for (String transmissionId : transmissionIds.split("-")) {
+                try {
+                    sendMlrOfSingleTransmission(Long.parseLong(transmissionId));
+                } catch (Exception e) {
+                    logger.error("Async bulk send-mlr operation failed for transmission: " + transmissionId, e);
+                }
+            }
+        }).start();
+
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<?> sendMlrOfSingleTransmission(Long transmissionId) throws Exception {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
