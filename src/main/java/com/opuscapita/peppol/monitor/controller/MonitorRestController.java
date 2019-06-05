@@ -206,9 +206,12 @@ public class MonitorRestController {
     @GetMapping("/manual-operation/{operationName}")
     public ResponseEntity<?> manualOperation(@PathVariable String operationName) throws Exception {
         String[] list = filenames.split("\\n");
+        logger.info("Load filenames for manual operation: " + operationName);
         for (String filename : list) {
+            logger.info("Processing " + filename + " for manual operation: " + operationName);
             Transmission transmission = transmissionService.getByFilename(filename);
             if (transmission != null) {
+                logger.info("Found transmission for " + filename + " proceeding to manual operation");
                 if (operationName.equals("send-mlr")) {
                     mlrManager.sendToMlrReporter(transmission);
                 }
