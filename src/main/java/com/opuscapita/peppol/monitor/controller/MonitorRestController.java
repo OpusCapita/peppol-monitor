@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RefreshScope
@@ -99,22 +100,35 @@ public class MonitorRestController {
     public ResponseEntity<byte[]> downloadMlrOfTransmission(@PathVariable Long transmissionId) throws IOException {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         String mlrPath = transmissionService.getMlrPath(transmission);
-        InputStream inputStream = transmissionService.getFileContent(mlrPath);
-        return wrapFileToDownload(inputStream, FilenameUtils.getName(mlrPath));
-    }
-
-    private ResponseEntity<byte[]> wrapFileToDownload(InputStream inputStream, String filename) throws IOException {
-        byte[] rawData = IOUtils.toByteArray(inputStream);
-
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.TEXT_XML);
-        header.setContentLength(rawData.length);
-        header.set("Content-Disposition", "attachment; filename=" + filename);
-        return new ResponseEntity<>(rawData, header, HttpStatus.OK);
+        try {
+            InputStream inputStream = transmissionService.getFileContent(mlrPath);
+            return wrapFileToDownload(inputStream, FilenameUtils.getName(mlrPath));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/send-mlr/{transmissionId}")
     public ResponseEntity<?> sendMlrOfTransmission(@PathVariable Long transmissionId) throws Exception {
+        return sendMlrOfSingleTransmission(transmissionId);
+    }
+
+    @GetMapping("/send-mlrs/{transmissionIds}")
+    public ResponseEntity<?> sendMlrOfTransmissions(@PathVariable String transmissionIds) {
+        new Thread(() -> {
+            for (String transmissionId : transmissionIds.split("-")) {
+                try {
+                    sendMlrOfSingleTransmission(Long.parseLong(transmissionId));
+                } catch (Exception e) {
+                    logger.error("Async bulk send-mlr operation failed for transmission: " + transmissionId, e);
+                }
+            }
+        }).start();
+
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<?> sendMlrOfSingleTransmission(Long transmissionId) throws Exception {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -126,6 +140,25 @@ public class MonitorRestController {
 
     @GetMapping("/mark-fixed-message/{transmissionId}")
     public ResponseEntity<?> markAsFixedMessage(@PathVariable Long transmissionId) {
+        return markAsFixedSingleMessage(transmissionId);
+    }
+
+    @GetMapping("/mark-fixed-messages/{transmissionIds}")
+    public ResponseEntity<?> markAsFixedMessages(@PathVariable String transmissionIds) {
+        new Thread(() -> {
+            for (String transmissionId : transmissionIds.split("-")) {
+                try {
+                    markAsFixedSingleMessage(Long.parseLong(transmissionId));
+                } catch (Exception e) {
+                    logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
+                }
+            }
+        }).start();
+
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<?> markAsFixedSingleMessage(Long transmissionId) {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -177,9 +210,12 @@ public class MonitorRestController {
     @GetMapping("/manual-operation/{operationName}")
     public ResponseEntity<?> manualOperation(@PathVariable String operationName) throws Exception {
         String[] list = filenames.split("\\n");
+        logger.info("Load filenames for manual operation: " + operationName);
         for (String filename : list) {
+            logger.info("Processing " + filename + " for manual operation: " + operationName);
             Transmission transmission = transmissionService.getByFilename(filename);
             if (transmission != null) {
+                logger.info("Found transmission for " + filename + " proceeding to manual operation");
                 if (operationName.equals("send-mlr")) {
                     mlrManager.sendToMlrReporter(transmission);
                 }
@@ -200,6 +236,12 @@ public class MonitorRestController {
         return wrap(accessPoints);
     }
 
+    @GetMapping("/get-access-point/{accessPointId}")
+    public ResponseEntity<?> getAccessPoint(@PathVariable String accessPointId) {
+        Optional<AccessPoint> accessPoint = accessPointRepository.findById(accessPointId);
+        return wrap(accessPoint.orElse(null));
+    }
+
     @PostMapping("/update-access-point")
     public ResponseEntity<?> updateAccessPoint(@RequestBody AccessPoint accessPoint) {
         AccessPoint persisted = accessPointRepository.save(accessPoint);
@@ -210,6 +252,16 @@ public class MonitorRestController {
     public ResponseEntity<?> getParticipants() {
         List<Participant> participants = participantRepository.findAll();
         return wrap(participants);
+    }
+
+    private ResponseEntity<byte[]> wrapFileToDownload(InputStream inputStream, String filename) throws IOException {
+        byte[] rawData = IOUtils.toByteArray(inputStream);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.TEXT_XML);
+        header.setContentLength(rawData.length);
+        header.set("Content-Disposition", "attachment; filename=" + filename);
+        return new ResponseEntity<>(rawData, header, HttpStatus.OK);
     }
 
     private <T> ResponseEntity<T> wrap(T body) {

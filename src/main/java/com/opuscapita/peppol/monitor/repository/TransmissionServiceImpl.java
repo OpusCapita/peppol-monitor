@@ -75,16 +75,6 @@ public class TransmissionServiceImpl implements TransmissionService {
     }
 
     @Override
-    public List<Transmission> filterTransmissions(TransmissionFilterDto filterDto) {
-        return repository.findAll(TransmissionFilterSpecification.filter(filterDto, null));
-    }
-
-    @Override
-    public List<Transmission> getAllTransmissions(int pageNumber, int pageSize) {
-        return repository.findAll(PageRequest.of(pageNumber, pageSize)).getContent();
-    }
-
-    @Override
     public Page<Transmission> getAllTransmissions(TransmissionRequestDto request) {
         Specification<Transmission> spec = TransmissionFilterSpecification.filter(request.getFilter(), request.getPagination().getSorted());
         Pageable pageable = PageRequest.of(request.getPagination().getPage(), request.getPagination().getPageSize());

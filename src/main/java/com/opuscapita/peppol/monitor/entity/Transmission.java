@@ -48,6 +48,12 @@ public class Transmission {
     @Column(name = "access_point", length = 35)
     private String accessPoint;
 
+    @Column(name = "invoice_number")
+    private String invoiceNumber;
+
+    @Column(name = "invoice_date")
+    private String invoiceDate;
+
     @Column(name = "document_type")
     private String documentType;
 
@@ -142,6 +148,22 @@ public class Transmission {
 
     public void setAccessPoint(String accessPoint) {
         this.accessPoint = accessPoint;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public String getInvoiceDate() {
+        return invoiceDate;
+    }
+
+    public void setInvoiceDate(String invoiceDate) {
+        this.invoiceDate = invoiceDate;
     }
 
     public String getDocumentType() {

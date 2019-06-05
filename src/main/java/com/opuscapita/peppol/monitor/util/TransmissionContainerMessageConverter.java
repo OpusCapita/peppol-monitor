@@ -1,16 +1,28 @@
 package com.opuscapita.peppol.monitor.util;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
+import com.opuscapita.peppol.commons.container.metadata.ContainerBusinessMetadata;
 import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
 import com.opuscapita.peppol.commons.container.metadata.ContainerValidationRule;
 import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
+import com.opuscapita.peppol.monitor.entity.Participant;
 import com.opuscapita.peppol.monitor.entity.Transmission;
+import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TransmissionContainerMessageConverter {
+
+    private final ParticipantRepository participantRepository;
+
+    @Autowired
+    public TransmissionContainerMessageConverter(ParticipantRepository participantRepository) {
+        this.participantRepository = participantRepository;
+    }
 
     public ContainerMessage convert(Transmission transmission) {
         ContainerMessage cm = new ContainerMessage(transmission.getFilename());
@@ -32,6 +44,7 @@ public class TransmissionContainerMessageConverter {
         metadata.setValidationRule(convertValidationRule(transmission));
         metadata.setDocumentTypeIdentifier(transmission.getDocumentTypeId());
         metadata.setProfileTypeIdentifier(transmission.getProfileId());
+        metadata.setBusinessMetadata(convertBusinessMetadata(transmission));
         cm.setMetadata(metadata);
 
         return cm;
@@ -54,6 +67,21 @@ public class TransmissionContainerMessageConverter {
         } catch (Exception ignored) {
             return null;
         }
+    }
+
+    private ContainerBusinessMetadata convertBusinessMetadata(Transmission transmission) {
+        ContainerBusinessMetadata metadata = new ContainerBusinessMetadata();
+        metadata.setDocumentId(transmission.getInvoiceNumber());
+        metadata.setIssueDate(transmission.getInvoiceDate());
+        if (StringUtils.isNotBlank(transmission.getSender())) {
+            Participant p = participantRepository.findById(transmission.getSender()).orElse(new Participant());
+            metadata.setSenderName(p.getName());
+        }
+        if (StringUtils.isNotBlank(transmission.getReceiver())) {
+            Participant p = participantRepository.findById(transmission.getReceiver()).orElse(new Participant());
+            metadata.setReceiverName(p.getName());
+        }
+        return metadata;
     }
 
     private ProcessStep convertStatusToStep(Transmission transmission) {

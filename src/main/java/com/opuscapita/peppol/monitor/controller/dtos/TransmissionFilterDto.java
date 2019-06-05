@@ -10,10 +10,12 @@ import java.util.List;
 public class TransmissionFilterDto {
 
     private String id;
+    private String messageId;
     private String filename;
     private String sender;
     private String receiver;
     private String accessPoint;
+    private String invoiceNumber;
     private Date startDate;
     private Date endDate;
     private String history;
@@ -26,6 +28,14 @@ public class TransmissionFilterDto {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public String getFilename() {
@@ -58,6 +68,14 @@ public class TransmissionFilterDto {
 
     public void setAccessPoint(String accessPoint) {
         this.accessPoint = accessPoint;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
     }
 
     public Date getStartDate() {

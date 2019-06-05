@@ -28,14 +28,14 @@ public class MlrReportManager {
     }
 
     public void sendToMlrReporter(ContainerMessage cm) throws Exception {
-        if (cm.isOutbound()) {
-            messageQueue.convertAndSend(mlrQueue, cm);
-            logger.debug("Monitor send the message to mlr-reporter: " + cm.getFileName());
-        }
+        messageQueue.convertAndSend(mlrQueue, cm);
+        logger.debug("Monitor send the message to mlr-reporter: " + cm.getFileName());
     }
 
     public void sendToMlrReporter(Transmission transmission) throws Exception {
+        logger.info("Transmission [" + transmission.getTransmissionId() + "] to ContainerMessage convention started");
         ContainerMessage cm = converter.convert(transmission);
+        logger.info("Transmission [" + transmission.getTransmissionId() + "] to ContainerMessage[" + cm.getMetadata().getTransmissionId() + "] convention ended");
         sendToMlrReporter(cm);
     }
 }
