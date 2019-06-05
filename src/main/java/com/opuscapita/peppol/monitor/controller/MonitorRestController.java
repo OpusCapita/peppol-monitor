@@ -100,8 +100,12 @@ public class MonitorRestController {
     public ResponseEntity<byte[]> downloadMlrOfTransmission(@PathVariable Long transmissionId) throws IOException {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         String mlrPath = transmissionService.getMlrPath(transmission);
-        InputStream inputStream = transmissionService.getFileContent(mlrPath);
-        return wrapFileToDownload(inputStream, FilenameUtils.getName(mlrPath));
+        try {
+            InputStream inputStream = transmissionService.getFileContent(mlrPath);
+            return wrapFileToDownload(inputStream, FilenameUtils.getName(mlrPath));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/send-mlr/{transmissionId}")
