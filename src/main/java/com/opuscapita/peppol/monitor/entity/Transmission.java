@@ -166,30 +166,6 @@ public class Transmission {
         this.invoiceDate = invoiceDate;
     }
 
-    public String getDocumentType() {
-        return documentType;
-    }
-
-    public void setDocumentType(String documentType) {
-        this.documentType = documentType;
-    }
-
-    public String getDocumentTypeId() {
-        return documentTypeId;
-    }
-
-    public void setDocumentTypeId(String documentTypeId) {
-        this.documentTypeId = documentTypeId;
-    }
-
-    public String getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(String profileId) {
-        this.profileId = profileId;
-    }
-
     public Date getArrivedAt() {
         return arrivedAt;
     }

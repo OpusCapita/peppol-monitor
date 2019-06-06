@@ -41,9 +41,7 @@ public class TransmissionContainerMessageConverter {
         } else {
             metadata.setReceivingAccessPoint(transmission.getAccessPoint());
         }
-        metadata.setValidationRule(convertValidationRule(transmission));
-        metadata.setDocumentTypeIdentifier(transmission.getDocumentTypeId());
-        metadata.setProfileTypeIdentifier(transmission.getProfileId());
+//        metadata.setValidationRule(convertValidationRule(transmission));
         metadata.setBusinessMetadata(convertBusinessMetadata(transmission));
         cm.setMetadata(metadata);
 
@@ -51,23 +49,23 @@ public class TransmissionContainerMessageConverter {
     }
 
     // reverting toString result to object, from "ValidationRule {id: %s, name: %s}"
-    private ContainerValidationRule convertValidationRule(Transmission transmission) {
-        try {
-            String ruleString = transmission.getDocumentType();
-            String temp1 = ruleString.split("\\{")[1];
-            temp1 = temp1.substring(0, temp1.length() - 1);
-            String[] temp2 = temp1.split(", ");
-            String id = temp2[0].split(": ")[1];
-            String name = temp2[1].split(": ")[1];
-
-            ContainerValidationRule rule = new ContainerValidationRule();
-            rule.setId(Integer.parseInt(id));
-            rule.setDescription(name);
-            return rule;
-        } catch (Exception ignored) {
-            return null;
-        }
-    }
+//    private ContainerValidationRule convertValidationRule(Transmission transmission) {
+//        try {
+//            String ruleString = transmission.getDocumentType();
+//            String temp1 = ruleString.split("\\{")[1];
+//            temp1 = temp1.substring(0, temp1.length() - 1);
+//            String[] temp2 = temp1.split(", ");
+//            String id = temp2[0].split(": ")[1];
+//            String name = temp2[1].split(": ")[1];
+//
+//            ContainerValidationRule rule = new ContainerValidationRule();
+//            rule.setId(Integer.parseInt(id));
+//            rule.setDescription(name);
+//            return rule;
+//        } catch (Exception ignored) {
+//            return null;
+//        }
+//    }
 
     private ContainerBusinessMetadata convertBusinessMetadata(Transmission transmission) {
         ContainerBusinessMetadata metadata = new ContainerBusinessMetadata();
