@@ -430,7 +430,7 @@ class TransmissionTable extends Components.ContextComponent {
                     minRows={10}
                     pages={Math.ceil(totalCount / (pagination.pageSize || 10))}
                     defaultPageSize={10}
-                    pageSizeOptions={[5, 10, 20, 50]}
+                    pageSizeOptions={[5, 10, 20, 50, 100, 1000]}
                     defaultSorted={[{id: 'arrivedAt', desc: true}]}
 
                     getTrProps={(state, rowInfo) => {

@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Component
 public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
@@ -85,12 +87,9 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         transmission.setSender(getParticipant(metadata.getSenderId(), business.getSenderName()));
         transmission.setReceiver(getParticipant(metadata.getRecipientId(), business.getReceiverName()));
         transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
-        transmission.setDocumentType(getValidationRule(metadata));
-        transmission.setDocumentTypeId(metadata.getDocumentTypeIdentifier());
-        transmission.setProfileId(metadata.getProfileTypeIdentifier());
         transmission.setInvoiceNumber(business.getDocumentId());
         transmission.setInvoiceDate(business.getIssueDate());
-        transmission.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs()));
+        transmission.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs().stream().filter(log -> !log.isWarning()).collect(Collectors.toList())));
 
         return transmission;
     }

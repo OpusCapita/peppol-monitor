@@ -283,30 +283,30 @@ class TransmissionDetail extends Components.ContextComponent {
                                     <label className="control-label">{transmission.arrivedAt}</label>
                                 </div>
                             </div>
-                            <div className="form-group">
-                                <div className="col-sm-3">
-                                    <label className="control-label btn-link">Profile ID</label>
-                                </div>
-                                <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{transmission.profileId}</label>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <div className="col-sm-3">
-                                    <label className="control-label btn-link">Validation Rule</label>
-                                </div>
-                                <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{transmission.documentType}</label>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <div className="col-sm-3">
-                                    <label className="control-label btn-link">Document Type ID</label>
-                                </div>
-                                <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{transmission.documentTypeId}</label>
-                                </div>
-                            </div>
+                            {/*<div className="form-group">*/}
+                                {/*<div className="col-sm-3">*/}
+                                    {/*<label className="control-label btn-link">Profile ID</label>*/}
+                                {/*</div>*/}
+                                {/*<div className="offset-md-1 col-md-8">*/}
+                                    {/*<label className="control-label">{transmission.profileId}</label>*/}
+                                {/*</div>*/}
+                            {/*</div>*/}
+                            {/*<div className="form-group">*/}
+                                {/*<div className="col-sm-3">*/}
+                                    {/*<label className="control-label btn-link">Validation Rule</label>*/}
+                                {/*</div>*/}
+                                {/*<div className="offset-md-1 col-md-8">*/}
+                                    {/*<label className="control-label">{transmission.documentType}</label>*/}
+                                {/*</div>*/}
+                            {/*</div>*/}
+                            {/*<div className="form-group">*/}
+                                {/*<div className="col-sm-3">*/}
+                                    {/*<label className="control-label btn-link">Document Type ID</label>*/}
+                                {/*</div>*/}
+                                {/*<div className="offset-md-1 col-md-8">*/}
+                                    {/*<label className="control-label">{transmission.documentTypeId}</label>*/}
+                                {/*</div>*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                 </div>

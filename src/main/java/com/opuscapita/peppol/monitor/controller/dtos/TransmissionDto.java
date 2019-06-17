@@ -46,9 +46,6 @@ public class TransmissionDto {
         dto.messageStatus = transmission.getMessage().getLastTransmission().getStatus();
         dto.sender = transmission.getSender();
         dto.receiver = transmission.getReceiver();
-        dto.documentType = transmission.getDocumentType();
-        dto.documentTypeId = transmission.getDocumentTypeId();
-        dto.profileId = transmission.getProfileId();
         dto.arrivedAt = transmission.getArrivedAt();
         return dto;
     }
