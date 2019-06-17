@@ -13,7 +13,14 @@ import java.util.List;
 
 @Entity
 @DynamicUpdate
-@Table(name = "transmissions", indexes = {@Index(name = "ix_transmission_id", columnList = "transmission_id")})
+@Table(name = "transmissions", indexes = {
+        @Index(name = "ix_transmission_id", columnList = "transmission_id"),
+        @Index(name = "ix_message_id", columnList = "message_id"),
+        @Index(name = "ix_transmission_filename", columnList = "filename"),
+        @Index(name = "ix_transmission_invoice", columnList = "invoice_number"),
+        @Index(name = "ix_transmission_status", columnList = "status"),
+        @Index(name = "ix_transmission_source", columnList = "source"),
+})
 public class Transmission {
 
     @Id
@@ -21,21 +28,21 @@ public class Transmission {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "transmission_id", unique = true, nullable = false, length = 50)
+    @Column(name = "transmission_id", unique = true, nullable = false, length = 100)
     private String transmissionId;
 
-    @Column(name = "filename", nullable = false)
+    @Column(name = "filename", nullable = false, length = 150)
     private String filename;
 
-    @Column(name = "status")
+    @Column(name = "status", length = 10)
     @Enumerated(EnumType.STRING)
     private MessageStatus status;
 
-    @Column(name = "source", nullable = false)
+    @Column(name = "source", nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
     private Source source;
 
-    @Column(name = "direction")
+    @Column(name = "direction", length = 5)
     @Enumerated(EnumType.STRING)
     private ProcessFlow direction;
 
@@ -48,10 +55,10 @@ public class Transmission {
     @Column(name = "access_point", length = 35)
     private String accessPoint;
 
-    @Column(name = "invoice_number")
+    @Column(name = "invoice_number", length = 50)
     private String invoiceNumber;
 
-    @Column(name = "invoice_date")
+    @Column(name = "invoice_date", length = 50)
     private String invoiceDate;
 
     @Column(name = "document_type")
@@ -164,30 +171,6 @@ public class Transmission {
 
     public void setInvoiceDate(String invoiceDate) {
         this.invoiceDate = invoiceDate;
-    }
-
-    public String getDocumentType() {
-        return documentType;
-    }
-
-    public void setDocumentType(String documentType) {
-        this.documentType = documentType;
-    }
-
-    public String getDocumentTypeId() {
-        return documentTypeId;
-    }
-
-    public void setDocumentTypeId(String documentTypeId) {
-        this.documentTypeId = documentTypeId;
-    }
-
-    public String getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(String profileId) {
-        this.profileId = profileId;
     }
 
     public Date getArrivedAt() {
