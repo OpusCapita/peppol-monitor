@@ -20,7 +20,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -42,9 +41,6 @@ import java.util.stream.Collectors;
 public class MonitorRestController {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorRestController.class);
-
-    @Value("${manual-operation:''}")
-    private String filenames;
 
     private final MlrReportManager mlrManager;
     private final ReprocessManager reprocessManager;
@@ -115,16 +111,13 @@ public class MonitorRestController {
 
     @GetMapping("/send-mlrs/{transmissionIds}")
     public ResponseEntity<?> sendMlrOfTransmissions(@PathVariable String transmissionIds) {
-        new Thread(() -> {
-            for (String transmissionId : transmissionIds.split("-")) {
-                try {
-                    sendMlrOfSingleTransmission(Long.parseLong(transmissionId));
-                } catch (Exception e) {
-                    logger.error("Async bulk send-mlr operation failed for transmission: " + transmissionId, e);
-                }
+        for (String transmissionId : transmissionIds.split("-")) {
+            try {
+                sendMlrOfSingleTransmission(Long.parseLong(transmissionId));
+            } catch (Exception e) {
+                logger.error("Async bulk send-mlr operation failed for transmission: " + transmissionId, e);
             }
-        }).start();
-
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -145,16 +138,13 @@ public class MonitorRestController {
 
     @GetMapping("/mark-fixed-messages/{transmissionIds}")
     public ResponseEntity<?> markAsFixedMessages(@PathVariable String transmissionIds) {
-        new Thread(() -> {
-            for (String transmissionId : transmissionIds.split("-")) {
-                try {
-                    markAsFixedSingleMessage(Long.parseLong(transmissionId));
-                } catch (Exception e) {
-                    logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
-                }
+        for (String transmissionId : transmissionIds.split("-")) {
+            try {
+                markAsFixedSingleMessage(Long.parseLong(transmissionId));
+            } catch (Exception e) {
+                logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
             }
-        }).start();
-
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -179,16 +169,13 @@ public class MonitorRestController {
 
     @GetMapping("/reprocess-messages/{transmissionIds}")
     public ResponseEntity<?> reprocessMessages(@PathVariable String transmissionIds) {
-        new Thread(() -> {
-            for (String transmissionId : transmissionIds.split("-")) {
-                try {
-                    reprocessSingleMessage(Long.parseLong(transmissionId));
-                } catch (IOException e) {
-                    logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
-                }
+        for (String transmissionId : transmissionIds.split("-")) {
+            try {
+                reprocessSingleMessage(Long.parseLong(transmissionId));
+            } catch (IOException e) {
+                logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
             }
-        }).start();
-
+        }
         return ResponseEntity.ok().build();
     }
 
@@ -204,23 +191,6 @@ public class MonitorRestController {
         transmissionService.addMessageToHistoryOfTransmission(transmission, log);
 
         reprocessManager.reprocessMessage(transmission);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/manual-operation/{operationName}")
-    public ResponseEntity<?> manualOperation(@PathVariable String operationName) throws Exception {
-        String[] list = filenames.split("\\n");
-        logger.info("Load filenames for manual operation: " + operationName);
-        for (String filename : list) {
-            logger.info("Processing " + filename + " for manual operation: " + operationName);
-            Transmission transmission = transmissionService.getByFilename(filename);
-            if (transmission != null) {
-                logger.info("Found transmission for " + filename + " proceeding to manual operation");
-                if (operationName.equals("send-mlr")) {
-                    mlrManager.sendToMlrReporter(transmission);
-                }
-            }
-        }
         return ResponseEntity.ok().build();
     }
 
