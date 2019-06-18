@@ -31,4 +31,5 @@ public interface TransmissionService {
 
     void addMessageToHistoryOfTransmission(Transmission transmission, DocumentLog log);
 
+    Transmission loadTransmissionHistory(Transmission transmission);
 }

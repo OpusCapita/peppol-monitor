@@ -244,6 +244,7 @@ public class MonitorRestController {
 
         for (Transmission transmission : transmissions.getContent()) {
             try {
+                transmissionService.loadTransmissionHistory(transmission);
                 mlrManager.sendToMlrReporter(transmission);
             } catch (Exception e) {
                 logger.error("Async bulk send-mlr operation failed for transmission: " + transmission.getTransmissionId(), e);
