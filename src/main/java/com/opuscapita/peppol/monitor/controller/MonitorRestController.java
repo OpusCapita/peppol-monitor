@@ -3,9 +3,7 @@ package com.opuscapita.peppol.monitor.controller;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionDto;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionResponseDto;
+import com.opuscapita.peppol.monitor.controller.dtos.*;
 import com.opuscapita.peppol.monitor.entity.AccessPoint;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Participant;
@@ -31,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -222,6 +222,34 @@ public class MonitorRestController {
     public ResponseEntity<?> getParticipants() {
         List<Participant> participants = participantRepository.findAll();
         return wrap(participants);
+    }
+
+    @GetMapping("/custom-operation/{page}/{pageSize}")
+    public ResponseEntity<?> customOperation(@PathVariable Integer page, @PathVariable Integer pageSize) throws Exception {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        TransmissionFilterDto filter = new TransmissionFilterDto();
+        filter.setStartDate(dateFormat.parse("2019-06-08 02:57:34"));
+        filter.setEndDate(dateFormat.parse("2019-06-17 12:07:00"));
+        filter.setStatuses(Arrays.asList(MessageStatus.delivered, MessageStatus.failed));
+
+        TransmissionPaginationDto pagination = new TransmissionPaginationDto();
+        pagination.setPage(page);
+        pagination.setPageSize(pageSize);
+
+        TransmissionRequestDto request = new TransmissionRequestDto();
+        request.setFilter(filter);
+        request.setPagination(pagination);
+        Page<Transmission> transmissions = transmissionService.getAllTransmissions(request);
+
+        for (Transmission transmission : transmissions.getContent()) {
+            try {
+                mlrManager.sendToMlrReporter(transmission);
+            } catch (Exception e) {
+                logger.error("Async bulk send-mlr operation failed for transmission: " + transmission.getTransmissionId(), e);
+            }
+        }
+        return ResponseEntity.ok().build();
     }
 
     private ResponseEntity<byte[]> wrapFileToDownload(InputStream inputStream, String filename) throws IOException {
