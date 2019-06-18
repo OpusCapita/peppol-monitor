@@ -126,4 +126,12 @@ public class TransmissionServiceImpl implements TransmissionService {
         saveTransmission(transmission);
     }
 
+    @Override
+    public Transmission loadTransmissionHistory(Transmission transmission) {
+        if (transmission != null) {
+            transmission.setLogs(historySerializer.fromJson(transmission.getRawHistory()));
+        }
+        return transmission;
+    }
+
 }
