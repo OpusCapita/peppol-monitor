@@ -1,6 +1,5 @@
 package com.opuscapita.peppol.monitor.controller.dtos;
 
-import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
@@ -21,10 +20,8 @@ public class TransmissionDto {
     public String invoiceNumber;
     public String invoiceDate;
     public Source source;
-    public ProcessFlow direction;
-    public String documentType;
+    public String direction;
     public String documentTypeId;
-    public String profileId;
     public Date arrivedAt;
 
     public static TransmissionDto of(Transmission transmission) {
@@ -40,6 +37,7 @@ public class TransmissionDto {
         dto.invoiceDate = transmission.getInvoiceDate();
         dto.source = transmission.getSource();
         dto.direction = transmission.getDirection();
+        dto.documentTypeId = transmission.getDocumentTypeId();
         dto.transmissionId = transmission.getTransmissionId();
         dto.filename = transmission.getFilename();
         dto.status = transmission.getStatus();

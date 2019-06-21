@@ -83,13 +83,22 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         transmission.setFilename(cm.getFileName());
         transmission.setStatus(extractStatusInfo(cm));
         transmission.setSource(cm.getSource());
-        transmission.setDirection(cm.getFlow());
         transmission.setSender(getParticipant(metadata.getSenderId(), business.getSenderName()));
         transmission.setReceiver(getParticipant(metadata.getRecipientId(), business.getReceiverName()));
         transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
         transmission.setInvoiceNumber(business.getDocumentId());
         transmission.setInvoiceDate(business.getIssueDate());
-        transmission.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs().stream().filter(log -> !log.isWarning()).collect(Collectors.toList())));
+        if (cm.getRoute() != null && cm.getRoute().getDestination() != null) {
+            transmission.setDirection(cm.getRoute().getDestination());
+        }
+        if (metadata.getValidationRule() != null && metadata.getValidationRule().getId() != null) {
+            transmission.setDocumentTypeId(metadata.getValidationRule().getId().toString());
+        }
+        if (MessageStatus.delivered.equals(transmission.getStatus()) || MessageStatus.fixed.equals(transmission.getStatus())) {
+            transmission.setRawHistory(null);
+        } else {
+            transmission.setRawHistory(historySerializer.toJson(cm.getHistory().getLogs().stream().filter(log -> !log.isWarning()).collect(Collectors.toList())));
+        }
 
         return transmission;
     }
@@ -115,13 +124,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         return message;
     }
 
-    private String getValidationRule(ContainerMessageMetadata metadata) {
-        if (metadata != null && metadata.getValidationRule() != null) {
-            return metadata.getValidationRule().toString();
-        }
-        return null;
-    }
-
     private String getParticipant(String participantId, String participantName) {
         if (StringUtils.isBlank(participantId)) {
             return null;
@@ -138,7 +140,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         }
 
         try {
-            participant = participantRepository.save(participant);
+            participant = participantRepository.saveAndFlush(participant);
         } catch (Exception e) {
             logger.debug("Couldn't save the participant (" + participant.getId() + "), reason: " + e.getMessage());
         }
@@ -160,7 +162,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         }
 
         try {
-            accessPoint = accessPointRepository.save(accessPoint);
+            accessPoint = accessPointRepository.saveAndFlush(accessPoint);
         } catch (Exception e) {
             logger.debug("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
         }

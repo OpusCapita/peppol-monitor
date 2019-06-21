@@ -1,6 +1,5 @@
 package com.opuscapita.peppol.monitor.entity;
 
-import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import org.hibernate.annotations.DynamicUpdate;
@@ -42,9 +41,8 @@ public class Transmission {
     @Enumerated(EnumType.STRING)
     private Source source;
 
-    @Column(name = "direction", length = 5)
-    @Enumerated(EnumType.STRING)
-    private ProcessFlow direction;
+    @Column(name = "direction", length = 10)
+    private String direction;
 
     @Column(name = "sender", length = 35)
     private String sender;
@@ -61,14 +59,8 @@ public class Transmission {
     @Column(name = "invoice_date", length = 50)
     private String invoiceDate;
 
-    @Column(name = "document_type")
-    private String documentType;
-
     @Column(name = "document_type_id")
     private String documentTypeId;
-
-    @Column(name = "profile_id")
-    private String profileId;
 
     @Column(name = "arrived_at")
     private Date arrivedAt;
@@ -125,11 +117,11 @@ public class Transmission {
         this.source = source;
     }
 
-    public ProcessFlow getDirection() {
+    public String getDirection() {
         return direction;
     }
 
-    public void setDirection(ProcessFlow direction) {
+    public void setDirection(String direction) {
         this.direction = direction;
     }
 
@@ -187,6 +179,14 @@ public class Transmission {
 
     public void setMessage(Message message) {
         this.message = message;
+    }
+
+    public String getDocumentTypeId() {
+        return documentTypeId;
+    }
+
+    public void setDocumentTypeId(String documentTypeId) {
+        this.documentTypeId = documentTypeId;
     }
 
     public String getRawHistory() {

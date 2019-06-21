@@ -42,7 +42,7 @@ public class TransmissionServiceImpl implements TransmissionService {
     @Override
     public Transmission saveTransmission(Transmission transmission) {
         try {
-            transmission = repository.save(transmission);
+            transmission = repository.saveAndFlush(transmission);
             logger.info("Monitor saved the message: " + transmission.getFilename());
         } catch (Exception e) {
             logger.error("Error occurred while saving the message: " + transmission.getFilename() + ", reason: " + e.getMessage());
