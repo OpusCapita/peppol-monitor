@@ -85,7 +85,6 @@ public class MonitorWriteRestController {
                 Transmission transmission = transmissionService.getByFilename(filename);
                 if (transmission != null) {
                     logger.info("Send MLR requested for file: " + transmission.getFilename() + " by: " + userId);
-                    transmissionService.loadTransmissionHistory(transmission);
                     mlrManager.sendToMlrReporter(transmission);
                 }
             } catch (Exception e) {
@@ -130,11 +129,10 @@ public class MonitorWriteRestController {
                 Transmission transmission = transmissionService.getByFilename(filename);
                 if (transmission != null) {
                     logger.info("Mark as Fixed requested for file: " + transmission.getFilename() + " by: " + userId);
-                    transmissionService.loadTransmissionHistory(transmission);
-
                     DocumentLog log = new DocumentLog("Message marked as fixed by " + userId, DocumentLogLevel.INFO);
                     log.setSource(ProcessStep.WEB);
                     transmission.setStatus(MessageStatus.fixed);
+
                     transmissionService.addMessageToHistoryOfTransmission(transmission, log);
                 }
             } catch (Exception e) {
@@ -183,8 +181,6 @@ public class MonitorWriteRestController {
                 Transmission transmission = transmissionService.getByFilename(filename);
                 if (transmission != null) {
                     logger.info("Reprocess requested for file: " + transmission.getFilename() + " by: " + userId);
-                    transmissionService.loadTransmissionHistory(transmission);
-
                     DocumentLog log = new DocumentLog("Sending REPROCESS request for the message, triggered by " + userId, DocumentLogLevel.INFO);
                     log.setSource(ProcessStep.REPROCESSOR);
                     transmission.setStatus(MessageStatus.fixed);
