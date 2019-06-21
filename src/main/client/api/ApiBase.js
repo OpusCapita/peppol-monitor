@@ -37,6 +37,10 @@ class ApiBase {
         return this.ajax.get(`/peppol-monitor/api/send-mlrs/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
+    sendMlrsAdvanced(transmissionList) {
+        return this.ajax.post(`/peppol-monitor/api/send-mlrs-advanced`).send(transmissionList).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
     validateFile(data) {
         return this.ajax.post(`/peppol-validator/api/validate-file`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }

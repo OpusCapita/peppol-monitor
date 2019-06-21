@@ -111,13 +111,19 @@ public class MonitorRestController {
 
     @GetMapping("/send-mlrs/{transmissionIds}")
     public ResponseEntity<?> sendMlrOfTransmissions(@PathVariable String transmissionIds) {
-        for (String transmissionId : transmissionIds.split("-")) {
+        for (String transmissionId : transmissionIds.split("\\|")) {
             try {
                 sendMlrOfSingleTransmission(Long.parseLong(transmissionId));
             } catch (Exception e) {
                 logger.error("Async bulk send-mlr operation failed for transmission: " + transmissionId, e);
             }
         }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/send-mlrs-advanced")
+    public ResponseEntity<?> sendMlrsAdvanced(@RequestBody List<String> transmissionList) {
+        logger.info("Got the transmission list for advanced-operations, filesize: " + transmissionList.size());
         return ResponseEntity.ok().build();
     }
 
@@ -138,7 +144,7 @@ public class MonitorRestController {
 
     @GetMapping("/mark-fixed-messages/{transmissionIds}")
     public ResponseEntity<?> markAsFixedMessages(@PathVariable String transmissionIds) {
-        for (String transmissionId : transmissionIds.split("-")) {
+        for (String transmissionId : transmissionIds.split("\\|")) {
             try {
                 markAsFixedSingleMessage(Long.parseLong(transmissionId));
             } catch (Exception e) {
@@ -169,7 +175,7 @@ public class MonitorRestController {
 
     @GetMapping("/reprocess-messages/{transmissionIds}")
     public ResponseEntity<?> reprocessMessages(@PathVariable String transmissionIds) {
-        for (String transmissionId : transmissionIds.split("-")) {
+        for (String transmissionId : transmissionIds.split("\\|")) {
             try {
                 reprocessSingleMessage(Long.parseLong(transmissionId));
             } catch (IOException e) {
