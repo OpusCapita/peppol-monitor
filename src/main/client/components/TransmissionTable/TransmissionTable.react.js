@@ -185,6 +185,10 @@ class TransmissionTable extends Components.ContextComponent {
         this.context.router.push(`/peppol-monitor/messageDetail/${id}`);
     }
 
+    goCustomPage() {
+        this.context.router.push(`/peppol-monitor/advancedOperations`);
+    }
+
     showParticipantLookup(participant) {
         const parts = participant.split(":");
         window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`, '_blank');
@@ -402,7 +406,9 @@ class TransmissionTable extends Components.ContextComponent {
                         </div>
                         <div className="form-submit text-right">
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter
+                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
+                            <button className="btn btn-default float-left" onClick={() => this.goCustomPage()}>
+                                Custom Operations
                             </button>
                             <div className="btn-group float-left" role="group">
                                 <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
@@ -414,7 +420,6 @@ class TransmissionTable extends Components.ContextComponent {
                                     <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
                                     <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
                             </div>
-
                         </div>
                         <hr/>
                     </div>

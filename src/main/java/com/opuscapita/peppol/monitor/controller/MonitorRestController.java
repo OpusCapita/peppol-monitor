@@ -123,7 +123,18 @@ public class MonitorRestController {
 
     @PostMapping("/send-mlrs-advanced")
     public ResponseEntity<?> sendMlrsAdvanced(@RequestBody List<String> transmissionList) {
-        logger.info("Got the transmission list for advanced-operations, filesize: " + transmissionList.size());
+        logger.info("Advanced Operations called, file-size: " + transmissionList.size());
+        for (String filename : transmissionList) {
+            try {
+                Transmission transmission = transmissionService.getByFilename(filename);
+                if (transmission != null) {
+                    transmissionService.loadTransmissionHistory(transmission);
+                    mlrManager.sendToMlrReporter(transmission);
+                }
+            } catch (Exception e) {
+                logger.error("Advanced bulk send-mlr operation failed for file: " + filename, e);
+            }
+        }
         return ResponseEntity.ok().build();
     }
 

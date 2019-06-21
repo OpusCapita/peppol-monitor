@@ -24,7 +24,6 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     render() {
-        const {userData} = this.context;
         // noinspection HtmlUnknownTarget
         return (
             <div>
@@ -73,16 +72,6 @@ class PeppolMonitor extends Components.ContextComponent {
                                 System Status
                             </a>
                         </div>
-                        {
-                            (userData.roles && userData.roles.includes("admin")) &&
-                            <div className="col-lg-12">
-                                <a href="/peppol-monitor?r=advancedOperations" className="thumbnail"
-                                   onClick={e => this.showPage('advancedOperations', e)}>
-                                    <span className="glyphicon glyphicon-eye-open"></span>
-                                    Advanced Operations
-                                </a>
-                            </div>
-                        }
                     </div>
                 </div>
             </div>

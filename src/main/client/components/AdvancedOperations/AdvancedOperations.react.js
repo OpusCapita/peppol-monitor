@@ -36,11 +36,11 @@ class AdvancedOperations extends Components.ContextComponent {
     }
 
     async bulkReprocess() {
-
+        this.context.showNotification('This feature is not implemented yet', 'info', 3);
     }
 
     async bulkMarkAsFixed() {
-
+        this.context.showNotification('This feature is not implemented yet', 'info', 3);
     }
 
     async bulkSendMlr() {
