@@ -36,16 +36,8 @@ class AdvancedOperations extends Components.ContextComponent {
     }
 
     async bulkReprocess() {
-        this.context.showNotification('This feature is not implemented yet', 'info', 3);
-    }
-
-    async bulkMarkAsFixed() {
-        this.context.showNotification('This feature is not implemented yet', 'info', 3);
-    }
-
-    async bulkSendMlr() {
         const {transmissionList} = this.state;
-        const {showModalDialog, hideModalDialog} = this.context;
+        const {userData, showModalDialog, hideModalDialog} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
@@ -54,7 +46,51 @@ class AdvancedOperations extends Components.ContextComponent {
                 this.setState({loading: true});
 
                 setTimeout(() => {
-                    this.api.sendMlrsAdvanced(transmissionList).then(() => {
+                    this.api.reprocessMessagesAdvanced(transmissionList, userData.id).then(() => {
+                        this.setState({loading: false});
+                        this.context.showNotification('Reprocessing of the messages has been started', 'info', 3);
+                    }).catch(e => {
+                        this.setState({loading: false});
+                        this.context.showNotification(e.message, 'error', 10);
+                    });
+
+                }, 500);
+            }
+        }
+
+        const modalTitle = "Bulk Reprocess";
+        const modalText = `${transmissionList.length} transmissions will be reprocessed in the background.\n\nDo you want to continue?`;
+        const modalButtons = {no: 'No', yes: 'Yes'};
+
+        showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
+    }
+
+    async bulkMarkAsFixed() {
+        const {userData} = this.context;
+        const {transmissionList} = this.state;
+
+        this.setState({loading: true});
+        this.api.markAsFixedMessagesAdvanced(transmissionList, userData.id).then(() => {
+            this.setState({loading: false});
+            this.context.showNotification('Marking operation of the messages as fixed has been started', 'info', 3);
+        }).catch(e => {
+            this.setState({loading: false});
+            this.context.showNotification(e.message, 'error', 10);
+        });
+    }
+
+    async bulkSendMlr() {
+        const {transmissionList} = this.state;
+        const {userData, showModalDialog, hideModalDialog} = this.context;
+
+        const onConfirmationClick = (btn) => {
+            hideModalDialog();
+
+            if (btn === 'yes') {
+                this.setState({loading: true});
+
+                setTimeout(() => {
+                    this.api.sendMlrsAdvanced(transmissionList, userData.id).then(() => {
                         this.setState({loading: false});
                         this.context.showNotification('MLR sending operation of the messages has been started', 'info', 3);
                     }).catch(e => {
@@ -78,7 +114,10 @@ class AdvancedOperations extends Components.ContextComponent {
             <div>
                 <h2>Advanced Operations</h2>
                 <label className="btn btn-default upload-btn">
-                    Select the text file to load the transmissions
+                    Select the file to load the transmissions
+                    <div className="upload-btn-explanation">
+                        (You need to select a txt file with full paths of transmissions, one each line)
+                    </div>
                     <input type="file" hidden onChange={e => this.loadFile(e)}/>
                 </label>
                 <div className="form-submit text-right advanced-actions">

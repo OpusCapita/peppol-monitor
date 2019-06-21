@@ -17,8 +17,8 @@ class ApiBase {
         return this.ajax.get(`/peppol-monitor/api/get-transmission-by-transmissionId/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    uploadFile(transmissionId, data) {
-        return this.ajax.post(`/peppol-monitor/api/upload-file/${transmissionId}`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    uploadFile(transmissionId, userId, data) {
+        return this.ajax.post(`/peppol-monitor/api/upload-file/${userId}/${transmissionId}`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     downloadFile(transmissionId) {
@@ -29,36 +29,44 @@ class ApiBase {
         return this.ajax.get(`/peppol-monitor/api/download-mlr/${transmissionId}`).responseType('blob').catch(ApiError.getErrorFromResponse);
     }
 
-    sendMlr(transmissionId) {
-        return this.ajax.get(`/peppol-monitor/api/send-mlr/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    sendMlr(transmissionId, userId) {
+        return this.ajax.get(`/peppol-monitor/api/send-mlr/${userId}/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    sendMlrs(transmissionIds) {
-        return this.ajax.get(`/peppol-monitor/api/send-mlrs/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    sendMlrs(transmissionIds, userId) {
+        return this.ajax.get(`/peppol-monitor/api/send-mlrs/${userId}/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    sendMlrsAdvanced(transmissionList) {
-        return this.ajax.post(`/peppol-monitor/api/send-mlrs-advanced`).send(transmissionList).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    sendMlrsAdvanced(transmissionList, userId) {
+        return this.ajax.post(`/peppol-monitor/api/send-mlrs-advanced/${userId}`).send(transmissionList).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     validateFile(data) {
         return this.ajax.post(`/peppol-validator/api/validate-file`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    markAsFixedMessage(transmissionId) {
-        return this.ajax.get(`/peppol-monitor/api/mark-fixed-message/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    markAsFixedMessage(transmissionId, userId) {
+        return this.ajax.get(`/peppol-monitor/api/mark-fixed-message/${userId}/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    markAsFixedMessages(transmissionIds) {
-        return this.ajax.get(`/peppol-monitor/api/mark-fixed-messages/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    markAsFixedMessages(transmissionIds, userId) {
+        return this.ajax.get(`/peppol-monitor/api/mark-fixed-messages/${userId}/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    reprocessMessage(transmissionId) {
-        return this.ajax.get(`/peppol-monitor/api/reprocess-message/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    markAsFixedMessagesAdvanced(transmissionList, userId) {
+        return this.ajax.post(`/peppol-monitor/api/mark-fixed-messages-advanced/${userId}`).send(transmissionList).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    reprocessMessages(transmissionIds) {
-        return this.ajax.get(`/peppol-monitor/api/reprocess-messages/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    reprocessMessage(transmissionId, userId) {
+        return this.ajax.get(`/peppol-monitor/api/reprocess-message/${userId}/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
+    reprocessMessages(transmissionIds, userId) {
+        return this.ajax.get(`/peppol-monitor/api/reprocess-messages/${userId}/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
+    reprocessMessagesAdvanced(transmissionList, userId) {
+        return this.ajax.post(`/peppol-monitor/api/reprocess-messages-advanced/${userId}`).send(transmissionList).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     getMessageHistory(messageId) {

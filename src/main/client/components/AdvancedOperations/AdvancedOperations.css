@@ -1,3 +1,9 @@
 .form-submit.advanced-actions {
     margin: 30px 0;
 }
+
+.upload-btn .upload-btn-explanation {
+    font-size: 13px;
+    padding-top: 5px;
+    font-style: oblique;
+}

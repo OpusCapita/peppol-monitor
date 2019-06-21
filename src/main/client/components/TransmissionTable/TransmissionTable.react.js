@@ -105,7 +105,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     async bulkReprocess() {
         const {transmissionList} = this.state;
-        const {showModalDialog, hideModalDialog} = this.context;
+        const {userData, showModalDialog, hideModalDialog} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
@@ -115,7 +115,7 @@ class TransmissionTable extends Components.ContextComponent {
 
                 setTimeout(() => {
                     const transmissionIds = transmissionList.map(t => t.id).join("|");
-                    this.api.reprocessMessages(transmissionIds).then(() => {
+                    this.api.reprocessMessages(transmissionIds, userData.id).then(() => {
                         this.setState({loading: false});
                         this.context.showNotification('Reprocessing of the messages has been started', 'info', 3);
                     }).catch(e => {
@@ -137,7 +137,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     async bulkSendMlr() {
         const {transmissionList} = this.state;
-        const {showModalDialog, hideModalDialog} = this.context;
+        const {userData, showModalDialog, hideModalDialog} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
@@ -147,7 +147,7 @@ class TransmissionTable extends Components.ContextComponent {
 
                 setTimeout(() => {
                     const transmissionIds = transmissionList.map(t => t.id).join("|");
-                    this.api.sendMlrs(transmissionIds).then(() => {
+                    this.api.sendMlrs(transmissionIds, userData.id).then(() => {
                         this.setState({loading: false});
                         this.context.showNotification('MLR sending operation of the messages has been started', 'info', 3);
                     }).catch(e => {
@@ -167,11 +167,12 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     async bulkMarkAsFixed() {
+        const {userData} = this.context;
         const {transmissionList} = this.state;
         this.setState({loading: true});
 
         const transmissionIds = transmissionList.map(t => t.id).join("|");
-        this.api.markAsFixedMessages(transmissionIds).then(() => {
+        this.api.markAsFixedMessages(transmissionIds, userData.id).then(() => {
             this.setState({loading: false});
             this.context.showNotification('Marking operation of the messages as fixed has been started', 'info', 3);
         }).catch(e => {
