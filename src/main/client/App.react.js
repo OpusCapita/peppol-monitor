@@ -8,6 +8,7 @@ import ParticipantTable from './components/ParticipantTable';
 import DocumentTypes from './components/DocumentTypes';
 import SystemStatus from './components/SystemStatus';
 import StandaloneValidator from './components/StandaloneValidator';
+import AdvancedOperations from './components/AdvancedOperations';
 
 import {Route} from 'react-router';
 
@@ -22,6 +23,13 @@ const menuButton = (router) => (
 const messageDetail = (props) => (
     <div>
         <TransmissionDetail transmissionId={props.params.transmissionId}/>
+    </div>
+);
+
+const advancedOperations = (props) => (
+    <div>
+        <AdvancedOperations/>
+        {menuButton(props.router)}
     </div>
 );
 
@@ -80,6 +88,7 @@ const App = () => (
         <Route path="/participants" component={participantList}/>
         <Route path="/documentTypes" component={documentTypeList}/>
         <Route path="/systemStatus" component={systemStatus}/>
+        <Route path="/advancedOperations" component={advancedOperations}/>
         <Route path="/messageDetail/:transmissionId" components={messageDetail}/>
     </Containers.ServiceLayout>
 );

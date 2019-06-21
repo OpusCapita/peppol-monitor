@@ -3,19 +3,22 @@ package com.opuscapita.peppol.monitor.util;
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.container.metadata.ContainerBusinessMetadata;
 import com.opuscapita.peppol.commons.container.metadata.ContainerMessageMetadata;
-import com.opuscapita.peppol.commons.container.metadata.ContainerValidationRule;
-import com.opuscapita.peppol.commons.container.state.ProcessFlow;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Participant;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TransmissionContainerMessageConverter {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransmissionContainerMessageConverter.class);
 
     private final ParticipantRepository participantRepository;
 
@@ -25,6 +28,7 @@ public class TransmissionContainerMessageConverter {
     }
 
     public ContainerMessage convert(Transmission transmission) {
+        logger.info("Transmission [" + transmission.getTransmissionId() + "] to ContainerMessage convention started");
         ContainerMessage cm = new ContainerMessage(transmission.getFilename());
         cm.setSource(transmission.getSource());
         cm.setStep(convertStatusToStep(transmission));
@@ -36,36 +40,16 @@ public class TransmissionContainerMessageConverter {
         metadata.setTimestamp(transmission.getArrivedAt());
         metadata.setSenderId(transmission.getSender());
         metadata.setRecipientId(transmission.getReceiver());
-        if (ProcessFlow.IN.equals(transmission.getDirection())) {
+        if (Source.NETWORK.equals(transmission.getSource())) {
             metadata.setSendingAccessPoint(transmission.getAccessPoint());
         } else {
             metadata.setReceivingAccessPoint(transmission.getAccessPoint());
         }
-//        metadata.setValidationRule(convertValidationRule(transmission));
         metadata.setBusinessMetadata(convertBusinessMetadata(transmission));
         cm.setMetadata(metadata);
 
         return cm;
     }
-
-    // reverting toString result to object, from "ValidationRule {id: %s, name: %s}"
-//    private ContainerValidationRule convertValidationRule(Transmission transmission) {
-//        try {
-//            String ruleString = transmission.getDocumentType();
-//            String temp1 = ruleString.split("\\{")[1];
-//            temp1 = temp1.substring(0, temp1.length() - 1);
-//            String[] temp2 = temp1.split(", ");
-//            String id = temp2[0].split(": ")[1];
-//            String name = temp2[1].split(": ")[1];
-//
-//            ContainerValidationRule rule = new ContainerValidationRule();
-//            rule.setId(Integer.parseInt(id));
-//            rule.setDescription(name);
-//            return rule;
-//        } catch (Exception ignored) {
-//            return null;
-//        }
-//    }
 
     private ContainerBusinessMetadata convertBusinessMetadata(Transmission transmission) {
         ContainerBusinessMetadata metadata = new ContainerBusinessMetadata();

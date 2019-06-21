@@ -3,12 +3,12 @@ package com.opuscapita.peppol.monitor.repository;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionFilterDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.util.TransmissionHistorySerializer;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class TransmissionServiceImpl implements TransmissionService {
     @Override
     public Transmission saveTransmission(Transmission transmission) {
         try {
-            transmission = repository.save(transmission);
+            transmission = repository.saveAndFlush(transmission);
             logger.info("Monitor saved the message: " + transmission.getFilename());
         } catch (Exception e) {
             logger.error("Error occurred while saving the message: " + transmission.getFilename() + ", reason: " + e.getMessage());
@@ -54,10 +54,7 @@ public class TransmissionServiceImpl implements TransmissionService {
     @Override
     public Transmission getTransmission(Long id) {
         Transmission transmission = repository.findById(id).orElse(null);
-        if (transmission != null) {
-            transmission.setLogs(historySerializer.fromJson(transmission.getRawHistory()));
-        }
-        return transmission;
+        return loadTransmissionHistory(transmission);
     }
 
     @Override
@@ -67,11 +64,18 @@ public class TransmissionServiceImpl implements TransmissionService {
 
     @Override
     public Transmission getByFilename(String filename) {
+        filename = filename.trim();
+        if (StringUtils.isBlank(filename)) {
+            return null;
+        }
+
         List<Transmission> transmissions = repository.findByFilename(filename);
         if (transmissions == null || transmissions.isEmpty()) {
             return null;
         }
-        return transmissions.stream().max(Comparator.comparing(Transmission::getId)).orElse(null);
+
+        Transmission transmission = transmissions.stream().max(Comparator.comparing(Transmission::getId)).orElse(null);
+        return loadTransmissionHistory(transmission);
     }
 
     @Override

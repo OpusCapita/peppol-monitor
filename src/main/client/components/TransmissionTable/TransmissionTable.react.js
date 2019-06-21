@@ -105,7 +105,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     async bulkReprocess() {
         const {transmissionList} = this.state;
-        const {showModalDialog, hideModalDialog} = this.context;
+        const {userData, showModalDialog, hideModalDialog} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
@@ -114,8 +114,8 @@ class TransmissionTable extends Components.ContextComponent {
                 this.setState({loading: true});
 
                 setTimeout(() => {
-                    const transmissionIds = transmissionList.map(t => t.id).join("-");
-                    this.api.reprocessMessages(transmissionIds).then(() => {
+                    const transmissionIds = transmissionList.map(t => t.id).join("|");
+                    this.api.reprocessMessages(transmissionIds, userData.id).then(() => {
                         this.setState({loading: false});
                         this.context.showNotification('Reprocessing of the messages has been started', 'info', 3);
                     }).catch(e => {
@@ -137,7 +137,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     async bulkSendMlr() {
         const {transmissionList} = this.state;
-        const {showModalDialog, hideModalDialog} = this.context;
+        const {userData, showModalDialog, hideModalDialog} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
@@ -146,8 +146,8 @@ class TransmissionTable extends Components.ContextComponent {
                 this.setState({loading: true});
 
                 setTimeout(() => {
-                    const transmissionIds = transmissionList.map(t => t.id).join("-");
-                    this.api.sendMlrs(transmissionIds).then(() => {
+                    const transmissionIds = transmissionList.map(t => t.id).join("|");
+                    this.api.sendMlrs(transmissionIds, userData.id).then(() => {
                         this.setState({loading: false});
                         this.context.showNotification('MLR sending operation of the messages has been started', 'info', 3);
                     }).catch(e => {
@@ -167,11 +167,12 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     async bulkMarkAsFixed() {
+        const {userData} = this.context;
         const {transmissionList} = this.state;
         this.setState({loading: true});
 
-        const transmissionIds = transmissionList.map(t => t.id).join("-");
-        this.api.markAsFixedMessages(transmissionIds).then(() => {
+        const transmissionIds = transmissionList.map(t => t.id).join("|");
+        this.api.markAsFixedMessages(transmissionIds, userData.id).then(() => {
             this.setState({loading: false});
             this.context.showNotification('Marking operation of the messages as fixed has been started', 'info', 3);
         }).catch(e => {
@@ -183,6 +184,10 @@ class TransmissionTable extends Components.ContextComponent {
     showTransmissionDetail(e, id) {
         e && e.preventDefault();
         this.context.router.push(`/peppol-monitor/messageDetail/${id}`);
+    }
+
+    goCustomPage() {
+        this.context.router.push(`/peppol-monitor/advancedOperations`);
     }
 
     showParticipantLookup(participant) {
@@ -402,7 +407,9 @@ class TransmissionTable extends Components.ContextComponent {
                         </div>
                         <div className="form-submit text-right">
                             <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter
+                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
+                            <button className="btn btn-default float-left" onClick={() => this.goCustomPage()}>
+                                Custom Operations
                             </button>
                             <div className="btn-group float-left" role="group">
                                 <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
@@ -414,7 +421,6 @@ class TransmissionTable extends Components.ContextComponent {
                                     <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
                                     <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
                             </div>
-
                         </div>
                         <hr/>
                     </div>

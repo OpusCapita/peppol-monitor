@@ -8,6 +8,10 @@
 	color: #666;
 }
 
+.transmission-detail .right-arrow {
+	margin: 0 10px 2px;
+}
+
 .transmission-detail-actions {
 	margin-top: 10px;
 }

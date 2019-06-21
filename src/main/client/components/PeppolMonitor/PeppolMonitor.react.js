@@ -24,7 +24,6 @@ class PeppolMonitor extends Components.ContextComponent {
     }
 
     render() {
-        // this.context.userData.roles = ["admin", "peppol", "user"]
         // noinspection HtmlUnknownTarget
         return (
             <div>

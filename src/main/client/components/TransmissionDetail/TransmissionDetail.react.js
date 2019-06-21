@@ -46,11 +46,10 @@ class TransmissionDetail extends Components.ContextComponent {
             return;
         }
 
-
         let data = new FormData();
         data.append('file', file);
         this.context.showSpinner();
-        this.api.uploadFile(this.props.transmissionId, data).then(() => {
+        this.api.uploadFile(this.props.transmissionId, this.context.userData.id, data).then(() => {
             this.context.hideSpinner();
             this.context.showNotification('Successfully updated the file', 'success', 3);
         }).catch(e => {
@@ -78,7 +77,7 @@ class TransmissionDetail extends Components.ContextComponent {
 
     sendMlr(event) {
         this.context.showSpinner();
-        this.api.sendMlr(this.props.transmissionId).then((response) => {
+        this.api.sendMlr(this.props.transmissionId, this.context.userData.id).then((response) => {
             this.context.hideSpinner();
             this.context.showNotification('The request is sent to mlr-reporter', 'info', 3);
         }).catch(e => {
@@ -108,7 +107,7 @@ class TransmissionDetail extends Components.ContextComponent {
         event.preventDefault();
 
         this.context.showSpinner();
-        this.api.markAsFixedMessage(this.props.transmissionId).then(() => {
+        this.api.markAsFixedMessage(this.props.transmissionId, this.context.userData.id).then(() => {
             this.context.hideSpinner();
             this.context.showNotification('The transmission is marked as fixed', 'info', 3);
         }).catch(e => {
@@ -120,7 +119,7 @@ class TransmissionDetail extends Components.ContextComponent {
     reprocessMessage(event) {
         event.preventDefault();
         const {transmission} = this.state;
-        const {showNotification, showModalDialog, hideModalDialog, showSpinner, hideSpinner} = this.context;
+        const {userData, showNotification, showModalDialog, hideModalDialog, showSpinner, hideSpinner} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
@@ -129,7 +128,7 @@ class TransmissionDetail extends Components.ContextComponent {
                 showSpinner();
 
                 setTimeout(() => {
-                    this.api.reprocessMessage(this.props.transmissionId).then(() => {
+                    this.api.reprocessMessage(this.props.transmissionId, userData.id).then(() => {
                         hideSpinner();
                         this.context.showNotification('The file is sent for reprocessing', 'info', 3);
                     }).catch(e => {
@@ -229,6 +228,14 @@ class TransmissionDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
+                                    <label className="control-label btn-link">Document Type ID</label>
+                                </div>
+                                <div className="offset-md-1 col-md-8">
+                                    <label className="control-label">{transmission.documentTypeId}</label>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
                                     <label className="control-label btn-link">Invoice Number</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
@@ -261,10 +268,14 @@ class TransmissionDetail extends Components.ContextComponent {
                             </div>
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <label className="control-label btn-link">Source / Direction</label>
+                                    <label className="control-label btn-link">Source / Destination</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
-                                    <label className="control-label">{transmission.source} / {transmission.direction}</label>
+                                    <label className="control-label">
+                                        {transmission.source}
+                                        <span className="glyphicon glyphicon-arrow-right right-arrow"></span>
+                                        {(transmission.direction) ? transmission.direction.toUpperCase() : '-'}
+                                    </label>
                                 </div>
                             </div>
                             <div className="form-group">
@@ -283,30 +294,6 @@ class TransmissionDetail extends Components.ContextComponent {
                                     <label className="control-label">{transmission.arrivedAt}</label>
                                 </div>
                             </div>
-                            {/*<div className="form-group">*/}
-                                {/*<div className="col-sm-3">*/}
-                                    {/*<label className="control-label btn-link">Profile ID</label>*/}
-                                {/*</div>*/}
-                                {/*<div className="offset-md-1 col-md-8">*/}
-                                    {/*<label className="control-label">{transmission.profileId}</label>*/}
-                                {/*</div>*/}
-                            {/*</div>*/}
-                            {/*<div className="form-group">*/}
-                                {/*<div className="col-sm-3">*/}
-                                    {/*<label className="control-label btn-link">Validation Rule</label>*/}
-                                {/*</div>*/}
-                                {/*<div className="offset-md-1 col-md-8">*/}
-                                    {/*<label className="control-label">{transmission.documentType}</label>*/}
-                                {/*</div>*/}
-                            {/*</div>*/}
-                            {/*<div className="form-group">*/}
-                                {/*<div className="col-sm-3">*/}
-                                    {/*<label className="control-label btn-link">Document Type ID</label>*/}
-                                {/*</div>*/}
-                                {/*<div className="offset-md-1 col-md-8">*/}
-                                    {/*<label className="control-label">{transmission.documentTypeId}</label>*/}
-                                {/*</div>*/}
-                            {/*</div>*/}
                         </div>
                     </div>
                 </div>
