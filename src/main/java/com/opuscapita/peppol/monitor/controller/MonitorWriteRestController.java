@@ -78,10 +78,8 @@ public class MonitorWriteRestController {
 
     @PostMapping("/send-mlrs-advanced/{userId}")
     public ResponseEntity<?> sendMlrOfTransmissionsAdvanced(@PathVariable String userId, @RequestBody List<String> transmissionList) {
-        logger.info("Advanced Operations called, file-size: " + transmissionList.size());
         for (String filename : transmissionList) {
             try {
-                logger.info("Advanced Operations filename: " + filename);
                 Transmission transmission = transmissionService.getByFilename(filename);
                 if (transmission != null) {
                     logger.info("Send MLR requested for file: " + transmission.getFilename() + " by: " + userId);

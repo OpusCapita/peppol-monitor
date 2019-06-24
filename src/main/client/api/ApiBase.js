@@ -92,6 +92,10 @@ class ApiBase {
     getStatus(serviceName) {
         return this.ajax.get(`/${serviceName}/api/health/check`).catch(ApiError.getErrorFromResponse);
     }
+
+    getStatistics(from, to) {
+        return this.ajax.get(`/peppol-monitor/api/get-statistics/${from}/${to}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
 }
 
 export default ApiBase;
