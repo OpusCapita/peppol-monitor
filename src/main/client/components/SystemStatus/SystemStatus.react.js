@@ -8,7 +8,9 @@ class SystemStatus extends Components.ContextComponent {
 
     state = {
         loading: false,
-        selectedYear: new Date().getFullYear(),
+        selectedYear: {
+            value: new Date().getFullYear()
+        },
         selectedMonth: new Date().getMonth() + 1,
         results: {
             "peppol-inbound": "...",
@@ -97,34 +99,32 @@ class SystemStatus extends Components.ContextComponent {
     getStats() {
         const {selectedYear, selectedMonth} = this.state;
 
-        const startYear = selectedYear;
-        const startMonth = selectedMonth < 10 ? `0${selectedMonth}` : selectedMonth;
-        const endYear = selectedMonth === 12 ? selectedYear + 1 : selectedYear;
-        const endMonth = ((selectedMonth + 1) % 12) < 10 ? `0${(selectedMonth + 1) % 12}` : ((selectedMonth + 1) % 12);
+        const startYear = selectedYear.value;
+        const startMonth = selectedMonth.value < 10 ? `0${selectedMonth.value}` : selectedMonth.value;
+        const endYear = selectedMonth.value === 12 ? selectedYear.value + 1 : selectedYear.value;
+        const endMonth = ((selectedMonth.value + 1) % 12) < 10 ? `0${(selectedMonth.value + 1) % 12}` : ((selectedMonth.value + 1) % 12);
 
-        const period = `${startYear}-${startMonth}`;
-        const from = `${period}-01`;
+        const from = `${startYear}-${startMonth}-01`;
         const to = `${endYear}-${endMonth}-01`;
 
         this.context.showSpinner();
         this.api.getStatistics(from, to).then(stats => {
-            this.context.hideSpinner();
-
             let csvContent = "data:text/csv;charset=utf-8,";
             stats.forEach((stat) => {
-                let row = `${period},${stat.doc_type},${stat.direction},${stat.files}`;
+                let row = `${startYear}-${startMonth},${stat.doc_type},${stat.direction},${stat.files}`;
                 csvContent += row + "\r\n";
             });
             const encodedUri = encodeURI(csvContent);
 
             const a = document.createElement("a");
             a.setAttribute("href", encodedUri);
-            a.setAttribute("download", `PEPPOL-OpusCapitaAPStatistics-${period}.csv`);
+            a.setAttribute("download", `PEPPOL-OpusCapitaAP-${selectedMonth.label}${selectedYear.label}Statistics.csv`);
             a.click();
 
-        }).catch(e => {
             this.context.hideSpinner();
+        }).catch(e => {
             this.context.showNotification(e.message, 'error', 10);
+            this.context.hideSpinner();
         });
     }
 
@@ -161,7 +161,7 @@ class SystemStatus extends Components.ContextComponent {
                         </div>
                     </div>
                 </div>
-                <hr />
+                <hr/>
                 {
                     Object.keys(results).map((service, i) => {
                         return (
