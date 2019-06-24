@@ -1,5 +1,6 @@
 import React from 'react';
 import {Components} from '@opuscapita/service-base-ui';
+import Select from '@opuscapita/react-select';
 import {ApiBase} from '../../api';
 import './SystemStatus.css';
 
@@ -118,7 +119,7 @@ class SystemStatus extends Components.ContextComponent {
 
             const a = document.createElement("a");
             a.setAttribute("href", encodedUri);
-            a.setAttribute("download", "my_data.csv");
+            a.setAttribute("download", `PEPPOL-OpusCapitaAPStatistics-${period}.csv`);
             a.click();
 
         }).catch(e => {
