@@ -125,7 +125,7 @@ class SystemStatus extends Components.ContextComponent {
         this.context.showSpinner();
         this.api.getStatistics(from, to).then(stats => {
             const csvData = this.prepareCSVData(`${startYear}-${startMonth}`, stats);
-            this.downloadAsCSV(csvContent, `PEPPOL-OpusCapitaAP-${selectedMonth.label}${selectedYear.label}Statistics.csv`);
+            this.downloadAsCSV(csvData, `PEPPOL-OpusCapitaAP-${selectedMonth.label}${selectedYear.label}Statistics.csv`);
 
             this.context.hideSpinner();
         }).catch(e => {
@@ -176,7 +176,7 @@ class SystemStatus extends Components.ContextComponent {
                                     (results[service].startsWith("2") ? 'row status-line green' :
                                         'row status-line red')
                             }>
-                                <div className="col-md-4">{service}</div>
+                                <div className="col-md-4">{service.substring(7).toUpperCase()}</div>
                                 <div className="col-md-8 text-right">{results[service]}</div>
                             </div>
                         )

@@ -23,8 +23,8 @@ public class StatisticsService {
 
     // from and to are dates, ex: 2019-05-30
     public List<TransmissionStatisticsDto> get(String from, String to) {
-        String complexSql = String.format("select doc_type, direction, count(*) as files from raw_stats where tstamp >= '%s' and tstamp < '%s' group by direction, doc_type order by direction, files desc, doc_type", from, to);
-        return jdbcTemplate.query(complexSql, new StatsRowMapper());
+        String query = String.format("select doc_type, direction, count(*) as files from raw_stats where tstamp >= '%s' and tstamp < '%s' group by direction, doc_type order by direction, files desc, doc_type", from, to);
+        return jdbcTemplate.query(query, new StatsRowMapper());
     }
 
     public class StatsRowMapper implements RowMapper {
