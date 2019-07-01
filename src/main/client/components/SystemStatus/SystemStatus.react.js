@@ -8,9 +8,7 @@ class SystemStatus extends Components.ContextComponent {
 
     state = {
         loading: false,
-        selectedYear: {
-            value: new Date().getFullYear()
-        },
+        selectedYear: new Date().getFullYear(),
         selectedMonth: new Date().getMonth() + 1,
         results: {
             "peppol-inbound": "...",
@@ -109,17 +107,24 @@ class SystemStatus extends Components.ContextComponent {
 
         this.context.showSpinner();
         this.api.getStatistics(from, to).then(stats => {
-            let csvContent = "data:text/csv;charset=utf-8,";
+            let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF";
+            csvContent += "period,doc_type,direction,files\r\n";
             stats.forEach((stat) => {
-                let row = `${startYear}-${startMonth},${encodeURIComponent(stat.doc_type)},${stat.direction},${stat.files}`;
+                let row = `${startYear}-${startMonth},"${stat.doc_type}",${stat.direction},${stat.files}`;
                 csvContent += row + "\r\n";
             });
-            const encodedUri = encodeURI(csvContent);
+            const encodedUri = encodeURIComponent(csvContent);
 
             const a = document.createElement("a");
             a.setAttribute("href", encodedUri);
             a.setAttribute("download", `PEPPOL-OpusCapitaAP-${selectedMonth.label}${selectedYear.label}Statistics.csv`);
             a.click();
+
+
+            const BOM = "\uFEFF";
+            const final = BOM + csvContent;
+            const blobFinal = new Blob([final], { type: "text/csv;charset=utf-8" });
+            saveAs(blobFinal, "myFile.csv");
 
             this.context.hideSpinner();
         }).catch(e => {
