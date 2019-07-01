@@ -64,9 +64,9 @@ public class MonitorWriteRestController {
         return sendMlrOfSingleTransmission(transmissionId, userId);
     }
 
-    @GetMapping("/send-mlrs/{userId}/{transmissionIds}")
-    public ResponseEntity<?> sendMlrOfTransmissions(@PathVariable String userId, @PathVariable String transmissionIds) {
-        for (String transmissionId : transmissionIds.split("\\|")) {
+    @PostMapping("/send-mlrs/{userId}")
+    public ResponseEntity<?> sendMlrOfTransmissions(@PathVariable String userId, @RequestBody List<String> transmissionIds) {
+        for (String transmissionId : transmissionIds) {
             try {
                 sendMlrOfSingleTransmission(Long.parseLong(transmissionId), userId);
             } catch (Exception e) {
@@ -78,10 +78,8 @@ public class MonitorWriteRestController {
 
     @PostMapping("/send-mlrs-advanced/{userId}")
     public ResponseEntity<?> sendMlrOfTransmissionsAdvanced(@PathVariable String userId, @RequestBody List<String> transmissionList) {
-        logger.info("Advanced Operations called, file-size: " + transmissionList.size());
         for (String filename : transmissionList) {
             try {
-                logger.info("Advanced Operations filename: " + filename);
                 Transmission transmission = transmissionService.getByFilename(filename);
                 if (transmission != null) {
                     logger.info("Send MLR requested for file: " + transmission.getFilename() + " by: " + userId);
@@ -110,9 +108,9 @@ public class MonitorWriteRestController {
         return markAsFixedSingleMessage(transmissionId, userId);
     }
 
-    @GetMapping("/mark-fixed-messages/{userId}/{transmissionIds}")
-    public ResponseEntity<?> markAsFixedMessages(@PathVariable String userId, @PathVariable String transmissionIds) {
-        for (String transmissionId : transmissionIds.split("\\|")) {
+    @PostMapping("/mark-fixed-messages/{userId}")
+    public ResponseEntity<?> markAsFixedMessages(@PathVariable String userId, @RequestBody List<String> transmissionIds) {
+        for (String transmissionId : transmissionIds) {
             try {
                 markAsFixedSingleMessage(Long.parseLong(transmissionId), userId);
             } catch (Exception e) {
@@ -162,12 +160,12 @@ public class MonitorWriteRestController {
         return reprocessSingleMessage(transmissionId, userId);
     }
 
-    @GetMapping("/reprocess-messages/{userId}/{transmissionIds}")
-    public ResponseEntity<?> reprocessMessages(@PathVariable String userId, @PathVariable String transmissionIds) {
-        for (String transmissionId : transmissionIds.split("\\|")) {
+    @PostMapping("/reprocess-messages/{userId}")
+    public ResponseEntity<?> reprocessMessages(@PathVariable String userId, @RequestBody List<String> transmissionIds) {
+        for (String transmissionId : transmissionIds) {
             try {
                 reprocessSingleMessage(Long.parseLong(transmissionId), userId);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("Async bulk reprocess operation failed for transmission: " + transmissionId, e);
             }
         }

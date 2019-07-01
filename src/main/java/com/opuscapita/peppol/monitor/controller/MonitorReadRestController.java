@@ -4,11 +4,13 @@ import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionResponseDto;
+import com.opuscapita.peppol.monitor.controller.dtos.TransmissionStatisticsDto;
 import com.opuscapita.peppol.monitor.entity.AccessPoint;
 import com.opuscapita.peppol.monitor.entity.Participant;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
+import com.opuscapita.peppol.monitor.repository.StatisticsService;
 import com.opuscapita.peppol.monitor.repository.TransmissionService;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -30,13 +32,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class MonitorReadRestController {
 
+    private final StatisticsService statisticsService;
     private final TransmissionService transmissionService;
     private final ParticipantRepository participantRepository;
     private final AccessPointRepository accessPointRepository;
 
     @Autowired
-    public MonitorReadRestController(TransmissionService transmissionService, ParticipantRepository participantRepository,
-                                     AccessPointRepository accessPointRepository) {
+    public MonitorReadRestController(StatisticsService statisticsService, TransmissionService transmissionService,
+                                     ParticipantRepository participantRepository, AccessPointRepository accessPointRepository) {
+        this.statisticsService = statisticsService;
         this.transmissionService = transmissionService;
         this.participantRepository = participantRepository;
         this.accessPointRepository = accessPointRepository;
@@ -101,6 +105,11 @@ public class MonitorReadRestController {
     public ResponseEntity<?> getParticipants() {
         List<Participant> participants = participantRepository.findAll();
         return wrap(participants);
+    }
+
+    @GetMapping("/get-statistics/{from}/{to}")
+    public List<TransmissionStatisticsDto> getStatistics(@PathVariable String from, @PathVariable String to) {
+        return statisticsService.get(from, to);
     }
 
     private ResponseEntity<byte[]> wrapFileToDownload(InputStream inputStream, String filename) throws IOException {

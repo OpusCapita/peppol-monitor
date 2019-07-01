@@ -59,7 +59,7 @@ public class Transmission {
     @Column(name = "invoice_date", length = 50)
     private String invoiceDate;
 
-    @Column(name = "document_type_id")
+    @Column(name = "document_type_id", length = 10)
     private String documentTypeId;
 
     @Column(name = "arrived_at")

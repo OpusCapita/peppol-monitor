@@ -34,7 +34,7 @@ class ApiBase {
     }
 
     sendMlrs(transmissionIds, userId) {
-        return this.ajax.get(`/peppol-monitor/api/send-mlrs/${userId}/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+        return this.ajax.post(`/peppol-monitor/api/send-mlrs/${userId}`).send(transmissionIds).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     sendMlrsAdvanced(transmissionList, userId) {
@@ -50,7 +50,7 @@ class ApiBase {
     }
 
     markAsFixedMessages(transmissionIds, userId) {
-        return this.ajax.get(`/peppol-monitor/api/mark-fixed-messages/${userId}/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+        return this.ajax.post(`/peppol-monitor/api/mark-fixed-messages/${userId}`).send(transmissionIds).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     markAsFixedMessagesAdvanced(transmissionList, userId) {
@@ -62,7 +62,7 @@ class ApiBase {
     }
 
     reprocessMessages(transmissionIds, userId) {
-        return this.ajax.get(`/peppol-monitor/api/reprocess-messages/${userId}/${transmissionIds}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+        return this.ajax.post(`/peppol-monitor/api/reprocess-messages/${userId}`).send(transmissionIds).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     reprocessMessagesAdvanced(transmissionList, userId) {
@@ -91,6 +91,10 @@ class ApiBase {
 
     getStatus(serviceName) {
         return this.ajax.get(`/${serviceName}/api/health/check`).catch(ApiError.getErrorFromResponse);
+    }
+
+    getStatistics(from, to) {
+        return this.ajax.get(`/peppol-monitor/api/get-statistics/${from}/${to}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 }
 

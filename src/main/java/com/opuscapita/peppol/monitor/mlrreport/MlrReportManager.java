@@ -2,6 +2,7 @@ package com.opuscapita.peppol.monitor.mlrreport;
 
 import com.opuscapita.peppol.commons.container.ContainerMessage;
 import com.opuscapita.peppol.commons.queue.MessageQueue;
+import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 import com.opuscapita.peppol.monitor.util.TransmissionContainerMessageConverter;
 import org.slf4j.Logger;
@@ -27,13 +28,15 @@ public class MlrReportManager {
         this.messageQueue = messageQueue;
     }
 
-    public void sendToMlrReporter(ContainerMessage cm) throws Exception {
-        messageQueue.convertAndSend(mlrQueue, cm);
-        logger.debug("Monitor send the message to mlr-reporter: " + cm.getFileName());
+    public void sendToMlrReporter(ContainerMessage cm, MessageStatus status) throws Exception {
+        if (status.isFinal()) {
+            messageQueue.convertAndSend(mlrQueue, cm);
+            logger.debug("Monitor send the message to mlr-reporter: " + cm.getFileName());
+        }
     }
 
     public void sendToMlrReporter(Transmission transmission) throws Exception {
         ContainerMessage cm = converter.convert(transmission);
-        sendToMlrReporter(cm);
+        sendToMlrReporter(cm, transmission.getStatus());
     }
 }
