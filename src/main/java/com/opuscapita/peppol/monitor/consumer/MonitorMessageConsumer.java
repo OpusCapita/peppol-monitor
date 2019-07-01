@@ -72,7 +72,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         transmissionService.saveTransmission(transmission);
 
         // finally send message to mlr-reporter
-        mlrManager.sendToMlrReporter(cm);
+        mlrManager.sendToMlrReporter(cm, transmission.getStatus());
     }
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {

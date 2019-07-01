@@ -111,7 +111,7 @@ class SystemStatus extends Components.ContextComponent {
         this.api.getStatistics(from, to).then(stats => {
             let csvContent = "data:text/csv;charset=utf-8,";
             stats.forEach((stat) => {
-                let row = `${startYear}-${startMonth},${stat.doc_type},${stat.direction},${stat.files}`;
+                let row = `${startYear}-${startMonth},${encodeURIComponent(stat.doc_type)},${stat.direction},${stat.files}`;
                 csvContent += row + "\r\n";
             });
             const encodedUri = encodeURI(csvContent);
