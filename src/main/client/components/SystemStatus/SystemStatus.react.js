@@ -94,9 +94,26 @@ class SystemStatus extends Components.ContextComponent {
         return result;
     }
 
+    prepareCSVData(period, stats) {
+        let csvContent = "period,doc_type,direction,files\r\n";
+        stats.forEach((stat) => {
+            csvContent += `${period},"${stat.doc_type}",${stat.direction},${stat.files}\r\n`;
+        });
+        return csvContent;
+    }
+
+    downloadAsCSV(data, filename) {
+        const BOM = "\uFEFF";
+        const final = BOM + data;
+        const blob = new Blob([final], { type: "text/csv;charset=utf-8" });
+        const link = document.createElement("a");
+        link.setAttribute("href", window.URL.createObjectURL(blob));
+        link.setAttribute("download", filename);
+        link.click();
+    }
+
     getStats() {
         const {selectedYear, selectedMonth} = this.state;
-
         const startYear = selectedYear.value;
         const startMonth = selectedMonth.value < 10 ? `0${selectedMonth.value}` : selectedMonth.value;
         const endYear = selectedMonth.value === 12 ? selectedYear.value + 1 : selectedYear.value;
@@ -107,24 +124,8 @@ class SystemStatus extends Components.ContextComponent {
 
         this.context.showSpinner();
         this.api.getStatistics(from, to).then(stats => {
-            let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF";
-            csvContent += "period,doc_type,direction,files\r\n";
-            stats.forEach((stat) => {
-                let row = `${startYear}-${startMonth},"${stat.doc_type}",${stat.direction},${stat.files}`;
-                csvContent += row + "\r\n";
-            });
-            const encodedUri = encodeURIComponent(csvContent);
-
-            const a = document.createElement("a");
-            a.setAttribute("href", encodedUri);
-            a.setAttribute("download", `PEPPOL-OpusCapitaAP-${selectedMonth.label}${selectedYear.label}Statistics.csv`);
-            a.click();
-
-
-            const BOM = "\uFEFF";
-            const final = BOM + csvContent;
-            const blobFinal = new Blob([final], { type: "text/csv;charset=utf-8" });
-            saveAs(blobFinal, "myFile.csv");
+            const csvData = this.prepareCSVData(`${startYear}-${startMonth}`, stats);
+            this.downloadAsCSV(csvContent, `PEPPOL-OpusCapitaAP-${selectedMonth.label}${selectedYear.label}Statistics.csv`);
 
             this.context.hideSpinner();
         }).catch(e => {

@@ -114,7 +114,7 @@ class TransmissionTable extends Components.ContextComponent {
                 this.setState({loading: true});
 
                 setTimeout(() => {
-                    const transmissionIds = transmissionList.map(t => t.id).join("|");
+                    const transmissionIds = transmissionList.map(t => t.id);
                     this.api.reprocessMessages(transmissionIds, userData.id).then(() => {
                         this.setState({loading: false});
                         this.context.showNotification('Reprocessing of the messages has been started', 'info', 3);
@@ -146,7 +146,7 @@ class TransmissionTable extends Components.ContextComponent {
                 this.setState({loading: true});
 
                 setTimeout(() => {
-                    const transmissionIds = transmissionList.map(t => t.id).join("|");
+                    const transmissionIds = transmissionList.map(t => t.id);
                     this.api.sendMlrs(transmissionIds, userData.id).then(() => {
                         this.setState({loading: false});
                         this.context.showNotification('MLR sending operation of the messages has been started', 'info', 3);
@@ -171,7 +171,7 @@ class TransmissionTable extends Components.ContextComponent {
         const {transmissionList} = this.state;
         this.setState({loading: true});
 
-        const transmissionIds = transmissionList.map(t => t.id).join("|");
+        const transmissionIds = transmissionList.map(t => t.id);
         this.api.markAsFixedMessages(transmissionIds, userData.id).then(() => {
             this.setState({loading: false});
             this.context.showNotification('Marking operation of the messages as fixed has been started', 'info', 3);
