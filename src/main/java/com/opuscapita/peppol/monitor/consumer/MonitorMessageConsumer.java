@@ -69,7 +69,14 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         } else {
             transmission = updateTransmissionEntity(cm, transmission);
         }
-        transmissionService.saveTransmission(transmission);
+
+        try {
+            transmissionService.saveTransmission(transmission);
+            logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
+
+        } catch (Exception e) {
+            handleDBErrors(transmission, cm, e);
+        }
 
         // finally send message to mlr-reporter
         mlrManager.sendToMlrReporter(cm, transmission.getStatus());
@@ -189,6 +196,14 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             return MessageStatus.delivered;
         }
         return MessageStatus.unknown;
+    }
+
+    // fix to status-stuck-in-UI issues, reset operation for final statuses in case of concurrency exceptions
+    private void handleDBErrors(Transmission transmission, ContainerMessage cm, Exception e) throws Exception {
+        logger.error("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
+        if (transmission.getStatus().isFinal()) {
+            consume(cm);
+        }
     }
 
     private String toKibana(ContainerMessage cm) {

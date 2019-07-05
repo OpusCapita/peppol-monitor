@@ -65,6 +65,9 @@ public class Transmission {
     @Column(name = "arrived_at")
     private Date arrivedAt;
 
+    @Version
+    private Integer version;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "message_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -195,6 +198,14 @@ public class Transmission {
 
     public void setRawHistory(String rawHistory) {
         this.rawHistory = rawHistory;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
     public List<DocumentLog> getLogs() {
