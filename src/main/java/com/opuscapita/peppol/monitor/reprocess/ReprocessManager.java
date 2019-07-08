@@ -1,7 +1,6 @@
 package com.opuscapita.peppol.monitor.reprocess;
 
 import com.opuscapita.peppol.commons.auth.AuthorizationService;
-import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
 import com.opuscapita.peppol.monitor.entity.Transmission;
@@ -38,12 +37,14 @@ public class ReprocessManager {
 
     public void reprocessMessage(Transmission transmission) throws IOException {
         logger.debug("Message reprocess requested for transmission: " + transmission.getTransmissionId());
-        String endpoint = getEndpoint(transmission.getFilename(), transmission.getSource());
+        String endpoint = getEndpoint(transmission.getFilename());
         logger.info("Sending reprocess request to endpoint: " + endpoint + " for file: " + transmission.getFilename());
 
         HttpHeaders headers = new HttpHeaders();
         authService.setAuthorizationHeader(headers);
         headers.set("Transfer-Encoding", "chunked");
+        headers.set("Access-Point", transmission.getAccessPoint());
+        headers.set("Peppol-Source", transmission.getSource().name());
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         HttpEntity<Resource> entity = new HttpEntity<>(getFileContent(transmission), headers);
 
@@ -60,14 +61,13 @@ public class ReprocessManager {
         return new InputStreamResource(content);
     }
 
-    private String getEndpoint(String filename, Source source) {
+    private String getEndpoint(String filename) {
         String baseName = FilenameUtils.getName(filename);
         return UriComponentsBuilder
                 .fromUriString("http://peppol-inbound")
                 .port(3037)
                 .path("/reprocess")
                 .queryParam("filename", baseName)
-                .queryParam("source", source.name())
                 .toUriString();
     }
 }
