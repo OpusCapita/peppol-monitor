@@ -66,6 +66,10 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             transmission = createTransmissionEntity(cm, message);
+
+        } else if (transmission.getStatus().isFinal()) {
+            return;
+
         } else {
             transmission = updateTransmissionEntity(cm, transmission);
         }
@@ -78,7 +82,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             handleDBErrors(transmission, cm, e);
         }
 
-        // finally send message to mlr-reporter
         mlrManager.sendToMlrReporter(cm, transmission.getStatus());
     }
 
@@ -198,7 +201,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         return MessageStatus.unknown;
     }
 
-    // fix to status-stuck-in-UI issues, reset operation for final statuses in case of concurrency exceptions
+    // https://opuscapita.atlassian.net/wiki/spaces/IIPEP/pages/773882045/Monitoring+Service+Concurrency+Issues
     private void handleDBErrors(Transmission transmission, ContainerMessage cm, Exception e) throws Exception {
         logger.error("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
         if (transmission.getStatus().isFinal()) {
