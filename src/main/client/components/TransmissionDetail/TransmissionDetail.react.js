@@ -27,7 +27,7 @@ class TransmissionDetail extends Components.ContextComponent {
         super(props);
 
         this.api = new ApiBase();
-        this.this.markDialog = null;
+        this.markDialog = null;
     }
 
     componentDidMount() {
@@ -133,7 +133,7 @@ class TransmissionDetail extends Components.ContextComponent {
 
         const modalButtons = {no: 'Cancel', yes: 'Ok'};
         this.markDialog.show('Mark as Fixed', undefined, onButtonClick, modalButtons);
-        setTimeout(() => this.markDialog.focus(), 500);
+        setTimeout(() => this.markDialog.dialog.focus(), 500);
     }
 
     reprocessMessage(event) {
@@ -333,8 +333,8 @@ class TransmissionDetail extends Components.ContextComponent {
                 </div>
 
                 <Components.ModalDialog ref={node => this.markDialog = node}>
-                    <p>Would you like to provide additional information<br/>&nbsp;</p>
-                    <textarea value={fixComment} onChange={this.handleFixCommentChange} cols={40} rows={10} />
+                    <p>Would you like to provide additional information?<br/></p>
+                    <textarea value={fixComment} onChange={e => this.handleFixCommentChange(e)} cols={30} rows={3} />
                 </Components.ModalDialog>
 
                 {
