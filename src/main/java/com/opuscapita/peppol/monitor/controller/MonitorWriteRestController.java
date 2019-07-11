@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -105,6 +107,11 @@ public class MonitorWriteRestController {
 
     @PostMapping("/mark-fixed-message/{userId}/{transmissionId}")
     public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId, @RequestBody String fixComment) {
+        try {
+            fixComment = URLDecoder.decode(fixComment, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         return markAsFixedSingleMessage(transmissionId, userId, fixComment);
     }
 

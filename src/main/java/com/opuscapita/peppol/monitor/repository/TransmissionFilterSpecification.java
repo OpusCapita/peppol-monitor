@@ -62,7 +62,7 @@ public class TransmissionFilterSpecification {
 
             if (StringUtils.isNotBlank(filterDto.getInvoiceNumber())) {
                 Predicate invoiceNumberPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("invoiceNumber"), "%" + filterDto.getInvoiceNumber() + "%")
+                        criteriaBuilder.equal(root.get("invoiceNumber"), filterDto.getInvoiceNumber())
                 );
                 predicates.add(invoiceNumberPredicate);
             }
