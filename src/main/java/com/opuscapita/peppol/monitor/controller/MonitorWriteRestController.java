@@ -103,16 +103,16 @@ public class MonitorWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/mark-fixed-message/{userId}/{transmissionId}")
-    public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId) {
-        return markAsFixedSingleMessage(transmissionId, userId);
+    @PostMapping("/mark-fixed-message/{userId}/{transmissionId}")
+    public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId, @RequestBody String fixComment) {
+        return markAsFixedSingleMessage(transmissionId, userId, fixComment);
     }
 
     @PostMapping("/mark-fixed-messages/{userId}")
     public ResponseEntity<?> markAsFixedMessages(@PathVariable String userId, @RequestBody List<String> transmissionIds) {
         for (String transmissionId : transmissionIds) {
             try {
-                markAsFixedSingleMessage(Long.parseLong(transmissionId), userId);
+                markAsFixedSingleMessage(Long.parseLong(transmissionId), userId, "");
             } catch (Exception e) {
                 logger.error("Async bulk mark-as-fixed operation failed for transmission: " + transmissionId, e);
             }
@@ -140,14 +140,14 @@ public class MonitorWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-    private ResponseEntity<?> markAsFixedSingleMessage(Long transmissionId, String userId) {
+    private ResponseEntity<?> markAsFixedSingleMessage(Long transmissionId, String userId, String fixComment) {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         logger.info("Mark as Fixed requested for file: " + transmission.getFilename() + " by: " + userId);
-        DocumentLog log = new DocumentLog("Message marked as fixed by " + userId, DocumentLogLevel.INFO);
+        DocumentLog log = new DocumentLog(userId + " fixed the message, explanation: " + fixComment, DocumentLogLevel.INFO);
         log.setSource(ProcessStep.WEB);
         transmission.setStatus(MessageStatus.fixed);
         transmissionService.addMessageToHistoryOfTransmission(transmission, log);
