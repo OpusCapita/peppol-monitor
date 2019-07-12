@@ -117,15 +117,17 @@ class TransmissionDetail extends Components.ContextComponent {
             this.markDialog.hide();
 
             if (btn === 'yes') {
-                this.context.showSpinner();
+                // this.context.showSpinner();
 
                 setTimeout(() => {
+                    alert("this.state.fixComment: " + this.state.fixComment);
                     const comment = encodeURI(this.state.fixComment.trim())
+                    alert("encoded fix comment: " + comment);
                     this.api.markAsFixedMessage(this.props.transmissionId, this.context.userData.id, comment).then(() => {
-                        this.context.hideSpinner();
+                        // this.context.hideSpinner();
                         this.context.showNotification('The transmission is marked as fixed', 'info', 3);
                     }).catch(e => {
-                        this.context.hideSpinner();
+                        // this.context.hideSpinner();
                         this.context.showNotification(e.message, 'error', 10);
                     });
                 }, 500);

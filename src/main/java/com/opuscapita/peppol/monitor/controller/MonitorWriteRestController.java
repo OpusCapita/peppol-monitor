@@ -3,9 +3,6 @@ package com.opuscapita.peppol.monitor.controller;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionFilterDto;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionPaginationDto;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
 import com.opuscapita.peppol.monitor.entity.AccessPoint;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
@@ -16,7 +13,6 @@ import com.opuscapita.peppol.monitor.reprocess.ReprocessManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -108,7 +103,9 @@ public class MonitorWriteRestController {
     @PostMapping("/mark-fixed-message/{userId}/{transmissionId}")
     public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId, @RequestBody String fixComment) {
         try {
-            fixComment = URLDecoder.decode(fixComment, "UTF-8");
+            logger.info("fix comment: " + fixComment);
+            fixComment = URLDecoder.decode(fixComment, StandardCharsets.UTF_8.name());
+            logger.info("decoded fix comment: " + fixComment);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -220,35 +217,6 @@ public class MonitorWriteRestController {
     public ResponseEntity<?> updateAccessPoint(@RequestBody AccessPoint accessPoint) {
         AccessPoint persisted = accessPointRepository.save(accessPoint);
         return wrap(persisted);
-    }
-
-    @GetMapping("/custom-operation/{page}/{pageSize}")
-    public ResponseEntity<?> customOperation(@PathVariable Integer page, @PathVariable Integer pageSize) throws Exception {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        TransmissionFilterDto filter = new TransmissionFilterDto();
-        filter.setStartDate(dateFormat.parse("2019-06-08 02:57:34"));
-        filter.setEndDate(dateFormat.parse("2019-06-17 12:07:00"));
-        filter.setStatuses(Arrays.asList(MessageStatus.delivered, MessageStatus.failed));
-
-        TransmissionPaginationDto pagination = new TransmissionPaginationDto();
-        pagination.setPage(page);
-        pagination.setPageSize(pageSize);
-
-        TransmissionRequestDto request = new TransmissionRequestDto();
-        request.setFilter(filter);
-        request.setPagination(pagination);
-        Page<Transmission> transmissions = transmissionService.getAllTransmissions(request);
-
-        for (Transmission transmission : transmissions.getContent()) {
-            try {
-                transmissionService.loadTransmissionHistory(transmission);
-                mlrManager.sendToMlrReporter(transmission);
-            } catch (Exception e) {
-                logger.error("Async bulk custom-operation failed for transmission: " + transmission.getTransmissionId(), e);
-            }
-        }
-        return ResponseEntity.ok().build();
     }
 
     private <T> ResponseEntity<T> wrap(T body) {
