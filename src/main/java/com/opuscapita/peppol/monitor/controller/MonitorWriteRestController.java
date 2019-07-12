@@ -10,6 +10,7 @@ import com.opuscapita.peppol.monitor.mlrreport.MlrReportManager;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.TransmissionService;
 import com.opuscapita.peppol.monitor.reprocess.ReprocessManager;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -101,14 +101,14 @@ public class MonitorWriteRestController {
     }
 
     @PostMapping("/mark-fixed-message/{userId}/{transmissionId}")
-    public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId, @RequestBody String fixComment) {
-        try {
-            logger.info("fix comment: " + fixComment);
+    public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId, @RequestBody String fixComment) throws Exception {
+        if (StringUtils.isNotBlank(fixComment)) {
+            fixComment = fixComment.substring(0, fixComment.length() - 1);
             fixComment = URLDecoder.decode(fixComment, StandardCharsets.UTF_8.name());
-            logger.info("decoded fix comment: " + fixComment);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        } else {
+            fixComment = "";
         }
+
         return markAsFixedSingleMessage(transmissionId, userId, fixComment);
     }
 
