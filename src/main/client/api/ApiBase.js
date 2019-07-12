@@ -45,8 +45,8 @@ class ApiBase {
         return this.ajax.post(`/peppol-validator/api/validate-file`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
-    markAsFixedMessage(transmissionId, userId) {
-        return this.ajax.get(`/peppol-monitor/api/mark-fixed-message/${userId}/${transmissionId}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    markAsFixedMessage(transmissionId, userId, fixComment) {
+        return this.ajax.post(`/peppol-monitor/api/mark-fixed-message/${userId}/${transmissionId}`).send(fixComment).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     markAsFixedMessages(transmissionIds, userId) {

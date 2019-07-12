@@ -5,13 +5,8 @@ import com.opuscapita.peppol.monitor.controller.dtos.TransmissionDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionResponseDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionStatisticsDto;
-import com.opuscapita.peppol.monitor.entity.AccessPoint;
-import com.opuscapita.peppol.monitor.entity.Participant;
-import com.opuscapita.peppol.monitor.entity.Transmission;
-import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
-import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
-import com.opuscapita.peppol.monitor.repository.StatisticsService;
-import com.opuscapita.peppol.monitor.repository.TransmissionService;
+import com.opuscapita.peppol.monitor.entity.*;
+import com.opuscapita.peppol.monitor.repository.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,14 +28,16 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class MonitorReadRestController {
 
+    private final MessageService messageService;
     private final StatisticsService statisticsService;
     private final TransmissionService transmissionService;
     private final ParticipantRepository participantRepository;
     private final AccessPointRepository accessPointRepository;
 
     @Autowired
-    public MonitorReadRestController(StatisticsService statisticsService, TransmissionService transmissionService,
+    public MonitorReadRestController(MessageService messageService, StatisticsService statisticsService, TransmissionService transmissionService,
                                      ParticipantRepository participantRepository, AccessPointRepository accessPointRepository) {
+        this.messageService = messageService;
         this.statisticsService = statisticsService;
         this.transmissionService = transmissionService;
         this.participantRepository = participantRepository;
@@ -87,6 +85,15 @@ public class MonitorReadRestController {
     public List<DocumentLog> getMessageHistory(@PathVariable String messageId) {
         List<Transmission> transmissionList = transmissionService.getAllTransmissions(messageId);
         return transmissionList.stream().flatMap(t -> t.getLogs().stream()).collect(Collectors.toList());
+    }
+
+    @GetMapping("/get-message-status/{messageId}")
+    public MessageStatus getMessageStatus(@PathVariable String messageId) {
+        Message message = messageService.getMessage(messageId);
+        if (message == null || message.getLastTransmission() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return message.getLastTransmission().getStatus();
     }
 
     @GetMapping("/get-access-points")

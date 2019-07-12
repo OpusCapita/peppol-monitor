@@ -3,9 +3,6 @@ package com.opuscapita.peppol.monitor.controller;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionFilterDto;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionPaginationDto;
-import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
 import com.opuscapita.peppol.monitor.entity.AccessPoint;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
@@ -13,10 +10,10 @@ import com.opuscapita.peppol.monitor.mlrreport.MlrReportManager;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.TransmissionService;
 import com.opuscapita.peppol.monitor.reprocess.ReprocessManager;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -103,16 +100,23 @@ public class MonitorWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/mark-fixed-message/{userId}/{transmissionId}")
-    public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId) {
-        return markAsFixedSingleMessage(transmissionId, userId);
+    @PostMapping("/mark-fixed-message/{userId}/{transmissionId}")
+    public ResponseEntity<?> markAsFixedMessage(@PathVariable String userId, @PathVariable Long transmissionId, @RequestBody String fixComment) throws Exception {
+        if (StringUtils.isNotBlank(fixComment)) {
+            fixComment = fixComment.substring(0, fixComment.length() - 1);
+            fixComment = URLDecoder.decode(fixComment, StandardCharsets.UTF_8.name());
+        } else {
+            fixComment = "";
+        }
+
+        return markAsFixedSingleMessage(transmissionId, userId, fixComment);
     }
 
     @PostMapping("/mark-fixed-messages/{userId}")
     public ResponseEntity<?> markAsFixedMessages(@PathVariable String userId, @RequestBody List<String> transmissionIds) {
         for (String transmissionId : transmissionIds) {
             try {
-                markAsFixedSingleMessage(Long.parseLong(transmissionId), userId);
+                markAsFixedSingleMessage(Long.parseLong(transmissionId), userId, "");
             } catch (Exception e) {
                 logger.error("Async bulk mark-as-fixed operation failed for transmission: " + transmissionId, e);
             }
@@ -140,14 +144,14 @@ public class MonitorWriteRestController {
         return ResponseEntity.ok().build();
     }
 
-    private ResponseEntity<?> markAsFixedSingleMessage(Long transmissionId, String userId) {
+    private ResponseEntity<?> markAsFixedSingleMessage(Long transmissionId, String userId, String fixComment) {
         Transmission transmission = transmissionService.getTransmission(transmissionId);
         if (transmission == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         logger.info("Mark as Fixed requested for file: " + transmission.getFilename() + " by: " + userId);
-        DocumentLog log = new DocumentLog("Message marked as fixed by " + userId, DocumentLogLevel.INFO);
+        DocumentLog log = new DocumentLog(userId + " marked as fixed: " + fixComment, DocumentLogLevel.INFO);
         log.setSource(ProcessStep.WEB);
         transmission.setStatus(MessageStatus.fixed);
         transmissionService.addMessageToHistoryOfTransmission(transmission, log);
@@ -213,35 +217,6 @@ public class MonitorWriteRestController {
     public ResponseEntity<?> updateAccessPoint(@RequestBody AccessPoint accessPoint) {
         AccessPoint persisted = accessPointRepository.save(accessPoint);
         return wrap(persisted);
-    }
-
-    @GetMapping("/custom-operation/{page}/{pageSize}")
-    public ResponseEntity<?> customOperation(@PathVariable Integer page, @PathVariable Integer pageSize) throws Exception {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        TransmissionFilterDto filter = new TransmissionFilterDto();
-        filter.setStartDate(dateFormat.parse("2019-06-08 02:57:34"));
-        filter.setEndDate(dateFormat.parse("2019-06-17 12:07:00"));
-        filter.setStatuses(Arrays.asList(MessageStatus.delivered, MessageStatus.failed));
-
-        TransmissionPaginationDto pagination = new TransmissionPaginationDto();
-        pagination.setPage(page);
-        pagination.setPageSize(pageSize);
-
-        TransmissionRequestDto request = new TransmissionRequestDto();
-        request.setFilter(filter);
-        request.setPagination(pagination);
-        Page<Transmission> transmissions = transmissionService.getAllTransmissions(request);
-
-        for (Transmission transmission : transmissions.getContent()) {
-            try {
-                transmissionService.loadTransmissionHistory(transmission);
-                mlrManager.sendToMlrReporter(transmission);
-            } catch (Exception e) {
-                logger.error("Async bulk custom-operation failed for transmission: " + transmission.getTransmissionId(), e);
-            }
-        }
-        return ResponseEntity.ok().build();
     }
 
     private <T> ResponseEntity<T> wrap(T body) {

@@ -27,3 +27,7 @@
 .transmission-detail-actions .btn-passive {
 	opacity: 0.5;
 }
+
+textarea {
+	width: 100%;
+}

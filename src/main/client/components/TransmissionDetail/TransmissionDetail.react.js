@@ -12,6 +12,7 @@ class TransmissionDetail extends Components.ContextComponent {
         loading: false,
         transmission: {},
         history: [],
+        fixComment: '',
         showHistory: false,
         showInfos: true,
         showErrors: true,
@@ -24,7 +25,9 @@ class TransmissionDetail extends Components.ContextComponent {
 
     constructor(props, context) {
         super(props);
+
         this.api = new ApiBase();
+        this.markDialog = null;
     }
 
     componentDidMount() {
@@ -103,17 +106,35 @@ class TransmissionDetail extends Components.ContextComponent {
         });
     }
 
+    handleFixCommentChange(event) {
+        this.setState({fixComment: event.target.value});
+    }
+
     markAsFixed(event) {
         event.preventDefault();
 
-        this.context.showSpinner();
-        this.api.markAsFixedMessage(this.props.transmissionId, this.context.userData.id).then(() => {
-            this.context.hideSpinner();
-            this.context.showNotification('The transmission is marked as fixed', 'info', 3);
-        }).catch(e => {
-            this.context.hideSpinner();
-            this.context.showNotification(e.message, 'error', 10);
-        });
+        const onButtonClick = (btn) => {
+            this.markDialog.hide();
+
+            if (btn === 'yes') {
+                this.context.showSpinner();
+
+                setTimeout(() => {
+                    const comment = encodeURI(this.state.fixComment.trim())
+                    this.api.markAsFixedMessage(this.props.transmissionId, this.context.userData.id, comment).then(() => {
+                        this.context.hideSpinner();
+                        this.context.showNotification('The transmission is marked as fixed', 'info', 3);
+                    }).catch(e => {
+                        this.context.hideSpinner();
+                        this.context.showNotification(e.message, 'error', 10);
+                    });
+                }, 500);
+            }
+        }
+
+        const modalButtons = {no: 'Cancel', yes: 'Ok'};
+        this.markDialog.show('Mark as Fixed', undefined, onButtonClick, modalButtons);
+        setTimeout(() => this.markDialog.dialog.focus(), 500);
     }
 
     reprocessMessage(event) {
@@ -194,7 +215,7 @@ class TransmissionDetail extends Components.ContextComponent {
 
     render() {
         const {i18n, router} = this.context;
-        const {loading, transmission, showHistory, showInfos, showErrors, showWarnings} = this.state;
+        const {loading, transmission, fixComment, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
         return (
             <div>
@@ -311,6 +332,12 @@ class TransmissionDetail extends Components.ContextComponent {
                         : <button className="btn btn-primary" onClick={e => this.loadHistory(e)}>Show History</button>
                     }
                 </div>
+
+                <Components.ModalDialog ref={node => this.markDialog = node}>
+                    <p>Would you like to provide additional information?<br/></p>
+                    <textarea value={fixComment} onChange={e => this.handleFixCommentChange(e)} cols={30} rows={3} />
+                </Components.ModalDialog>
+
                 {
                     showHistory &&
                     <div>
