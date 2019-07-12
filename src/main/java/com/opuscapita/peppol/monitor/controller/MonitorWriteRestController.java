@@ -151,7 +151,7 @@ public class MonitorWriteRestController {
         }
 
         logger.info("Mark as Fixed requested for file: " + transmission.getFilename() + " by: " + userId);
-        DocumentLog log = new DocumentLog(userId + " fixed the message, explanation: " + fixComment, DocumentLogLevel.INFO);
+        DocumentLog log = new DocumentLog(userId + " marked as fixed: " + fixComment, DocumentLogLevel.INFO);
         log.setSource(ProcessStep.WEB);
         transmission.setStatus(MessageStatus.fixed);
         transmissionService.addMessageToHistoryOfTransmission(transmission, log);
