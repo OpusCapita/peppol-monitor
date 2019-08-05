@@ -49,6 +49,9 @@ class AccessPoints extends Components.ContextComponent {
     updateAccessPoint(accessPoint) {
         this.setState({loading: true});
 
+        accessPoint.emailList = this.stripHtml(accessPoint.emailList);
+        accessPoint.contactPerson = this.stripHtml(accessPoint.contactPerson);
+
         this.api.updateAccessPoint(accessPoint).then(() => {
             this.setState({loading: false});
             this.context.showNotification('The access point record updated', 'success', 3);
@@ -57,6 +60,12 @@ class AccessPoints extends Components.ContextComponent {
             this.setState({loading: false});
             this.context.showNotification(e.message, 'error', 10);
         });
+    }
+
+    stripHtml(txt) {
+        const tmp = document.createElement("DIV");
+        tmp.innerHTML = txt;
+        return tmp.textContent || tmp.innerText || "";
     }
 
     renderEditable(cellInfo) {
