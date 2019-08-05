@@ -9,7 +9,10 @@ services:
      - registrator
      - redis
      - kong
+     - auth
+     - blob
      - rabbitmq
+     - user
      - api-registry
     labels:
       SERVICE_NAME: 'peppol-monitor'
@@ -49,7 +52,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${SECRET_develop_RABBITMQUSER}
       RABBITMQ_DEFAULT_PASS: ${SECRET_develop_RABBITMQPASS}
-      SERVICE_5672_NAME: 'rabbitmq'
+      SERVICE_5672_NAME: 'rabbitmq-amqp'
 
   redis:
     image: opuscapita/redis:dev
@@ -91,6 +94,97 @@ services:
       - postgres
       - mysql
       - redis
+
+  auth:
+    image: opuscapita/auth:dev
+    ports:
+     - '3005:3005'
+    environment:
+      GATEWAY_SCHEME: $GATEWAY_SCHEME
+      GATEWAY_IP: $GATEWAY_IP
+      GATEWAY_PORT: $GATEWAY_PORT
+      GATEWAY_CALLBACK: $GATEWAY_CALLBACK
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      REDIS_AUTH: ${REDIS_AUTH}
+      RABBITMQ_USER: ${SECRET_develop_RABBITMQUSER}
+      RABBITMQ_PASS: ${SECRET_develop_RABBITMQPASS}
+      SERVICE_3005_CHECK_HTTP: /auth/certs
+      SERVICE_3005_CHECK_INTERVAL: 15s
+      SERVICE_3005_CHECK_TIMEOUT: 3s
+    depends_on:
+      - kong
+      - consul
+    command: 'npm run dev:production'
+
+  blob:
+    image: opuscapita/blob:dev
+    depends_on:
+      - mysql
+      - consul
+      - registrator
+    labels:
+      SERVICE_NAME: 'blob'
+      SERVICE_TAGS: 'external,kong'
+    environment:
+      SERVICE_3012_CHECK_HTTP: /api/health/check
+      SERVICE_3012_CHECK_TIMEOUT: 3s
+      SERVICE_3012_CHECK_INTERVAL: 15s
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      REDIS_AUTH: ${REDIS_AUTH}
+      BLOB_ACCOUNT: ${BLOB_ACCOUNT}
+      BLOB_KEY: ${BLOB_KEY}
+    ports:
+      - '3012:3012'
+    command: 'npm run dev:production'
+
+  user:
+    image: opuscapita/user:dev
+    depends_on:
+      - mysql
+      - consul
+      - registrator
+      - rabbitmq
+      - acl
+    labels:
+      SERVICE_NAME: 'user'
+    environment:
+      MYSQL_DATABASE: $MYSQL_DATABASE
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      REDIS_AUTH: $REDIS_AUTH
+      CLIENT_KEY: $CLIENT_KEY
+      CLIENT_SECRET: $CLIENT_SECRET
+      RABBITMQ_USER: ${SECRET_develop_RABBITMQUSER}
+      RABBITMQ_PASS: ${SECRET_develop_RABBITMQPASS}
+      SERVICE_3008_CHECK_HTTP: /api/health/check
+      SERVICE_3008_CHECK_INTERVAL: 15s
+      SERVICE_3008_CHECK_TIMEOUT: 3s
+    ports:
+      - '3008:3008'
+    command: 'npm run dev'
+
+  acl:
+    image: opuscapita/acl:dev
+    labels:
+      - 'SERVICE_NAME=acl'
+      - 'SERVICE_TAGS=external,kong'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      REDIS_AUTH: ${REDIS_AUTH}
+      RABBITMQ_USER: ${SECRET_develop_RABBITMQUSER}
+      RABBITMQ_PASS: ${SECRET_develop_RABBITMQPASS}
+      SECURITY_MODE: local
+      SERVICE_3013_CHECK_HTTP: /api/health/check
+      SERVICE_3013_CHECK_INTERVAL: 15s
+      SERVICE_3013_CHECK_TIMEOUT: 3s
+    ports:
+     - '3013:3013'
+    depends_on:
+      - registrator
+      - mysql
+    command: 'npm run dev'
 
   api-registry:
     image: opuscapita/api-registrator:dev
