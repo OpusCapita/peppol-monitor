@@ -517,10 +517,10 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'source',
-                            width: 100,
-                            accessor: 'source',
-                            Header: 'Source',
-                            Cell: ({value}) => <span className="well">{value}</span>
+                            width: 155,
+                            accessor: row => row,
+                            Header: 'Direction',
+                            Cell: ({value}) => <span className="well">{value.source} <span className="glyphicon glyphicon-arrow-right right-arrow"></span> {(value.direction) ? value.direction.toUpperCase() : '-'}</span>
                         },
                         {
                             id: 'arrivedAt',
