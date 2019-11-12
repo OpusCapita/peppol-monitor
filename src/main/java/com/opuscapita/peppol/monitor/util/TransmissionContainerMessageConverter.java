@@ -33,7 +33,7 @@ public class TransmissionContainerMessageConverter {
         cm.setSource(transmission.getSource());
         cm.setStep(convertStatusToStep(transmission));
         cm.getHistory().setLogs(transmission.getLogs());
-
+        logger.info("Transmission [" + transmission.getTransmissionId() + "] to ContainerMessage convention second step");
         ContainerMessageMetadata metadata = new ContainerMessageMetadata();
         metadata.setTransmissionId(transmission.getTransmissionId());
         metadata.setMessageId(transmission.getMessage().getMessageId());
@@ -45,9 +45,10 @@ public class TransmissionContainerMessageConverter {
         } else {
             metadata.setReceivingAccessPoint(transmission.getAccessPoint());
         }
+        logger.info("Transmission [" + transmission.getTransmissionId() + "] to ContainerMessage convention third step");
         metadata.setBusinessMetadata(convertBusinessMetadata(transmission));
         cm.setMetadata(metadata);
-
+        logger.info("Transmission [" + transmission.getTransmissionId() + "] to ContainerMessage convention ended");
         return cm;
     }
 

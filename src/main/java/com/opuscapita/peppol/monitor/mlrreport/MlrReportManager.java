@@ -30,6 +30,7 @@ public class MlrReportManager {
 
     public void sendToMlrReporter(ContainerMessage cm, MessageStatus status) throws Exception {
         if (status.isFinal()) {
+            logger.info("Monitor sending the message to mlr-reporter: " + cm.getFileName());
             messageQueue.convertAndSend(mlrQueue, cm);
             logger.debug("Monitor send the message to mlr-reporter: " + cm.getFileName());
         }
