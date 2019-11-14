@@ -34,6 +34,9 @@ public class TransmissionContainerMessageConverter {
         cm.setStep(convertStatusToStep(transmission));
         cm.getHistory().setLogs(transmission.getLogs());
 
+        // we need to send mlr for unknown_recipient exception only for manual triggers
+        checkUnknownRecipientExceptionManualHandling(cm);
+
         ContainerMessageMetadata metadata = new ContainerMessageMetadata();
         metadata.setTransmissionId(transmission.getTransmissionId());
         metadata.setMessageId(transmission.getMessage().getMessageId());
@@ -49,6 +52,10 @@ public class TransmissionContainerMessageConverter {
         cm.setMetadata(metadata);
 
         return cm;
+    }
+
+    private void checkUnknownRecipientExceptionManualHandling(ContainerMessage cm) {
+        cm.getHistory().addInfo("UR_MANUAL_TRIGGER");
     }
 
     private ContainerBusinessMetadata convertBusinessMetadata(Transmission transmission) {
