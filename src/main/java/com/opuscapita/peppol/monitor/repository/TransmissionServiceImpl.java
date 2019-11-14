@@ -1,6 +1,5 @@
 package com.opuscapita.peppol.monitor.repository;
 
-import com.opuscapita.peppol.commons.auth.AuthorizationService;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
@@ -13,22 +12,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.*;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,31 +28,15 @@ public class TransmissionServiceImpl implements TransmissionService {
 
     private static final Logger logger = LoggerFactory.getLogger(TransmissionServiceImpl.class);
 
-    @Value("${peppol.storage.blob.url}")
-    private String host;
-    @Value("${peppol.storage.blob.port}")
-    private String port;
-
-    @Value("${peppol.auth.tenant.id}")
-    private String tenant;
-
-    private RestTemplate restTemplate;
-    private AuthorizationService authService;
-
     private final Storage storage;
     private final TransmissionRepository repository;
     private final TransmissionHistorySerializer historySerializer;
 
     @Autowired
-    public TransmissionServiceImpl(Storage storage, TransmissionRepository repository, TransmissionHistorySerializer historySerializer,
-                                   AuthorizationService authService, RestTemplateBuilder restTemplateBuilder) {
+    public TransmissionServiceImpl(Storage storage, TransmissionRepository repository, TransmissionHistorySerializer historySerializer) {
         this.storage = storage;
         this.repository = repository;
         this.historySerializer = historySerializer;
-
-        this.authService = authService;
-        this.restTemplate = restTemplateBuilder.build();
-        this.restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
     }
 
     @Override
@@ -114,47 +88,7 @@ public class TransmissionServiceImpl implements TransmissionService {
 
     @Override
     public InputStream getFileContent(String path) throws StorageException {
-        return getFile(path);
-    }
-
-    private InputStream getFile(String path) throws StorageException {
-        logger.debug("File requested from blob service for path: " + path);
-        try {
-            ResponseEntity<String> result = get(path, String.class);
-            logger.debug("File fetched successfully from blob service for path: " + path);
-            return new ByteArrayInputStream(result.getBody().getBytes());
-        } catch (Exception e) {
-            throw new StorageException("Error occurred while trying to read the file from blob service.", e);
-        }
-    }
-
-    private <T> ResponseEntity<T> get(String path, Class<T> type) throws StorageException {
-        String endpoint = getEndpoint(path, false);
-        logger.debug("Reading file from endpoint: " + endpoint);
-
-        HttpHeaders headers = new HttpHeaders();
-        authService.setAuthorizationHeader(headers);
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON_UTF8));
-        HttpEntity<String> entity = new HttpEntity<>("body", headers);
-        logger.debug("Setting http headers content type to application json");
-
-        return restTemplate.exchange(endpoint, HttpMethod.GET, entity, type);
-    }
-
-    private String getEndpoint(String path, boolean createMissing) throws StorageException {
-        if (StringUtils.isBlank(tenant)) {
-            throw new StorageException("Blob service cannot be used: Missing configuration \"peppol.auth.tenant.id\".");
-        }
-
-        return UriComponentsBuilder
-                .fromUriString("http://" + host)
-                .port(port)
-                .path("/api/" + tenant + "/files" + path)
-                .queryParam("inline", "true")
-                .queryParam("createMissing", String.valueOf(createMissing))
-                .queryParam("recursive", "true")
-                .toUriString();
+        return storage.get(path);
     }
 
     @Override
