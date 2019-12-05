@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TransmissionFilterDto {
 
@@ -19,7 +20,9 @@ public class TransmissionFilterDto {
     private Date startDate;
     private Date endDate;
     private String history;
+    private String errorType;
     private List<Source> sources;
+    private List<Source> destinations;
     private List<MessageStatus> statuses;
 
     public String getId() {
@@ -102,12 +105,34 @@ public class TransmissionFilterDto {
         this.history = history;
     }
 
+    public String getErrorType() {
+        if ("null".equals(errorType)) {
+            return null;
+        }
+        return errorType;
+    }
+
+    public void setErrorType(String errorType) {
+        this.errorType = errorType;
+    }
+
     public List<Source> getSources() {
         return sources;
     }
 
     public void setSources(List<Source> sources) {
         this.sources = sources;
+    }
+
+    public List<String> getDestinations() {
+        if (destinations != null) {
+            return destinations.stream().map(d -> d.name().toLowerCase()).collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    public void setDestinations(List<Source> destinations) {
+        this.destinations = destinations;
     }
 
     public List<MessageStatus> getStatuses() {

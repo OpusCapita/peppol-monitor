@@ -27,6 +27,21 @@ class TransmissionTable extends Components.ContextComponent {
         'delivered'
     ];
 
+    static errorTypes = [
+        {value: 'PROCESSING_ERROR', label: 'ALL_PROCESSING_ERRORS'},
+        {value: 'VALIDATION_ERROR', label: 'VALIDATION_ERROR'},
+        {value: 'Cannot find a validation artifact for file', label: 'UNKNOWN_ARTIFACT_ERROR'},
+        {value: 'blob service', label: 'BLOB_SERVICE_ERROR'},
+        {value: 'SENDING_ERROR', label: 'SENDING_ERRORS'},
+        {value: 'UNKNOWN_RECIPIENT', label: 'UNKNOWN_RECIPIENT'},
+        {value: 'UNSUPPORTED_DATA_FORMAT', label: 'UNSUPPORTED_DATA_FORMAT'},
+        {value: 'CONNECTION_ERROR', label: 'CONNECTION_ERROR'},
+        {value: 'RECEIVING_AP_ERROR', label: 'RECEIVING_AP_ERROR'},
+        {value: 'SECURITY_ERROR', label: 'SECURITY_ERROR'},
+        {value: 'BP_DELIVERY_ERROR', label: 'BP_DELIVERY_ERROR'},
+        {value: 'STOPPED_DELIVERY_ERROR', label: 'STOPPED_DELIVERY_ERROR'},
+    ];
+
     state = {
         init: true,
         loading: false,
@@ -207,6 +222,15 @@ class TransmissionTable extends Components.ContextComponent {
         });
     }
 
+    mapErrorTypesSelect() {
+        return TransmissionTable.errorTypes;
+    }
+
+    mapErrorTypesSelectValue() {
+        const errorType = this.state.searchValues.errorType;
+        return TransmissionTable.errorTypes.find(e => e.value === errorType);
+    }
+
     getStatusLabelClass(status) {
         switch (status) {
             case 'delivered':
@@ -226,6 +250,8 @@ class TransmissionTable extends Components.ContextComponent {
 
         if (Array.isArray(value))
             searchValues[field] = value.map(val => val.value);
+        else if (typeof value === 'object')
+            searchValues[field] = value !== null ? value.value : null;
         else
             searchValues[field] = value;
 
@@ -242,7 +268,9 @@ class TransmissionTable extends Components.ContextComponent {
             accessPoint: '',
             invoiceNumber: '',
             history: '',
+            errorType: null,
             sources: [],
+            destinations: [],
             statuses: [],
             startDate: '',
             endDate: ''
@@ -281,6 +309,18 @@ class TransmissionTable extends Components.ContextComponent {
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.filename}
                                                    onChange={e => this.handleSearchFormChange('filename', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Error Type</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Select className="react-select" isMulti={false}
+                                                    options={this.mapErrorTypesSelect()}
+                                                    onChange={value => this.handleSearchFormChange('errorType', value)}
+                                                    value={this.mapErrorTypesSelectValue()}
                                             />
                                         </div>
                                     </div>
@@ -375,6 +415,21 @@ class TransmissionTable extends Components.ContextComponent {
                                                     value={searchValues.statuses && searchValues.statuses.map(sts => ({
                                                         label: sts,
                                                         value: sts
+                                                    }))}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Destination</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapSourcesSelect()}
+                                                    onChange={value => this.handleSearchFormChange('destinations', value)}
+                                                    value={searchValues.destinations && searchValues.destinations.map(src => ({
+                                                        label: src,
+                                                        value: src
                                                     }))}
                                             />
                                         </div>

@@ -117,7 +117,7 @@ class SystemStatus extends Components.ContextComponent {
         const startYear = selectedYear.value;
         const startMonth = selectedMonth.value < 10 ? `0${selectedMonth.value}` : selectedMonth.value;
         const endYear = selectedMonth.value === 12 ? selectedYear.value + 1 : selectedYear.value;
-        const endMonth = ((selectedMonth.value + 1) % 12) < 10 ? `0${(selectedMonth.value + 1) % 12}` : ((selectedMonth.value + 1) % 12);
+        const endMonth = ((selectedMonth.value + 1) % 13) < 10 ? `0${(selectedMonth.value + 1) % 13}` : ((selectedMonth.value + 1) % 13);
 
         const from = `${startYear}-${startMonth}-01`;
         const to = `${endYear}-${endMonth}-01`;
