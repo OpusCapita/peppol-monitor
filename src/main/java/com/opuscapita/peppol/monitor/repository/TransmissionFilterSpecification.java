@@ -74,11 +74,25 @@ public class TransmissionFilterSpecification {
                 predicates.add(historyPredicate);
             }
 
+            if (StringUtils.isNotBlank(filterDto.getErrorType())) {
+                Predicate errorTypePredicate = criteriaBuilder.and(
+                        criteriaBuilder.like(root.get("rawHistory"), "%" + filterDto.getErrorType() + "%")
+                );
+                predicates.add(errorTypePredicate);
+            }
+
             if (filterDto.getSources() != null && !filterDto.getSources().isEmpty()) {
                 Predicate sourcePredicate = criteriaBuilder.and(
                         criteriaBuilder.in(root.get("source")).value(filterDto.getSources())
                 );
                 predicates.add(sourcePredicate);
+            }
+
+            if (filterDto.getDestinations() != null && !filterDto.getDestinations().isEmpty()) {
+                Predicate destinationPredicate = criteriaBuilder.and(
+                        criteriaBuilder.in(root.get("direction")).value(filterDto.getDestinations())
+                );
+                predicates.add(destinationPredicate);
             }
 
             if (filterDto.getStatuses() != null && !filterDto.getStatuses().isEmpty()) {
