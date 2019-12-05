@@ -251,7 +251,7 @@ class TransmissionTable extends Components.ContextComponent {
         if (Array.isArray(value))
             searchValues[field] = value.map(val => val.value);
         else if (typeof value === 'object')
-            searchValues[field] = value.value;
+            searchValues[field] = value !== null ? value.value : null;
         else
             searchValues[field] = value;
 
@@ -268,7 +268,7 @@ class TransmissionTable extends Components.ContextComponent {
             accessPoint: '',
             invoiceNumber: '',
             history: '',
-            errorType: '',
+            errorType: null,
             sources: [],
             destinations: [],
             statuses: [],

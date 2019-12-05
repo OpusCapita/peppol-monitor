@@ -106,6 +106,9 @@ public class TransmissionFilterDto {
     }
 
     public String getErrorType() {
+        if ("null".equals(errorType)) {
+            return null;
+        }
         return errorType;
     }
 
