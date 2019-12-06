@@ -268,9 +268,11 @@ class TransmissionTable extends Components.ContextComponent {
 
     mapLocalNameSelectedValue() {
         const selectedDocumentTypes = this.mapDocumentTypeSelectedValue();
-        return [...new Set(selectedDocumentTypes.map(d => d.localName))].map(value => {
-            return {value: value, label: value};
-        });
+        if (selectedDocumentTypes && selectedDocumentTypes.length) {
+            return [...new Set(selectedDocumentTypes.map(d => d.localName))].map(value => {
+                return {value: value, label: value};
+            });
+        }
     }
 
     mapDocumentTypesByLocalNames(localNames) {
