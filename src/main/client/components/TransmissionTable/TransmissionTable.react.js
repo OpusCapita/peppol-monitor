@@ -248,10 +248,16 @@ class TransmissionTable extends Components.ContextComponent {
     handleSearchFormChange(field, value) {
         const {searchValues} = this.state;
 
+        // multi-select
         if (Array.isArray(value))
             searchValues[field] = value.map(val => val.value);
+        // date-picker
+        else if (value instanceof Date)
+            searchValues[field] = value;
+        // single-select
         else if (typeof value === 'object')
             searchValues[field] = value !== null ? value.value : null;
+        // text-input
         else
             searchValues[field] = value;
 

@@ -21,7 +21,7 @@ public class Message {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "message_id", unique = true, nullable = false, length = 50)
+    @Column(name = "message_id", unique = true, nullable = false, length = 100)
     private String messageId;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
