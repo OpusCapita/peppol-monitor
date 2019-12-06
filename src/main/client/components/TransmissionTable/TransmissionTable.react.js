@@ -48,6 +48,7 @@ class TransmissionTable extends Components.ContextComponent {
         transmissionList: [],
         searchValues: {},
         showSearch: true,
+        documentTypeOptions: [],
         totalCount: -1,
         pagination: {},
     };
@@ -231,6 +232,54 @@ class TransmissionTable extends Components.ContextComponent {
         return TransmissionTable.errorTypes.find(e => e.value === errorType);
     }
 
+    async mapDocumentTypesSelectOptions() {
+        try {
+            const response = await this.api.getDocumentTypes();
+            response.forEach(d => {
+                d.value = d.id;
+                d.label = "[" + d.id + "] " + d.description;
+            });
+            this.setState({documentTypeOptions: response});
+        } catch (e) {
+            this.context.showNotification(e.message, 'error', 10);
+        }
+
+        return this.state.documentTypeOptions;
+    }
+
+    async mapLocalNameSelectOptions() {
+        if (!this.state.documentTypeOptions || !this.state.documentTypeOptions.length) {
+            await this.mapDocumentTypesSelectOptions();
+        }
+
+        const {documentTypeOptions} = this.state;
+        return [...new Set(documentTypeOptions.map(d => d.localName))].map(value => {
+            return {value: value, label: value};
+        });
+    }
+
+    mapDocumentTypeSelectedValue() {
+        const {documentTypeOptions} = this.state;
+        const documentTypeIds = this.state.searchValues.documentTypeIds;
+        if (documentTypeOptions && documentTypeIds && documentTypeIds.length) {
+            return documentTypeOptions.filter(d => documentTypeIds.includes(d.value));
+        }
+    }
+
+    mapLocalNameSelectedValue() {
+        const selectedDocumentTypes = this.mapDocumentTypeSelectedValue();
+        return [...new Set(selectedDocumentTypes.map(d => d.localName))].map(value => {
+            return {value: value, label: value};
+        });
+    }
+
+    mapDocumentTypesByLocalNames(localNames) {
+        const {documentTypeOptions} = this.state;
+        if (documentTypeOptions && localNames && localNames.length) {
+            return documentTypeOptions.filter(d => localNames.map(l => l.value).includes(d.localName));
+        }
+    }
+
     getStatusLabelClass(status) {
         switch (status) {
             case 'delivered':
@@ -332,6 +381,18 @@ class TransmissionTable extends Components.ContextComponent {
                                     </div>
                                     <div className="form-group">
                                         <div className="col-sm-3">
+                                            <label className="control-label">Document Type</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapDocumentTypesSelectOptions()}
+                                                    onChange={value => this.handleSearchFormChange('documentTypeIds', value)}
+                                                    value={this.mapDocumentTypeSelectedValue()}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
                                             <label className="control-label">Invoice Number</label>
                                         </div>
                                         <div className="offset-md-1 col-md-8">
@@ -407,6 +468,18 @@ class TransmissionTable extends Components.ContextComponent {
                                         <div className="offset-md-1 col-md-8">
                                             <input type="text" className="form-control" value={searchValues.history}
                                                    onChange={e => this.handleSearchFormChange('history', e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <div className="col-sm-3">
+                                            <label className="control-label">Local Name</label>
+                                        </div>
+                                        <div className="offset-md-1 col-md-8">
+                                            <Select className="react-select" isMulti={true}
+                                                    options={this.mapLocalNameSelectOptions()}
+                                                    onChange={value => this.handleSearchFormChange('documentTypeIds', this.mapDocumentTypesByLocalNames(value))}
+                                                    value={this.mapLocalNameSelectedValue()}
                                             />
                                         </div>
                                     </div>

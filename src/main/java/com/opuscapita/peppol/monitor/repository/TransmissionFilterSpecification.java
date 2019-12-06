@@ -95,6 +95,13 @@ public class TransmissionFilterSpecification {
                 predicates.add(destinationPredicate);
             }
 
+            if (filterDto.getDocumentTypeIds() != null && !filterDto.getDocumentTypeIds().isEmpty()) {
+                Predicate documentTypeIdPredicate = criteriaBuilder.and(
+                        criteriaBuilder.in(root.get("documentTypeId")).value(filterDto.getDocumentTypeIds())
+                );
+                predicates.add(documentTypeIdPredicate);
+            }
+
             if (filterDto.getStatuses() != null && !filterDto.getStatuses().isEmpty()) {
                 Predicate statusPredicate = criteriaBuilder.and(
                         criteriaBuilder.in(root.get("status")).value(filterDto.getStatuses())

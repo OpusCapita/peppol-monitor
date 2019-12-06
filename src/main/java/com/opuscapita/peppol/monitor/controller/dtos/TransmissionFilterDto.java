@@ -23,6 +23,7 @@ public class TransmissionFilterDto {
     private String errorType;
     private List<Source> sources;
     private List<Source> destinations;
+    private List<String> documentTypeIds;
     private List<MessageStatus> statuses;
 
     public String getId() {
@@ -133,6 +134,14 @@ public class TransmissionFilterDto {
 
     public void setDestinations(List<Source> destinations) {
         this.destinations = destinations;
+    }
+
+    public List<String> getDocumentTypeIds() {
+        return documentTypeIds;
+    }
+
+    public void setDocumentTypeIds(List<String> documentTypeIds) {
+        this.documentTypeIds = documentTypeIds;
     }
 
     public List<MessageStatus> getStatuses() {
