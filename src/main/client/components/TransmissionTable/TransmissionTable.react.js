@@ -43,21 +43,13 @@ class TransmissionTable extends Components.ContextComponent {
     ];
 
     state = {
-        init: true,
         loading: false,
         transmissionList: [],
         searchValues: {},
-        showSearch: true,
+        documentTypeOptions: [],
+        localNameOptions: [],
         totalCount: -1,
         pagination: {},
-    };
-
-    static propTypes = {
-        goTransmissionDetail: PropTypes.func
-    };
-
-    static defaultProps = {
-        goTransmissionDetail: () => null
     };
 
     constructor(props, context) {
@@ -66,35 +58,11 @@ class TransmissionTable extends Components.ContextComponent {
         this.api = new ApiBase();
     }
 
-    componentDidMount() {
-        window.addEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener("beforeunload", this.saveStateToLocalStorage.bind(this));
-        this.saveStateToLocalStorage();
-    }
-
-    saveStateToLocalStorage() {
-        localStorage.setItem("transmissionTable_searchValues", JSON.stringify(this.state.searchValues));
-    }
-
-    loadStateFromLocalStorage() {
-        this.setState({init: false});
-        try {
-            const searchValues = JSON.parse(localStorage.getItem("transmissionTable_searchValues"));
-            if (searchValues) {
-                this.setState({searchValues});
-            }
-        } catch (e) {
-        }
+    async componentDidMount() {
+        await this.fetchDocumentTypesFromValidator();
     }
 
     async loadTransmissionList(tableState) {
-        if (this.state.init) {
-            this.loadStateFromLocalStorage();
-        }
-
         this.setState({loading: true});
         let {pagination, searchValues} = this.state;
 
@@ -231,6 +199,54 @@ class TransmissionTable extends Components.ContextComponent {
         return TransmissionTable.errorTypes.find(e => e.value === errorType);
     }
 
+    async fetchDocumentTypesFromValidator() {
+        try {
+            const documentTypes = await this.api.getDocumentTypes();
+            documentTypes.forEach(d => {
+                d.value = d.id;
+                d.label = "[" + d.id + "] " + d.description;
+            });
+
+            const localNames = [...new Set(documentTypes.map(d => d.localName))].map(value => {
+                return {value: value, label: value};
+            });
+
+            this.setState({documentTypeOptions: documentTypes, localNameOptions: localNames});
+        } catch (e) {
+            this.context.showNotification(e.message, 'error', 10);
+            this.setState({documentTypeOptions: [], localNameOptions: []});
+        }
+    }
+
+    mapDocumentTypeSelectedValue() {
+        const {documentTypeOptions} = this.state;
+        const documentTypeIds = this.state.searchValues.documentTypeIds;
+        if (documentTypeOptions && documentTypeIds && documentTypeIds.length) {
+            return documentTypeOptions.filter(d => documentTypeIds.includes(d.value));
+        }
+        return [];
+    }
+
+    mapLocalNameSelectedValue() {
+        const {documentTypeOptions} = this.state;
+        const localNameIds = this.state.searchValues.localNameIds;
+        if (documentTypeOptions && localNameIds && localNameIds.length) {
+            const selectedDocumentTypes = documentTypeOptions.filter(d => localNameIds.includes(d.value));
+            return [...new Set(selectedDocumentTypes.map(d => d.localName))].map(value => {
+                return {value: value, label: value};
+            });
+        }
+        return [];
+    }
+
+    mapDocumentTypesByLocalNames(localNames) {
+        const {documentTypeOptions} = this.state;
+        if (documentTypeOptions && localNames && localNames.length) {
+            return documentTypeOptions.filter(d => localNames.map(l => l.value).includes(d.localName));
+        }
+        return [];
+    }
+
     getStatusLabelClass(status) {
         switch (status) {
             case 'delivered':
@@ -248,10 +264,16 @@ class TransmissionTable extends Components.ContextComponent {
     handleSearchFormChange(field, value) {
         const {searchValues} = this.state;
 
+        // multi-select
         if (Array.isArray(value))
             searchValues[field] = value.map(val => val.value);
+        // date-picker
+        else if (value instanceof Date)
+            searchValues[field] = value;
+        // single-select
         else if (typeof value === 'object')
             searchValues[field] = value !== null ? value.value : null;
+        // text-input
         else
             searchValues[field] = value;
 
@@ -272,6 +294,8 @@ class TransmissionTable extends Components.ContextComponent {
             sources: [],
             destinations: [],
             statuses: [],
+            localNameIds: [],
+            documentTypeIds: [],
             startDate: '',
             endDate: ''
         };
@@ -281,205 +305,226 @@ class TransmissionTable extends Components.ContextComponent {
 
     render() {
         const {i18n} = this.context;
-        const {loading, transmissionList, pagination, totalCount, searchValues, showSearch} = this.state;
+        const {loading, transmissionList, documentTypeOptions, localNameOptions, pagination, totalCount, searchValues} = this.state;
 
         return (
             <div>
                 <h3>Transmission List</h3>
-                {
-                    showSearch &&
-                    <div>
-                        <div className="form-horizontal transmission-search">
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Transmission ID</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.id}
-                                                   onChange={e => this.handleSearchFormChange('id', e.target.value)}
-                                            />
-                                        </div>
+                <div>
+                    <div className="form-horizontal transmission-search">
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Transmission ID</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">File Name</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.filename}
-                                                   onChange={e => this.handleSearchFormChange('filename', e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Error Type</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={false}
-                                                    options={this.mapErrorTypesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('errorType', value)}
-                                                    value={this.mapErrorTypesSelectValue()}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Invoice Number</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.invoiceNumber}
-                                                   onChange={e => this.handleSearchFormChange('invoiceNumber', e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Source</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapSourcesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('sources', value)}
-                                                    value={searchValues.sources && searchValues.sources.map(src => ({
-                                                        label: src,
-                                                        value: src
-                                                    }))}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Sender</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.sender}
-                                                   onChange={e => this.handleSearchFormChange('sender', e.target.value)}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Start Date</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Components.DatePicker
-                                                showIcon={false}
-                                                dateFormat={i18n.dateTimeFormat}
-                                                onChange={e => this.handleSearchFormChange('startDate', e.date)}
-                                                value={searchValues.startDate && new Date(searchValues.startDate)}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.id}
+                                               onChange={e => this.handleSearchFormChange('id', e.target.value)}
+                                        />
                                     </div>
                                 </div>
-                                <div className="col-md-6">
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Message ID</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.messageId}
-                                                   onChange={e => this.handleSearchFormChange('messageId', e.target.value)}
-                                            />
-                                        </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">File Name</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Access Point</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.accessPoint}
-                                                   onChange={e => this.handleSearchFormChange('accessPoint', e.target.value)}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.filename}
+                                               onChange={e => this.handleSearchFormChange('filename', e.target.value)}
+                                        />
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">History</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.history}
-                                                   onChange={e => this.handleSearchFormChange('history', e.target.value)}
-                                            />
-                                        </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Error Type</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Status</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapStatusesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('statuses', value)}
-                                                    value={searchValues.statuses && searchValues.statuses.map(sts => ({
-                                                        label: sts,
-                                                        value: sts
-                                                    }))}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={false}
+                                                options={this.mapErrorTypesSelect()}
+                                                onChange={value => this.handleSearchFormChange('errorType', value)}
+                                                value={this.mapErrorTypesSelectValue()}
+                                        />
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Destination</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Select className="react-select" isMulti={true}
-                                                    options={this.mapSourcesSelect()}
-                                                    onChange={value => this.handleSearchFormChange('destinations', value)}
-                                                    value={searchValues.destinations && searchValues.destinations.map(src => ({
-                                                        label: src,
-                                                        value: src
-                                                    }))}
-                                            />
-                                        </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Document Type</label>
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">Receiver</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <input type="text" className="form-control" value={searchValues.receiver}
-                                                   onChange={e => this.handleSearchFormChange('receiver', e.target.value)}
-                                            />
-                                        </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={documentTypeOptions}
+                                                onChange={value => this.handleSearchFormChange('documentTypeIds', value)}
+                                                value={this.mapDocumentTypeSelectedValue()}
+                                        />
                                     </div>
-                                    <div className="form-group">
-                                        <div className="col-sm-3">
-                                            <label className="control-label">End Date</label>
-                                        </div>
-                                        <div className="offset-md-1 col-md-8">
-                                            <Components.DatePicker
-                                                showIcon={false}
-                                                dateFormat={i18n.dateTimeFormat}
-                                                onChange={e => this.handleSearchFormChange('endDate', e.date)}
-                                                value={searchValues.endDate && new Date(searchValues.endDate)}
-                                            />
-                                        </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Invoice Number</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.invoiceNumber}
+                                               onChange={e => this.handleSearchFormChange('invoiceNumber', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Source</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapSourcesSelect()}
+                                                onChange={value => this.handleSearchFormChange('sources', value)}
+                                                value={searchValues.sources && searchValues.sources.map(src => ({
+                                                    label: src,
+                                                    value: src
+                                                }))}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Sender</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.sender}
+                                               onChange={e => this.handleSearchFormChange('sender', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Start Date</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Components.DatePicker
+                                            showIcon={false}
+                                            dateFormat={i18n.dateTimeFormat}
+                                            onChange={e => this.handleSearchFormChange('startDate', e.date)}
+                                            value={searchValues.startDate && new Date(searchValues.startDate)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Message ID</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.messageId}
+                                               onChange={e => this.handleSearchFormChange('messageId', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Access Point</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.accessPoint}
+                                               onChange={e => this.handleSearchFormChange('accessPoint', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">History</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.history}
+                                               onChange={e => this.handleSearchFormChange('history', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Local Name</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={localNameOptions}
+                                                onChange={value => this.handleSearchFormChange('localNameIds', this.mapDocumentTypesByLocalNames(value))}
+                                                value={this.mapLocalNameSelectedValue()}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Status</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapStatusesSelect()}
+                                                onChange={value => this.handleSearchFormChange('statuses', value)}
+                                                value={searchValues.statuses && searchValues.statuses.map(sts => ({
+                                                    label: sts,
+                                                    value: sts
+                                                }))}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Destination</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Select className="react-select" isMulti={true}
+                                                options={this.mapSourcesSelect()}
+                                                onChange={value => this.handleSearchFormChange('destinations', value)}
+                                                value={searchValues.destinations && searchValues.destinations.map(src => ({
+                                                    label: src,
+                                                    value: src
+                                                }))}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">Receiver</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <input type="text" className="form-control" value={searchValues.receiver}
+                                               onChange={e => this.handleSearchFormChange('receiver', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <div className="col-sm-3">
+                                        <label className="control-label">End Date</label>
+                                    </div>
+                                    <div className="offset-md-1 col-md-8">
+                                        <Components.DatePicker
+                                            showIcon={false}
+                                            dateFormat={i18n.dateTimeFormat}
+                                            onChange={e => this.handleSearchFormChange('endDate', e.date)}
+                                            value={searchValues.endDate && new Date(searchValues.endDate)}
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="form-submit text-right">
-                            <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
-                            <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
-                            <button className="btn btn-default float-left" onClick={() => this.goCustomPage()}>
-                                Custom Operations
-                            </button>
-                            <div className="btn-group float-left" role="group">
-                                <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Bulk Operations
-                                </button>
-                                <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                    <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Reprocess</a>
-                                    <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
-                                    <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
-                            </div>
-                        </div>
-                        <hr/>
                     </div>
-                }
+                    <div className="form-submit text-right">
+                        <button className="btn btn-link" onClick={() => this.resetSearch()}>Reset</button>
+                        <button className="btn btn-primary" onClick={() => this.loadTransmissionList()}>Filter</button>
+                        <button className="btn btn-default float-left" onClick={() => this.goCustomPage()}>
+                            Custom Operations
+                        </button>
+                        <div className="btn-group float-left" role="group">
+                            <button id="btnGroupDrop1" type="button" className="btn btn-secondary dropdown-toggle"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Bulk Operations
+                            </button>
+                            <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Reprocess</a>
+                                <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
+                                <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
+                        </div>
+                    </div>
+                    <hr/>
+                </div>
 
                 <ReactTable
                     className="transmission-list-table"
