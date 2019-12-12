@@ -4,8 +4,7 @@ import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TransmissionFilterDto {
@@ -23,6 +22,7 @@ public class TransmissionFilterDto {
     private String errorType;
     private List<Source> sources;
     private List<Source> destinations;
+    private List<String> localNameIds;
     private List<String> documentTypeIds;
     private List<MessageStatus> statuses;
 
@@ -136,8 +136,24 @@ public class TransmissionFilterDto {
         this.destinations = destinations;
     }
 
+    public List<String> getLocalNameIds() {
+        return localNameIds;
+    }
+
+    public void setLocalNameIds(List<String> localNameIds) {
+        this.localNameIds = localNameIds;
+    }
+
     public List<String> getDocumentTypeIds() {
-        return documentTypeIds;
+        if (documentTypeIds == null) {
+            return localNameIds;
+        }
+        if (localNameIds == null) {
+            return documentTypeIds;
+        }
+        Set<String> merge = new HashSet<>(documentTypeIds);
+        merge.addAll(localNameIds);
+        return new ArrayList<>(merge);
     }
 
     public void setDocumentTypeIds(List<String> documentTypeIds) {

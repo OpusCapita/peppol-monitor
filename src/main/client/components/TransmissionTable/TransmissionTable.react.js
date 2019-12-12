@@ -207,7 +207,7 @@ class TransmissionTable extends Components.ContextComponent {
                 d.label = "[" + d.id + "] " + d.description;
             });
 
-            const localNames = [...new Set(documentTypeOptions.map(d => d.localName))].map(value => {
+            const localNames = [...new Set(documentTypes.map(d => d.localName))].map(value => {
                 return {value: value, label: value};
             });
 
@@ -228,10 +228,15 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     mapLocalNameSelectedValue() {
-        const selectedDocumentTypes = this.mapDocumentTypeSelectedValue();
-        return [...new Set(selectedDocumentTypes.map(d => d.localName))].map(value => {
-            return {value: value, label: value};
-        });
+        const {documentTypeOptions} = this.state;
+        const localNameIds = this.state.searchValues.localNameIds;
+        if (documentTypeOptions && localNameIds && localNameIds.length) {
+            const selectedDocumentTypes = documentTypeOptions.filter(d => localNameIds.includes(d.value));
+            return [...new Set(selectedDocumentTypes.map(d => d.localName))].map(value => {
+                return {value: value, label: value};
+            });
+        }
+        return [];
     }
 
     mapDocumentTypesByLocalNames(localNames) {
@@ -289,6 +294,7 @@ class TransmissionTable extends Components.ContextComponent {
             sources: [],
             destinations: [],
             statuses: [],
+            localNameIds: [],
             documentTypeIds: [],
             startDate: '',
             endDate: ''
@@ -439,7 +445,7 @@ class TransmissionTable extends Components.ContextComponent {
                                     <div className="offset-md-1 col-md-8">
                                         <Select className="react-select" isMulti={true}
                                                 options={localNameOptions}
-                                                onChange={value => this.handleSearchFormChange('documentTypeIds', this.mapDocumentTypesByLocalNames(value))}
+                                                onChange={value => this.handleSearchFormChange('localNameIds', this.mapDocumentTypesByLocalNames(value))}
                                                 value={this.mapLocalNameSelectedValue()}
                                         />
                                     </div>
