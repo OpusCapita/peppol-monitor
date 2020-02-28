@@ -86,7 +86,7 @@ class ApiBase {
     }
 
     getDocumentTypes() {
-        return this.ajax.get(`/peppol-validator/api/get-document-types`).then(res => res.body).catch(ApiError.getErrorFromResponse);
+        return this.ajax.get(`/peppol-validator/api/public/get-document-types`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
     getStatus(serviceName) {

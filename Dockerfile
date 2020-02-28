@@ -13,7 +13,7 @@ COPY . $APP_HOME
 
 # install nodejs
 RUN apt-get install -y curl \
-  && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
+  && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
   && apt-get install -y nodejs \
   && curl -L https://www.npmjs.com/install.sh | sh
 
@@ -23,7 +23,7 @@ RUN npm run build
 
 # building backend
 RUN chmod +x ./gradlew
-RUN ./gradlew build || return 0
+RUN ./gradlew -q build || return 0
 
 ## actual container
 FROM openjdk:8
