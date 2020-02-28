@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@opuscapita/config": "^3.0.16",
+    "@opuscapita/bouncer": "^1.1.6",
     "@opuscapita/react-select": "^2.0.12",
     "@opuscapita/service-base-ui": "^2.0.6",
     "babel-core": "^6.26.3",
