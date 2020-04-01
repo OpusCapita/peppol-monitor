@@ -75,6 +75,7 @@ class StandaloneSender extends Components.ContextComponent {
                 <br/>
                 <div className="form-horizontal transmission-search">
                     <div className="row">
+                        <div className="col-md-3">&nbsp;</div>
                         <div className="col-md-6">
                             <div className="form-group">
                                 <div className="col-sm-3">
