@@ -24,7 +24,7 @@ class StandaloneSender extends Components.ContextComponent {
     }
 
     mapSourcesSelect() {
-        return TransmissionTable.sources.map(value => {
+        return StandaloneSender.sources.map(value => {
             return {value: value, label: value};
         });
     }
@@ -53,7 +53,7 @@ class StandaloneSender extends Components.ContextComponent {
         }
 
         this.context.showSpinner();
-        this.api.sendFile(this.state.data, this.state.source, this.context.userData.id).then(() => {
+        this.api.sendFile(this.state.data, this.state.source.value, this.context.userData.id).then(() => {
             this.context.showNotification('The file has been sent to Access Point', 'info', 3);
         }).catch(e => {
             this.context.showNotification(e.message, 'error', 10);
