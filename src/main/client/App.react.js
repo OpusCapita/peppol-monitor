@@ -8,6 +8,7 @@ import ParticipantTable from './components/ParticipantTable';
 import DocumentTypes from './components/DocumentTypes';
 import SystemStatus from './components/SystemStatus';
 import StandaloneValidator from './components/StandaloneValidator';
+import StandaloneSender from './components/StandaloneSender';
 import AdvancedOperations from './components/AdvancedOperations';
 
 import {Route} from 'react-router';
@@ -68,6 +69,13 @@ const validator = (props) => (
     </div>
 );
 
+const sender = (props) => (
+    <div>
+        <StandaloneSender/>
+        {menuButton(props.router)}
+    </div>
+);
+
 const messageList = (props) => (
     <div>
         <TransmissionTable/>
@@ -84,6 +92,7 @@ const App = () => (
         <Route path="/" component={home}/>
         <Route path="/messages" component={messageList}/>
         <Route path="/validator" component={validator}/>
+        <Route path="/sender" component={sender}/>
         <Route path="/accessPoints" component={accessPointList}/>
         <Route path="/participants" component={participantList}/>
         <Route path="/documentTypes" component={documentTypeList}/>

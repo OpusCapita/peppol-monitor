@@ -45,6 +45,10 @@ class ApiBase {
         return this.ajax.post(`/peppol-validator/api/validate-file`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
+    sendFile(data, source, userId) {
+        return this.ajax.post(`/peppol-monitor/api/standalone-sender/${source}/${userId}`).send(data).then(res => res.body).catch(ApiError.getErrorFromResponse);
+    }
+
     markAsFixedMessage(transmissionId, userId, fixComment) {
         return this.ajax.post(`/peppol-monitor/api/mark-fixed-message/${userId}/${transmissionId}`).send(fixComment).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }

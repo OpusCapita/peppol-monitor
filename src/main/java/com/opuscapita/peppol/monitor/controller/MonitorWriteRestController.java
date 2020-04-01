@@ -10,6 +10,7 @@ import com.opuscapita.peppol.monitor.mlrreport.MlrReportManager;
 import com.opuscapita.peppol.monitor.repository.AccessPointRepository;
 import com.opuscapita.peppol.monitor.repository.TransmissionService;
 import com.opuscapita.peppol.monitor.reprocess.ReprocessManager;
+import com.opuscapita.peppol.monitor.reprocess.StandaloneSender;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.opuscapita.peppol.commons.container.state.Source;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,14 +35,16 @@ public class MonitorWriteRestController {
 
     private final MlrReportManager mlrManager;
     private final ReprocessManager reprocessManager;
+    private final StandaloneSender standaloneSender;
     private final TransmissionService transmissionService;
     private final AccessPointRepository accessPointRepository;
 
     @Autowired
     public MonitorWriteRestController(MlrReportManager mlrManager, TransmissionService transmissionService,
-                                      ReprocessManager reprocessManager, AccessPointRepository accessPointRepository) {
+                                      ReprocessManager reprocessManager, StandaloneSender standaloneSender, AccessPointRepository accessPointRepository) {
         this.mlrManager = mlrManager;
         this.reprocessManager = reprocessManager;
+        this.standaloneSender = standaloneSender;
         this.transmissionService = transmissionService;
         this.accessPointRepository = accessPointRepository;
     }
@@ -52,6 +56,15 @@ public class MonitorWriteRestController {
         logger.info("Upload file requested for file: " + transmission.getFilename() + " by: " + userId);
         try (InputStream inputStream = multipartFile.getInputStream()) {
             transmissionService.updateFileContent(inputStream, transmission);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/standalone-sender/{source}/{userId}")
+    public ResponseEntity<?> standaloneSender(@RequestParam("file") MultipartFile multipartFile, @PathVariable Source source, @PathVariable String userId) throws IOException {
+        logger.info("Standalone-Send requested for file: " + multipartFile.getOriginalFilename() + " by: " + userId);
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            standaloneSender.sendFile(inputStream, multipartFile.getOriginalFilename(), source);
         }
         return ResponseEntity.ok().build();
     }

@@ -45,6 +45,13 @@ class PeppolMonitor extends Components.ContextComponent {
                             </a>
                         </div>
                         <div className="col-lg-6">
+                            <a href="/peppol-monitor?r=sender" className="thumbnail"
+                               onClick={e => this.showPage('sender', e)}>
+                                <span className="glyphicon glyphicon-send"></span>
+                                Sender
+                            </a>
+                        </div>
+                        <div className="col-lg-6">
                             <a href="/peppol-monitor?r=accessPoints" className="thumbnail"
                                onClick={e => this.showPage('accessPoints', e)}>
                                 <span className="glyphicon glyphicon-globe"></span>
