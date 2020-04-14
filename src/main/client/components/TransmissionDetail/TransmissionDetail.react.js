@@ -151,14 +151,14 @@ class TransmissionDetail extends Components.ContextComponent {
                 setTimeout(() => {
                     this.api.reprocessMessage(this.props.transmissionId, userData.id).then(() => {
                         hideSpinner();
-                        this.context.showNotification('The file is sent for reprocessing', 'info', 3);
+                        showNotification('The file is sent for reprocessing', 'info', 3);
                     }).catch(e => {
                         hideSpinner();
-                        this.context.showNotification(e.message, 'error', 10);
+                        showNotification(e.message, 'error', 10);
                     });
                 }, 500);
             }
-        }
+        };
 
         const modalTitle = "Reprocess";
         const modalText = `Message will be reprocessed in the background. This transmission will be marked as fixed and a new transmission will be created.${(transmission.status !== 'failed') ? `\n\nNote that this transmission is NOT failed.` : ''}\n\nDo you want to continue?`;
