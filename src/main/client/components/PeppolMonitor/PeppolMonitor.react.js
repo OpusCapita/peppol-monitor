@@ -73,6 +73,12 @@ class PeppolMonitor extends Components.ContextComponent {
                             </a>
                         </div>
                         <div className="col-lg-6">
+                            <a href="/peppol-smp" className="thumbnail" target="_blank">
+                                <span className="glyphicon glyphicon-link"></span>
+                                SMP Tool
+                            </a>
+                        </div>
+                        <div className="col-lg-6">
                             <a href="/peppol-monitor?r=systemStatus" className="thumbnail"
                                onClick={e => this.showPage('systemStatus', e)}>
                                 <span className="glyphicon glyphicon-alert"></span>
