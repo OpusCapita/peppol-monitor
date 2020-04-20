@@ -86,6 +86,65 @@ class TransmissionTable extends Components.ContextComponent {
         }
     }
 
+    getOrDefault(val) {
+        if (val) return val;
+        return "";
+    }
+
+    prepareCSVData(tranmissionList) {
+        let csvContent = "filename,invoiceNumber,messageId,transmissionId,messageStatus,transmissionStatus,sender,receiver,arrivedAt\r\n";
+        tranmissionList.forEach((transmission) => {
+            csvContent += `${this.getOrDefault(transmission.filename.split("/").pop())},`;
+            csvContent += `${this.getOrDefault(transmission.invoiceNumber)},`;
+            csvContent += `${this.getOrDefault(transmission.messageId)},`;
+            csvContent += `${this.getOrDefault(transmission.transmissionId)},`;
+            csvContent += `${this.getOrDefault(transmission.messageStatus)},`;
+            csvContent += `${this.getOrDefault(transmission.status)},`;
+            csvContent += `"${this.getOrDefault(transmission.sender)}",`;
+            csvContent += `"${this.getOrDefault(transmission.receiver)}",`;
+            csvContent += `"${this.getOrDefault(transmission.arrivedAt)}"`;
+            csvContent += `\r\n`;
+        });
+        return csvContent;
+    }
+
+    downloadAsCSV(data, filename) {
+        const BOM = "\uFEFF";
+        const final = BOM + data;
+        const blob = new Blob([final], { type: "text/csv;charset=utf-8" });
+        const link = document.createElement("a");
+        link.setAttribute("href", window.URL.createObjectURL(blob));
+        link.setAttribute("download", filename.replace(" ", "_"));
+        link.click();
+    }
+
+    async exportTransmissionList(tableState) {
+        this.context.showSpinner();
+
+        let {pagination, searchValues} = this.state;
+        try {
+            if (tableState) {
+                pagination.page = tableState.page;
+                pagination.sorted = tableState.sorted;
+            } else {
+                pagination.page = 0;
+            }
+
+            /* Requested Limit */
+            pagination.pageSize = 50000;
+
+            const response = await this.api.getTransmissionList(pagination, searchValues);
+            const csvData = this.prepareCSVData(response.data);
+            this.downloadAsCSV(csvData, `PEPPOL-TransmissionList-${this.context.i18n.formatDateTime(new Date())}.csv`);
+        }
+        catch (e) {
+            this.context.showNotification(e.message, 'error', 10);
+        }
+        finally {
+            this.context.hideSpinner();
+        }
+    }
+
     async bulkReprocess() {
         const {transmissionList} = this.state;
         const {userData, showModalDialog, hideModalDialog} = this.context;
@@ -520,7 +579,9 @@ class TransmissionTable extends Components.ContextComponent {
                             <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                 <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Reprocess</a>
                                 <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
-                                <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
+                                <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a>
+                                <a className="dropdown-item" onClick={() => this.exportTransmissionList()}>Export CSV</a>
+                            </div>
                         </div>
                     </div>
                     <hr/>
