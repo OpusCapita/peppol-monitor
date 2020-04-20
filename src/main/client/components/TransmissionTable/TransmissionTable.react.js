@@ -86,10 +86,43 @@ class TransmissionTable extends Components.ContextComponent {
         }
     }
 
-    async exportTransmissionList(tableState) {
-        this.setState({loading: true});
-        let {pagination, searchValues} = this.state;
+    getOrDefault(val) {
+        if (val) return val;
+        return "";
+    }
 
+    async prepareCSVData(tranmissionList) {
+        let csvContent = "filename,invoiceNumber,messageId,transmissionId,messageStatus,transmissionStatus,sender,receiver,direction,arrivedAt\r\n";
+        tranmissionList.forEach((transmission) => {
+            csvContent += `${this.getOrDefault(transmission.filename)},`;
+            csvContent += `${this.getOrDefault(transmission.invoiceNumber)},`;
+            csvContent += `${this.getOrDefault(transmission.messageId)},`;
+            csvContent += `${this.getOrDefault(transmission.transmissionId)},`;
+            csvContent += `${this.getOrDefault(transmission.messageStatus)},`;
+            csvContent += `${this.getOrDefault(transmission.status)},`;
+            csvContent += `"${this.getOrDefault(transmission.sender)}",`;
+            csvContent += `"${this.getOrDefault(transmission.receiver)}",`;
+            csvContent += `${this.getOrDefault(transmission.source)}-${this.getOrDefault(transmission.direction)},`;
+            csvContent += `"${this.getOrDefault(transmission.arrivedAt)}"`;
+            csvContent += `\r\n`;
+        });
+        return csvContent;
+    }
+
+    async downloadAsCSV(data, filename) {
+        const BOM = "\uFEFF";
+        const final = BOM + data;
+        const blob = new Blob([final], { type: "text/csv;charset=utf-8" });
+        const link = document.createElement("a");
+        link.setAttribute("href", window.URL.createObjectURL(blob));
+        link.setAttribute("download", filename);
+        link.click();
+    }
+
+    async exportTransmissionList(tableState) {
+        this.context.showSpinner();
+
+        let {pagination, searchValues} = this.state;
         try {
             if (tableState) {
                 pagination.page = tableState.page;
@@ -99,15 +132,15 @@ class TransmissionTable extends Components.ContextComponent {
                 pagination.page = 0;
             }
 
-            this.api.exportTransmissionList(pagination, searchValues).then(response => {
-                console.log(response);
-            });
+            const response = await this.api.getTransmissionList(pagination, searchValues);
+            const csvData = this.prepareCSVData(response.data);
+            this.downloadAsCSV(csvData, `PEPPOL-TransmissionList-${this.context.i18n.formatDateTime(new Date())}.csv`);
         }
         catch (e) {
             this.context.showNotification(e.message, 'error', 10);
         }
         finally {
-            this.setState({loading: false});
+            this.context.hideSpinner();
         }
     }
 
