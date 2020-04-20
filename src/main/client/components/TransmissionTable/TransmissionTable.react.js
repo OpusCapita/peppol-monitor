@@ -545,8 +545,9 @@ class TransmissionTable extends Components.ContextComponent {
                             <div className="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                 <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Reprocess</a>
                                 <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
-                                <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
-                                <a className="dropdown-item" onClick={() => this.exportTransmissionList()}>Export CSV</a></div>
+                                <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a>
+                                <a className="dropdown-item" onClick={() => this.exportTransmissionList()}>Export CSV</a>
+                            </div>
                         </div>
                     </div>
                     <hr/>
