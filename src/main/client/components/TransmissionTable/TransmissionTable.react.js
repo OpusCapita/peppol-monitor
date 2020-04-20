@@ -92,7 +92,7 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     prepareCSVData(tranmissionList) {
-        let csvContent = "filename,invoiceNumber,messageId,transmissionId,messageStatus,transmissionStatus,sender,receiver,direction,arrivedAt\r\n";
+        let csvContent = "filename,invoiceNumber,messageId,transmissionId,messageStatus,transmissionStatus,sender,receiver,arrivedAt\r\n";
         tranmissionList.forEach((transmission) => {
             csvContent += `${this.getOrDefault(transmission.filename.split("/").pop())},`;
             csvContent += `${this.getOrDefault(transmission.invoiceNumber)},`;
@@ -102,7 +102,6 @@ class TransmissionTable extends Components.ContextComponent {
             csvContent += `${this.getOrDefault(transmission.status)},`;
             csvContent += `"${this.getOrDefault(transmission.sender)}",`;
             csvContent += `"${this.getOrDefault(transmission.receiver)}",`;
-            csvContent += `${this.getOrDefault(transmission.source)}-${this.getOrDefault(transmission.direction)},`;
             csvContent += `"${this.getOrDefault(transmission.arrivedAt)}"`;
             csvContent += `\r\n`;
         });
