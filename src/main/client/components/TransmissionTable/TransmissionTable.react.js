@@ -94,7 +94,7 @@ class TransmissionTable extends Components.ContextComponent {
     prepareCSVData(tranmissionList) {
         let csvContent = "filename,invoiceNumber,messageId,transmissionId,messageStatus,transmissionStatus,sender,receiver,direction,arrivedAt\r\n";
         tranmissionList.forEach((transmission) => {
-            csvContent += `${this.getOrDefault(transmission.filename)},`;
+            csvContent += `${this.getOrDefault(transmission.filename.split("/").pop())},`;
             csvContent += `${this.getOrDefault(transmission.invoiceNumber)},`;
             csvContent += `${this.getOrDefault(transmission.messageId)},`;
             csvContent += `${this.getOrDefault(transmission.transmissionId)},`;
@@ -126,11 +126,13 @@ class TransmissionTable extends Components.ContextComponent {
         try {
             if (tableState) {
                 pagination.page = tableState.page;
-                pagination.pageSize = tableState.pageSize;
                 pagination.sorted = tableState.sorted;
             } else {
                 pagination.page = 0;
             }
+
+            /* Requested Limit */
+            pagination.pageSize = 50000;
 
             const response = await this.api.getTransmissionList(pagination, searchValues);
             const csvData = this.prepareCSVData(response.data);
