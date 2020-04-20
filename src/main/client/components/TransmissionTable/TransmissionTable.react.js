@@ -86,6 +86,31 @@ class TransmissionTable extends Components.ContextComponent {
         }
     }
 
+    async exportTransmissionList(tableState) {
+        this.setState({loading: true});
+        let {pagination, searchValues} = this.state;
+
+        try {
+            if (tableState) {
+                pagination.page = tableState.page;
+                pagination.pageSize = tableState.pageSize;
+                pagination.sorted = tableState.sorted;
+            } else {
+                pagination.page = 0;
+            }
+
+            this.api.exportTransmissionList(pagination, searchValues).then(response => {
+                console.log(response);
+            });
+        }
+        catch (e) {
+            this.context.showNotification(e.message, 'error', 10);
+        }
+        finally {
+            this.setState({loading: false});
+        }
+    }
+
     async bulkReprocess() {
         const {transmissionList} = this.state;
         const {userData, showModalDialog, hideModalDialog} = this.context;
@@ -521,6 +546,7 @@ class TransmissionTable extends Components.ContextComponent {
                                 <a className="dropdown-item" onClick={() => this.bulkReprocess()}>Reprocess</a>
                                 <a className="dropdown-item" onClick={() => this.bulkMarkAsFixed()}>Mark as Fixed</a>
                                 <a className="dropdown-item" onClick={() => this.bulkSendMlr()}>Send MLR</a></div>
+                                <a className="dropdown-item" onClick={() => this.exportTransmissionList()}>Export CSV</a></div>
                         </div>
                     </div>
                     <hr/>

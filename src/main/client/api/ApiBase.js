@@ -9,6 +9,10 @@ class ApiBase {
         return this.ajax.post(`/peppol-monitor/api/get-transmissions`).send({pagination, filter}).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }
 
+    exportTransmissionList(pagination, filter) {
+        return this.ajax.post(`/peppol-monitor/api/export-transmissions`).send({pagination, filter});
+    }
+
     getTransmissionById(id) {
         return this.ajax.get(`/peppol-monitor/api/get-transmission-by-id/${id}`).then(res => res.body).catch(ApiError.getErrorFromResponse);
     }

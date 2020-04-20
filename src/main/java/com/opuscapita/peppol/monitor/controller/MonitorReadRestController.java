@@ -1,5 +1,10 @@
 package com.opuscapita.peppol.monitor.controller;
 
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionDto;
 import com.opuscapita.peppol.monitor.controller.dtos.TransmissionRequestDto;
@@ -18,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -48,6 +54,26 @@ public class MonitorReadRestController {
     public TransmissionResponseDto getTransmissions(@RequestBody TransmissionRequestDto request) {
         Page<Transmission> transmissions = transmissionService.getAllTransmissions(request);
         return new TransmissionResponseDto(transmissions.getContent(), transmissions.getTotalElements());
+    }
+
+    @PostMapping("/export-transmissions")
+    public void exportTransmissions(@RequestBody TransmissionRequestDto request, HttpServletResponse response) throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+        Page<Transmission> transmissions = transmissionService.getAllTransmissions(request);
+        List<TransmissionDto> dtoList = transmissions.getContent().stream().map(TransmissionDto::of).collect(Collectors.toList());
+
+        String filename = "participants.csv";
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"");
+
+        //create a csv writer
+        StatefulBeanToCsv<TransmissionDto> writer = new StatefulBeanToCsvBuilder<TransmissionDto>(response.getWriter())
+                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                .withOrderedResults(false)
+                .build();
+
+        //write all users to csv file
+        writer.write(dtoList);
     }
 
     @GetMapping("/get-transmission-by-id/{id}")
