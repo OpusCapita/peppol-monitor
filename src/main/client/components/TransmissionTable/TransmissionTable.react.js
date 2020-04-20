@@ -91,7 +91,7 @@ class TransmissionTable extends Components.ContextComponent {
         return "";
     }
 
-    async prepareCSVData(tranmissionList) {
+    prepareCSVData(tranmissionList) {
         let csvContent = "filename,invoiceNumber,messageId,transmissionId,messageStatus,transmissionStatus,sender,receiver,direction,arrivedAt\r\n";
         tranmissionList.forEach((transmission) => {
             csvContent += `${this.getOrDefault(transmission.filename)},`;
@@ -109,13 +109,13 @@ class TransmissionTable extends Components.ContextComponent {
         return csvContent;
     }
 
-    async downloadAsCSV(data, filename) {
+    downloadAsCSV(data, filename) {
         const BOM = "\uFEFF";
         const final = BOM + data;
         const blob = new Blob([final], { type: "text/csv;charset=utf-8" });
         const link = document.createElement("a");
         link.setAttribute("href", window.URL.createObjectURL(blob));
-        link.setAttribute("download", filename);
+        link.setAttribute("download", filename.replace(" ", "_"));
         link.click();
     }
 
