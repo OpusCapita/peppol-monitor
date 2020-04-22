@@ -119,30 +119,47 @@ class TransmissionTable extends Components.ContextComponent {
     }
 
     async exportTransmissionList(tableState) {
-        this.context.showSpinner();
+        const PAGE_SIZE = 10000;
 
-        let {pagination, searchValues} = this.state;
-        try {
-            if (tableState) {
-                pagination.page = tableState.page;
-                pagination.sorted = tableState.sorted;
-            } else {
-                pagination.page = 0;
+        let {pagination, totalCount, searchValues} = this.state;
+        const {i18n, showModalDialog, hideModalDialog, showSpinner, hideSpinner, showNotification} = this.context;
+
+        const onConfirmationClick = (btn) => {
+            hideModalDialog();
+
+            if (btn === 'yes') {
+                pagination.pageSize = PAGE_SIZE;
+                if (tableState) {
+                    pagination.page = tableState.page;
+                    pagination.sorted = tableState.sorted;
+                } else {
+                    pagination.page = 0;
+                }
+
+                showSpinner();
+                setTimeout(() => {
+                    this.api.getTransmissionList(pagination, searchValues).then((response) => {
+                        const csvData = this.prepareCSVData(response.data);
+                        this.downloadAsCSV(csvData, `PEPPOL-TransmissionList-${i18n.formatDateTime(new Date())}.csv`);
+                    }).catch(e => {
+                        showNotification(e.message, 'error', 10);
+                    }).finally(() => {
+                        hideSpinner();
+                    });
+
+                }, 500);
             }
+        };
 
-            /* Requested Limit */
-            pagination.pageSize = 50000;
-
-            const response = await this.api.getTransmissionList(pagination, searchValues);
-            const csvData = this.prepareCSVData(response.data);
-            this.downloadAsCSV(csvData, `PEPPOL-TransmissionList-${this.context.i18n.formatDateTime(new Date())}.csv`);
+        const modalTitle = "Export CSV";
+        let modalText = `\n\nDo you want to continue?`;
+        if (totalCount > PAGE_SIZE)
+            modalText = `Your query contains ${totalCount} records. For the sake of efficiency please narrow down your query using the filters so that the response would contain less that 10000 records. Note that in case you want to continue, only the first 10000 records will be exported.` + modalText;
+        else {
+            modalText = `A total of ${totalCount} records will be exported.` + modalText;
         }
-        catch (e) {
-            this.context.showNotification(e.message, 'error', 10);
-        }
-        finally {
-            this.context.hideSpinner();
-        }
+        const modalButtons = {no: 'No', yes: 'Yes'};
+        showModalDialog(modalTitle, modalText, onConfirmationClick, modalButtons);
     }
 
     async bulkReprocess() {
