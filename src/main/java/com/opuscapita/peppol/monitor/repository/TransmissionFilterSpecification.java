@@ -6,6 +6,8 @@ import com.opuscapita.peppol.monitor.entity.Transmission;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -19,66 +21,39 @@ public class TransmissionFilterSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (StringUtils.isNotBlank(filterDto.getId())) {
-                Predicate idPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("transmissionId"), "%" + filterDto.getId() + "%")
-                );
-                predicates.add(idPredicate);
+                predicates.add(createLikeCriteria(filterDto.getId(), root.get("transmissionId"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getMessageId())) {
-                Predicate messageIdPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.join("message").get("messageId"), "%" + filterDto.getMessageId() + "%")
-                );
-                predicates.add(messageIdPredicate);
+                predicates.add(createLikeCriteria(filterDto.getMessageId(), root.join("message").get("messageId"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getFilename())) {
-                Predicate filenamePredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("filename"), "%" + filterDto.getFilename() + "%")
-                );
-                predicates.add(filenamePredicate);
+                predicates.add(createLikeCriteria(filterDto.getFilename(), root.get("filename"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getSender())) {
-                Predicate senderPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("sender"), "%" + filterDto.getSender() + "%")
-                );
-                predicates.add(senderPredicate);
+                predicates.add(createLikeCriteria(filterDto.getSender(), root.get("sender"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getReceiver())) {
-                Predicate receiverPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("receiver"), "%" + filterDto.getReceiver() + "%")
-                );
-                predicates.add(receiverPredicate);
+                predicates.add(createLikeCriteria(filterDto.getReceiver(), root.get("receiver"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getAccessPoint())) {
-                Predicate accessPointPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("accessPoint"), "%" + filterDto.getAccessPoint() + "%")
-                );
-                predicates.add(accessPointPredicate);
+                predicates.add(createLikeCriteria(filterDto.getAccessPoint(), root.get("accessPoint"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getInvoiceNumber())) {
-                Predicate invoiceNumberPredicate = criteriaBuilder.and(
-                        criteriaBuilder.equal(root.get("invoiceNumber"), filterDto.getInvoiceNumber())
-                );
-                predicates.add(invoiceNumberPredicate);
+                predicates.add(createEqualsCriteria(filterDto.getInvoiceNumber(), root.get("invoiceNumber"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getHistory())) {
-                Predicate historyPredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("rawHistory"), "%" + filterDto.getHistory() + "%")
-                );
-                predicates.add(historyPredicate);
+                predicates.add(createLikeCriteria(filterDto.getHistory(), root.get("rawHistory"), criteriaBuilder));
             }
 
             if (StringUtils.isNotBlank(filterDto.getErrorType())) {
-                Predicate errorTypePredicate = criteriaBuilder.and(
-                        criteriaBuilder.like(root.get("rawHistory"), "%" + filterDto.getErrorType() + "%")
-                );
-                predicates.add(errorTypePredicate);
+                predicates.add(createLikeCriteria(filterDto.getErrorType(), root.get("rawHistory"), criteriaBuilder));
             }
 
             if (filterDto.getSources() != null && !filterDto.getSources().isEmpty()) {
@@ -136,5 +111,18 @@ public class TransmissionFilterSpecification {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
         };
+    }
+
+    private static Predicate createLikeCriteria(String value, Expression<String> path, CriteriaBuilder criteriaBuilder) {
+        boolean isNot = value.startsWith("!");
+        return criteriaBuilder.and(
+                isNot
+                        ? criteriaBuilder.notLike(path, "%" + value.substring(1) + "%")
+                        : criteriaBuilder.like(path, "%" + value + "%")
+        );
+    }
+
+    private static Predicate createEqualsCriteria(String value, Expression<String> path, CriteriaBuilder criteriaBuilder) {
+        return criteriaBuilder.and(criteriaBuilder.equal(path, value));
     }
 }

@@ -93,8 +93,8 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         transmission.setFilename(cm.getFileName());
         transmission.setStatus(extractStatusInfo(cm));
         transmission.setSource(cm.getSource());
-        transmission.setSender(metadata.getSenderId());
-        transmission.setReceiver(metadata.getRecipientId());
+        transmission.setSender(getParticipant(metadata.getSenderId(), business.getSenderName()));
+        transmission.setReceiver(getParticipant(metadata.getRecipientId(), business.getReceiverName()));
         transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
         transmission.setInvoiceNumber(business.getDocumentId());
         transmission.setInvoiceDate(business.getIssueDate());
