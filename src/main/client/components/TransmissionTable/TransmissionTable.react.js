@@ -121,24 +121,25 @@ class TransmissionTable extends Components.ContextComponent {
     async exportTransmissionList(tableState) {
         const PAGE_SIZE = 10000;
 
-        let {pagination, totalCount, searchValues} = this.state;
+        const {pagination, totalCount, searchValues} = this.state;
         const {i18n, showModalDialog, hideModalDialog, showSpinner, hideSpinner, showNotification} = this.context;
 
         const onConfirmationClick = (btn) => {
             hideModalDialog();
 
             if (btn === 'yes') {
-                pagination.pageSize = PAGE_SIZE;
+                const paginationMut = Object.assign({}, pagination);
+                paginationMut.pageSize = PAGE_SIZE;
                 if (tableState) {
-                    pagination.page = tableState.page;
-                    pagination.sorted = tableState.sorted;
+                    paginationMut.page = tableState.page;
+                    paginationMut.sorted = tableState.sorted;
                 } else {
-                    pagination.page = 0;
+                    paginationMut.page = 0;
                 }
 
                 showSpinner();
                 setTimeout(() => {
-                    this.api.getTransmissionList(pagination, searchValues).then((response) => {
+                    this.api.getTransmissionList(paginationMut, searchValues).then((response) => {
                         const csvData = this.prepareCSVData(response.data);
                         this.downloadAsCSV(csvData, `PEPPOL-TransmissionList-${i18n.formatDateTime(new Date())}.csv`);
                     }).catch(e => {
