@@ -55,3 +55,8 @@
     visibility: visible !important;
     opacity: 1 !important;
 }
+
+.opuscapita-id {
+    font-weight: bold;
+    color: #e70;
+}
