@@ -59,7 +59,7 @@ class PeppolMonitor extends Components.ContextComponent {
                             </a>
                         </div>
                         <div className="col-lg-6">
-                            <a href="/peppol-smp?r=lookup/9908/987987988" className="thumbnail">
+                            <a href="/peppol-smp?r=lookup/0192/987794666" className="thumbnail">
                                 <span className="glyphicon glyphicon-search"></span>
                                 Lookup
                             </a>
