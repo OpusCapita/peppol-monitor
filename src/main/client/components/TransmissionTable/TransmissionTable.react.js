@@ -690,9 +690,11 @@ class TransmissionTable extends Components.ContextComponent {
                                 </a>
                         },
                         {
+                            id: 'accessPoint',
                             width: 100,
                             accessor: 'accessPoint',
-                            Header: 'Access Point'
+                            Header: 'Access Point',
+                            Cell: ({value}) => <span className={value === 'PNO000104' ? 'opuscapita-id' : ''}>{value}</span>
                         },
                         {
                             id: 'source',
