@@ -252,7 +252,7 @@ class TransmissionTable extends Components.ContextComponent {
 
     showParticipantLookup(participant) {
         const parts = participant.split(":");
-        window.open(`https://my.galaxygw.com/participantlookup#/${parts[0]}/${parts[1]}`, '_blank');
+        window.open(`${location.origin}/peppol-smp?r=lookup/${parts[0]}/${parts[1]}`, '_blank');
     }
 
     mapSourcesSelect() {
