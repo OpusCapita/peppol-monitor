@@ -12,8 +12,6 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long>, JpaSpec
 
     Archive findByTransmissionId(String transmissionId);
 
-    List<Archive> findByMessageId(Long messageId);
-
     List<Archive> findByFilename(String filename);
 
     List<Archive> findByInvoiceNumber(String invoiceNumber);

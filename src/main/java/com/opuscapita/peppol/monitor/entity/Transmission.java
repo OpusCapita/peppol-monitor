@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name = "transmissions", indexes = {
         @Index(name = "ix_transmission_id", columnList = "transmission_id"),
         @Index(name = "ix_message_id", columnList = "message_id"),
-        @Index(name = "ix_transmission_filename", columnList = "filename"),
+        @Index(name = "ix_transmission_fname", columnList = "filename"),
         @Index(name = "ix_transmission_invoice", columnList = "invoice_number"),
         @Index(name = "ix_transmission_status", columnList = "status"),
         @Index(name = "ix_transmission_source", columnList = "source"),
