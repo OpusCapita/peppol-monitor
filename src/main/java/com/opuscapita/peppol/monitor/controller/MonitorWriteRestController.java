@@ -3,6 +3,7 @@ package com.opuscapita.peppol.monitor.controller;
 import com.opuscapita.peppol.commons.container.state.ProcessStep;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import com.opuscapita.peppol.commons.container.state.log.DocumentLogLevel;
+import com.opuscapita.peppol.monitor.archive.ArchiveManager;
 import com.opuscapita.peppol.monitor.entity.AccessPoint;
 import com.opuscapita.peppol.monitor.entity.MessageStatus;
 import com.opuscapita.peppol.monitor.entity.Transmission;
@@ -34,19 +35,28 @@ public class MonitorWriteRestController {
     private static final Logger logger = LoggerFactory.getLogger(MonitorWriteRestController.class);
 
     private final MlrReportManager mlrManager;
+    private final ArchiveManager archiveManager;
     private final ReprocessManager reprocessManager;
     private final StandaloneSender standaloneSender;
     private final TransmissionService transmissionService;
     private final AccessPointRepository accessPointRepository;
 
     @Autowired
-    public MonitorWriteRestController(MlrReportManager mlrManager, TransmissionService transmissionService,
+    public MonitorWriteRestController(MlrReportManager mlrManager, ArchiveManager archiveManager, TransmissionService transmissionService,
                                       ReprocessManager reprocessManager, StandaloneSender standaloneSender, AccessPointRepository accessPointRepository) {
         this.mlrManager = mlrManager;
+        this.archiveManager = archiveManager;
         this.reprocessManager = reprocessManager;
         this.standaloneSender = standaloneSender;
         this.transmissionService = transmissionService;
         this.accessPointRepository = accessPointRepository;
+    }
+
+    @PostMapping("/archive")
+    public void archiveTransmissions() throws Exception {
+        logger.info("Received archiving request, initiating...");
+
+        new Thread(archiveManager::archive).start();
     }
 
     @PostMapping("/upload-file/{userId}/{transmissionId}")

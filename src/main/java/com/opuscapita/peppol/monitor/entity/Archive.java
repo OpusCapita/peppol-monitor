@@ -1,26 +1,18 @@
 package com.opuscapita.peppol.monitor.entity;
 
 import com.opuscapita.peppol.commons.container.state.Source;
-import com.opuscapita.peppol.commons.container.state.log.DocumentLog;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @DynamicUpdate
-@Table(name = "transmissions", indexes = {
-        @Index(name = "ix_transmission_id", columnList = "transmission_id"),
-        @Index(name = "ix_message_id", columnList = "message_id"),
-        @Index(name = "ix_transmission_fname", columnList = "filename"),
-        @Index(name = "ix_transmission_invoice", columnList = "invoice_number"),
-        @Index(name = "ix_transmission_status", columnList = "status"),
-        @Index(name = "ix_transmission_source", columnList = "source"),
+@Table(name = "archive", indexes = {
+        @Index(name = "ix_archive_filename", columnList = "filename"),
+        @Index(name = "ix_archive_invoice", columnList = "invoice_number")
 })
-public class Transmission {
+public class Archive {
 
     @Id
     @Column(name = "id")
@@ -68,17 +60,22 @@ public class Transmission {
     @Version
     private Integer version;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "message_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Message message;
-
-    @Lob
-    @Column(name = "history")
-    private String rawHistory;
-
-    @Transient
-    private List<DocumentLog> logs;
+    public static Archive convert(Transmission transmission) {
+        Archive archive = new Archive();
+        archive.setTransmissionId(transmission.getTransmissionId());
+        archive.setFilename(transmission.getFilename());
+        archive.setStatus(transmission.getStatus());
+        archive.setSource(transmission.getSource());
+        archive.setDirection(transmission.getDirection());
+        archive.setSender(transmission.getSender());
+        archive.setReceiver(transmission.getReceiver());
+        archive.setAccessPoint(transmission.getAccessPoint());
+        archive.setInvoiceNumber(transmission.getInvoiceNumber());
+        archive.setInvoiceDate(transmission.getInvoiceDate());
+        archive.setDocumentTypeId(transmission.getDocumentTypeId());
+        archive.setArrivedAt(transmission.getArrivedAt());
+        return archive;
+    }
 
     public Long getId() {
         return id;
@@ -176,14 +173,6 @@ public class Transmission {
         this.arrivedAt = arrivedAt;
     }
 
-    public Message getMessage() {
-        return message;
-    }
-
-    public void setMessage(Message message) {
-        this.message = message;
-    }
-
     public String getDocumentTypeId() {
         return documentTypeId;
     }
@@ -192,28 +181,12 @@ public class Transmission {
         this.documentTypeId = documentTypeId;
     }
 
-    public String getRawHistory() {
-        return rawHistory;
-    }
-
-    public void setRawHistory(String rawHistory) {
-        this.rawHistory = rawHistory;
-    }
-
     public Integer getVersion() {
         return version;
     }
 
     public void setVersion(Integer version) {
         this.version = version;
-    }
-
-    public List<DocumentLog> getLogs() {
-        return logs;
-    }
-
-    public void setLogs(List<DocumentLog> logs) {
-        this.logs = logs;
     }
 
 }
