@@ -203,7 +203,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     // https://opuscapita.atlassian.net/wiki/spaces/IIPEP/pages/773882045/Monitoring+Service+Concurrency+Issues
     private void handleDBErrors(Transmission transmission, ContainerMessage cm, Exception e) throws Exception {
-        logger.error("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
+        logger.debug("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
         if (transmission.getStatus().isFinal()) {
             consume(cm);
         }

@@ -20,7 +20,7 @@ public class TransmissionDto {
     public String invoiceNumber;
     public String invoiceDate;
     public Source source;
-    public String direction;
+    public Source direction;
     public String documentTypeId;
     public Date arrivedAt;
 
