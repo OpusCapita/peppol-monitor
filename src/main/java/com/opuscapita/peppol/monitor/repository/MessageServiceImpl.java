@@ -26,7 +26,6 @@ public class MessageServiceImpl implements MessageService {
         try {
             message = repository.saveAndFlush(message);
         } catch (Exception e) {
-            logger.error("Error occurred while saving the message, reason: " + e.getMessage());
             message = getMessage(message.getMessageId());
         }
 

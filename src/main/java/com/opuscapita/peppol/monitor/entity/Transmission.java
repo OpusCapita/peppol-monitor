@@ -42,7 +42,8 @@ public class Transmission {
     private Source source;
 
     @Column(name = "direction", length = 10)
-    private String direction;
+    @Enumerated(EnumType.STRING)
+    private Source direction;
 
     @Column(name = "sender", length = 35)
     private String sender;
@@ -120,11 +121,11 @@ public class Transmission {
         this.source = source;
     }
 
-    public String getDirection() {
+    public Source getDirection() {
         return direction;
     }
 
-    public void setDirection(String direction) {
+    public void setDirection(Source direction) {
         this.direction = direction;
     }
 
