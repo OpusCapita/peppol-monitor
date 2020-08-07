@@ -125,11 +125,8 @@ public class TransmissionFilterDto {
         this.sources = sources;
     }
 
-    public List<String> getDestinations() {
-        if (destinations != null) {
-            return destinations.stream().map(d -> d.name().toLowerCase()).collect(Collectors.toList());
-        }
-        return null;
+    public List<Source> getDestinations() {
+        return destinations;
     }
 
     public void setDestinations(List<Source> destinations) {
