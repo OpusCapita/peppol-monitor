@@ -81,18 +81,28 @@ public class Transmission {
     @Transient
     private List<DocumentLog> logs;
 
-    private String fieldTruncate( String field, int maxLen ) {
+    String fieldTruncate( String field, int maxLen ) {
 
-  		if( maxLen < 2) {
-  			return "";
+  		try {
+  			if( maxLen < 2) {
+  				return "";
+  			}
+
+  			if( field == null ) {
+  				return null;
+  			}
+
+  			if( field.length() <= maxLen) {
+  				return field;
+  			}
+
+  			String newField = field.substring(0, maxLen - 2) + "..";
+  			return newField;
+  		} catch (Exception e)  {
+  			System.err.println( "Issue to truncate " + field + e.getMessage() );
   		}
+  		return field;
 
-  		if( field.length() <= maxLen) {
-  			return field;
-  		}
-
-  		String newField = field.substring(0, maxLen - 2) + "..";
-  		return newField;
   	}
 
     public Long getId() {
