@@ -81,6 +81,20 @@ public class Transmission {
     @Transient
     private List<DocumentLog> logs;
 
+    private String fieldTruncate( String field, int maxLen ) {
+
+  		if( maxLen < 2) {
+  			return "";
+  		}
+
+  		if( field.length() <= maxLen) {
+  			return field;
+  		}
+
+  		String newField = field.substring(0, maxLen - 2) + "..";
+  		return newField;
+  	}
+
     public Long getId() {
         return id;
     }
@@ -134,7 +148,7 @@ public class Transmission {
     }
 
     public void setSender(String sender) {
-        this.sender = sender;
+        this.sender = this.fieldTruncate( sender, 35);
     }
 
     public String getReceiver() {
@@ -142,7 +156,7 @@ public class Transmission {
     }
 
     public void setReceiver(String receiver) {
-        this.receiver = receiver;
+        this.receiver = this.fieldTruncate( receiver, 35);
     }
 
     public String getAccessPoint() {
