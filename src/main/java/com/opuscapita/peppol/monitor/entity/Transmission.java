@@ -81,7 +81,7 @@ public class Transmission {
     @Transient
     private List<DocumentLog> logs;
 
-    String fieldTruncate( String field, int maxLen ) {
+    private String fieldTruncate( String field, int maxLen ) {
 
   		try {
   			if( maxLen < 2) {
@@ -118,7 +118,7 @@ public class Transmission {
     }
 
     public void setTransmissionId(String transmissionId) {
-        this.transmissionId = transmissionId;
+        this.transmissionId = this.fieldTruncate( transmissionId, 100);
     }
 
     public String getFilename() {
@@ -126,7 +126,8 @@ public class Transmission {
     }
 
     public void setFilename(String filename) {
-        this.filename = filename;
+
+        this.filename = this.fieldTruncate( filename, 150);
     }
 
     public MessageStatus getStatus() {
@@ -182,7 +183,7 @@ public class Transmission {
     }
 
     public void setInvoiceNumber(String invoiceNumber) {
-        this.invoiceNumber = invoiceNumber;
+        this.invoiceNumber = this.fieldTruncate( invoiceNumber, 50);
     }
 
     public String getInvoiceDate() {
@@ -190,7 +191,7 @@ public class Transmission {
     }
 
     public void setInvoiceDate(String invoiceDate) {
-        this.invoiceDate = invoiceDate;
+        this.invoiceDate = this.fieldTruncate( invoiceDate, 50);
     }
 
     public Date getArrivedAt() {
