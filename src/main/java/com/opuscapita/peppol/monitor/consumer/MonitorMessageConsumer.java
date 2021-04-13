@@ -48,7 +48,9 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     @Override
     public void consume(@NotNull ContainerMessage cm) throws Exception {
+        logger.info("REM: Monitor received the message 0 " + cm);
         logger.info("Monitor received the message: " + toKibana(cm));
+        logger.info("REM: Monitor received the message 1 ");
 
         if (cm.getMetadata() == null) {
             logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
