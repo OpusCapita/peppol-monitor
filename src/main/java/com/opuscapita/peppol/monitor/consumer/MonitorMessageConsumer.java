@@ -52,31 +52,53 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         logger.info("Monitor received the message: " + toKibana(cm));
         logger.info("REM: Monitor received the message 1 ");
 
+/*
+Apr 13, 2021 @ 15:34:14.916	2021-04-13 13:34:14.916 ERROR 1 --- [    container-1] o.h.i.ExceptionMapperStandardImpl        : HHH000346: Error during managed flush [org.hibernate.exception.ConstraintViolationException: could not execute statement]
+Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914 ERROR 1 --- [    container-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Column 'transmission_id' cannot be null
+Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914  WARN 1 --- [    container-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1048, SQLState: 23000
+*/
+
         if (cm.getMetadata() == null) {
             logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
             return;
         }
 
-        String messageId = cm.getMetadata().getMessageId();
-        String transmissionId = cm.getMetadata().getTransmissionId();
 
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+        }
+
+
+logger.info("REM: Monitor received the message 2 ");
+        String messageId = cm.getMetadata().getMessageId();
+logger.info("REM: Monitor received the message 3 ");
+        String transmissionId = cm.getMetadata().getTransmissionId();
+logger.info("REM: Monitor received the message 4 ");
         Message message = messageService.getMessage(messageId);
+logger.info("REM: Monitor received the message 5");
         if (message == null) {
             message = createMessageEntity(cm);
         }
-
+logger.info("REM: Monitor received the message 6");
         Transmission transmission = transmissionService.getTransmission(transmissionId);
+logger.info("REM: Monitor received the message 7");
         if (transmission == null) {
+          logger.info("REM: Monitor received the message 7b");
             transmission = createTransmissionEntity(cm, message);
-
+          logger.info("REM: Monitor received the message 7c");
         } else if (transmission.getStatus().isFinal()) {
             return;
 
         } else {
+            logger.info("REM: Monitor received the message 8a");
             transmission = updateTransmissionEntity(cm, transmission);
+            logger.info("REM: Monitor received the message 8b");
         }
 
         try {
+          logger.info("REM: Monitor received the message 9a");
             transmissionService.saveTransmission(transmission);
             logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
 
@@ -84,7 +106,9 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             handleDBErrors(transmission, cm, e);
         }
 
+        logger.info("REM: Monitor received the message 10");
         mlrManager.sendToMlrReporter(cm, transmission.getStatus());
+        logger.info("REM: Monitor received the message 11");
     }
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
