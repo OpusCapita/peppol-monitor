@@ -103,7 +103,8 @@ logger.info("REM: Monitor received the message 7");
             logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
 
         } catch (Exception e) {
-            handleDBErrors(transmission, cm, e);
+            logger.info("REM: boom " + e );
+            //handleDBErrors(transmission, cm, e);
         }
 
         logger.info("REM: Monitor received the message 10");
