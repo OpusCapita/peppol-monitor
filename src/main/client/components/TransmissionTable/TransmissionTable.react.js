@@ -437,7 +437,7 @@ class TransmissionTable extends Components.ContextComponent {
                                 </div>
                                 <div className="form-group">
                                     <div className="col-sm-3">
-                                        <label className="control-label">Invoice Number</label>
+                                        <label className="control-label">Document Number</label>
                                     </div>
                                     <div className="offset-md-1 col-md-8">
                                         <input type="text" className="form-control" value={searchValues.invoiceNumber}
