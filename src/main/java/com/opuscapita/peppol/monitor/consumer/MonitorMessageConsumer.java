@@ -95,7 +95,16 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         transmission.setSource(cm.getSource());
         transmission.setSender(getParticipant(metadata.getSenderId(), business.getSenderName()));
         transmission.setReceiver(getParticipant(metadata.getRecipientId(), business.getReceiverName()));
-        transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
+
+        //TODO
+        //Use accesspoint from sender if sender type is GW
+        if( cm.getSource() == Source.GW )  {
+          transmission.setAccessPoint(metadata.getSendingAccessPoint());
+        }
+        else {
+          transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
+        }
+
         transmission.setInvoiceNumber(business.getDocumentId());
         transmission.setInvoiceDate(business.getIssueDate());
         if (cm.getRoute() != null && cm.getRoute().getDestination() != null) {
@@ -174,7 +183,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         try {
             accessPoint = accessPointRepository.saveAndFlush(accessPoint);
         } catch (Exception e) {
-            logger.debug("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
+            logger.warn("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
         }
         return accessPoint.getId();
     }
