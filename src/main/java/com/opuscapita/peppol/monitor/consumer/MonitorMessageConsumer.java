@@ -224,7 +224,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         if (transmission.getStatus().isFinal()) {
 
           if( iteration > 100 ) {
-            console.log("Giving up on: " + transmission.getFilename() + " after " + iteration + " tries...");
+            logger.warn("Giving up on: " + transmission.getFilename() + " after " + iteration + " tries...");
             return;
           }
 
@@ -233,7 +233,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
               Thread.sleep(1000);
               logger.warn("Trying again, after sleep 1000");
           }
-          catch(Exception e)
+          catch(Exception se)
           {
               logger.warn("Sleep Exception");
           }
