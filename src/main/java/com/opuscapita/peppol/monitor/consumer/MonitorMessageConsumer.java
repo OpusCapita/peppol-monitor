@@ -231,7 +231,7 @@ Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914  WARN 1 --- [    container-1
         if (transmission.getStatus().isFinal()) {
 
           if( iteration > 100 ) {
-            console.log("Giving up on: " + transmission.getFilename() + " after " + iteration + " tries...");
+            logger.warn("Giving up on: " + transmission.getFilename() + " after " + iteration + " tries...");
             return;
           }
 
@@ -240,7 +240,7 @@ Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914  WARN 1 --- [    container-1
               Thread.sleep(1000);
               logger.warn("Trying again, after sleep 1000");
           }
-          catch(Exception e)
+          catch(Exception se)
           {
               logger.warn("Sleep Exception");
           }
