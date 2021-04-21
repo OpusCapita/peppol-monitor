@@ -103,7 +103,16 @@ Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914  WARN 1 --- [    container-1
         transmission.setSource(cm.getSource());
         transmission.setSender(getParticipant(metadata.getSenderId(), business.getSenderName()));
         transmission.setReceiver(getParticipant(metadata.getRecipientId(), business.getReceiverName()));
-        transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
+
+        //TODO
+        //Use accesspoint from sender if sender type is GW
+        if( cm.getSource() == Source.GW )  {
+          transmission.setAccessPoint(metadata.getSendingAccessPoint());
+        }
+        else {
+          transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
+        }
+
         transmission.setInvoiceNumber(business.getDocumentId());
         transmission.setInvoiceDate(business.getIssueDate());
         if (cm.getRoute() != null && cm.getRoute().getDestination() != null) {
@@ -182,7 +191,7 @@ Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914  WARN 1 --- [    container-1
         try {
             accessPoint = accessPointRepository.saveAndFlush(accessPoint);
         } catch (Exception e) {
-            logger.debug("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
+            logger.warn("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
         }
         return accessPoint.getId();
     }
