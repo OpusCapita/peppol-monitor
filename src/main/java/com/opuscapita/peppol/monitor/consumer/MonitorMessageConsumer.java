@@ -49,6 +49,13 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     @Override
     public void consume(@NotNull ContainerMessage cm) throws Exception {
+
+        this.intConsume( cm, 0 );
+
+    }
+
+
+    private void intConsume(@NotNull ContainerMessage cm, int iteration) throws Exception {
         logger.info("Monitor received the message: " + toKibana(cm));
 
         if (cm.getMetadata() == null) {
@@ -80,7 +87,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
             logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
 
         } catch (Exception e) {
-            handleDBErrors(transmission, cm, e);
+            handleDBErrors(transmission, cm, e, iteration);
         }
 
         mlrManager.sendToMlrReporter(cm, transmission.getStatus());
@@ -212,10 +219,26 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     }
 
     // https://opuscapita.atlassian.net/wiki/spaces/IIPEP/pages/773882045/Monitoring+Service+Concurrency+Issues
-    private void handleDBErrors(Transmission transmission, ContainerMessage cm, Exception e) throws Exception {
-        logger.debug("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
+    private void handleDBErrors(Transmission transmission, ContainerMessage cm, Exception e, int iteration ) throws Exception {
+        logger.warn("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
         if (transmission.getStatus().isFinal()) {
-            consume(cm);
+
+          if( iteration > 100 ) {
+            console.log("Giving up on: " + transmission.getFilename() + " after " + iteration + " tries...");
+            return;
+          }
+
+          try
+          {
+              Thread.sleep(1000);
+              logger.warn("Trying again, after sleep 1000");
+          }
+          catch(Exception e)
+          {
+              logger.warn("Sleep Exception");
+          }
+
+          intConsume(cm, iteration + 1);
         }
     }
 
