@@ -82,7 +82,7 @@ public class ReprocessManager {
     }
 
     private String getEndpointForGW(Transmission transm) {
-        String baseName = FilenameUtils.getName(filename);
+
 /*
         TODO, where is this stored??
         md.setProtocol( wrapper.getHeader("protocol") );
@@ -92,11 +92,13 @@ public class ReprocessManager {
         String AP = transm.getAccessPoint();
         String APParts[] = AP.split(":");
 
+        String baseName = FilenameUtils.getName(transm.getFilename());
+
         return UriComponentsBuilder
                 .fromUriString("http://peppol-inbound")
                 .port(3037)
                 .path("/reprocess")
-                .queryParam("filename", transm.getFilename())
+                .queryParam("filename", baseName )
                 .queryParam("transactionid", transm.getTransmissionId() )
                 //.queryParam("protocol", protocol)
                 //.queryParam("useragent", useragent)
@@ -108,4 +110,4 @@ public class ReprocessManager {
 
     }
 
-  }
+}
