@@ -6,6 +6,7 @@ import com.opuscapita.peppol.commons.storage.StorageException;
 import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.Transmission;
 
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 
 @Component
 public class ReprocessManager {
@@ -41,16 +43,24 @@ public class ReprocessManager {
         logger.debug("Message reprocess requested for transmission: " + transmission.getTransmissionId());
 
         String endpoint;
+        HttpHeaders headers;
+        Object tupple[];
 
         if( transmission.getSource() == Source.GW ) {
-          endpoint = getEndpointForGW( transmission );
+          tupple = getEndpointForGW( transmission );
+
+          endpoint = (String)       tupple[0];
+          headers =  (HttpHeaders)  tupple[1];
+
         }
         else {
           endpoint = getEndpoint( transmission.getFilename() );
+
+          headers = new HttpHeaders();
         }
         logger.info("Sending reprocess request to endpoint: " + endpoint + " for file: " + transmission.getFilename());
 
-        HttpHeaders headers = new HttpHeaders();
+
         authService.setAuthorizationHeader(headers);
         headers.set("Transfer-Encoding", "chunked");
         headers.set("Access-Point", transmission.getAccessPoint());
@@ -81,7 +91,7 @@ public class ReprocessManager {
                 .toUriString();
     }
 
-    private String getEndpointForGW(Transmission transm) {
+    private Object[] getEndpointForGW(Transmission transm) {
 
 /*
         TODO, where is this stored??
@@ -91,26 +101,36 @@ public class ReprocessManager {
 */
         String AP = transm.getAccessPoint();
         String APParts[] = AP.split(":");
+        Object tupel[];
 
         String baseName = FilenameUtils.getName(transm.getFilename());
 
         logger.info("AccessPoint: " + AP );
         logger.info("AccessPoint parts: " + APParts.length );
 
-        return UriComponentsBuilder
+        HttpHeaders headers = new HttpHeaders();
+
+        String url = UriComponentsBuilder
                 .fromUriString("http://peppol-inbound")
                 .port(3037)
                 .path("/reprocess")
                 .queryParam("filename", baseName )
-                .queryParam("transactionid", transm.getTransmissionId() )
                 //.queryParam("protocol", protocol)
                 //.queryParam("useragent", useragent)
                 //.queryParam("useragentversion", useragentversion)
-                .queryParam("gwalias", APParts[1])
-                .queryParam("gwaccount", APParts[2])
-                .queryParam("gwreceivetimestamp", transm.getArrivedAt() )
                 .toUriString();
 
+        headers.set("transactionid", transm.getTransmissionId());
+        headers.set("gwalias", APParts[1]);
+        headers.set("gwaccount",APParts[2]);
+        headers.set("gwreceivetimestamp", new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss").format( transm.getArrivedAt() ) );
+
+        tupel = new Object[2]; 
+
+        tupel[0] = (Object) url;
+        tupel[1] = (Object) headers;
+
+        return tupel;
     }
 
 }
