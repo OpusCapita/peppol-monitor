@@ -147,8 +147,8 @@ public class ReprocessManager {
             new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss").parse( wrapper.getHeader("gwreceivetimestamp") )
 */
 
-      tupel[0] = url;
-      tupel[1] = headers;
+      tupel[0] = (Object) url;
+      tupel[1] = (Object) headers;
 
       return tupel;
     }
