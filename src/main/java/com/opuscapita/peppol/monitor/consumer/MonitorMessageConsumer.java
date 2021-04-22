@@ -57,7 +57,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     private void intConsume(@NotNull ContainerMessage cm, int iteration) throws Exception {
 
-
         try {
           logger.info("Monitor received the message: " + toKibana(cm));
 
