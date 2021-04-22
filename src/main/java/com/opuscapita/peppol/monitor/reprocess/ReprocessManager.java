@@ -95,7 +95,7 @@ public class ReprocessManager {
         String baseName = FilenameUtils.getName(transm.getFilename());
 
         logger.info("AccessPoint: " + AP );
-        logger.info("AccessPoint parts: " + APParts.length() );
+        logger.info("AccessPoint parts: " + APParts.length );
 
         return UriComponentsBuilder
                 .fromUriString("http://peppol-inbound")
