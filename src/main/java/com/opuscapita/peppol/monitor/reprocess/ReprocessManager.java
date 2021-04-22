@@ -113,39 +113,15 @@ public class ReprocessManager {
                 .port(3037)
                 .path("/reprocess")
                 .queryParam("filename", baseName )
-                ////.queryParam("transactionid", transm.getTransmissionId() )
                 //.queryParam("protocol", protocol)
                 //.queryParam("useragent", useragent)
                 //.queryParam("useragentversion", useragentversion)
-                ////.queryParam("gwalias", APParts[1])
-                ////.queryParam("gwaccount", APParts[2])
-                ////.queryParam("gwreceivetimestamp", transm.getArrivedAt() )
                 .toUriString();
 
         headers.set("transactionid", transm.getTransmissionId());
         headers.set("gwalias", APParts[1]);
         headers.set("gwaccount",APParts[2]);
-        headers.set("gwreceivetimestamp", transm.getArrivedAt());
-
-/*
-        md.setRecipientId(  "0000:000000000" );
-        md.setSenderId(     "0000:000000000" );
-        md.setDocumentTypeIdentifier( "cust:opuscapita:unidentified-document" );
-        md.setProfileTypeIdentifier(  "cust:opuscapita:unidentified-process" );
-
-        md.setMessageId( wrapper.getHeader("transactionid") );
-        md.setTransmissionId( wrapper.getHeader("transactionid") );
-
-        md.setProtocol( wrapper.getHeader("protocol") );
-        md.setUserAgent( wrapper.getHeader("useragent") );
-        md.setUserAgentVersion( wrapper.getHeader("useragentversion") );
-
-        md.setSendingAccessPoint( "GW:" + wrapper.getHeader("gwalias") + ":" + wrapper.getHeader("gwaccount") );
-
-        try {
-          md.setTimestamp(
-            new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss").parse( wrapper.getHeader("gwreceivetimestamp") )
-*/
+        headers.set("gwreceivetimestamp", new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss").format( transm.getArrivedAt() ) );
 
       tupel[0] = (Object) url;
       tupel[1] = (Object) headers;
