@@ -125,7 +125,7 @@ public class ReprocessManager {
         headers.set("gwaccount",APParts[2]);
         headers.set("gwreceivetimestamp", new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss").format( transm.getArrivedAt() ) );
 
-        tupel = new Object[2];
+        tupel = new Object[2]; 
 
         tupel[0] = (Object) url;
         tupel[1] = (Object) headers;
