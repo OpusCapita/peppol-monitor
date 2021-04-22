@@ -3,7 +3,9 @@ package com.opuscapita.peppol.monitor.reprocess;
 import com.opuscapita.peppol.commons.auth.AuthorizationService;
 import com.opuscapita.peppol.commons.storage.Storage;
 import com.opuscapita.peppol.commons.storage.StorageException;
+import com.opuscapita.peppol.commons.container.state.Source;
 import com.opuscapita.peppol.monitor.entity.Transmission;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,15 @@ public class ReprocessManager {
 
     public void reprocessMessage(Transmission transmission) throws IOException {
         logger.debug("Message reprocess requested for transmission: " + transmission.getTransmissionId());
-        String endpoint = getEndpoint(transmission.getFilename());
+
+        String endpoint;
+
+        if( transmission.getSource() == Source.GW ) {
+          endpoint = getEndpointForGW( transmission );
+        }
+        else {
+          endpoint = getEndpoint( transmission.getFilename() );
+        }
         logger.info("Sending reprocess request to endpoint: " + endpoint + " for file: " + transmission.getFilename());
 
         HttpHeaders headers = new HttpHeaders();
@@ -70,4 +80,34 @@ public class ReprocessManager {
                 .queryParam("filename", baseName)
                 .toUriString();
     }
-}
+
+    private String getEndpointForGW(Transmission transm) {
+        String baseName = FilenameUtils.getName(filename);
+/*
+        TODO, where is this stored??
+        md.setProtocol( wrapper.getHeader("protocol") );
+        md.setUserAgent( wrapper.getHeader("useragent") );
+        md.setUserAgentVersion( wrapper.getHeader("useragentversion") );
+*/
+        try {
+
+        String AP = transm.getAccessPoint();
+        String APParts[] = AP.split(":");
+
+        return UriComponentsBuilder
+                .fromUriString("http://peppol-inbound")
+                .port(3037)
+                .path("/reprocess")
+                .queryParam("filename", transm.getFilename())
+                .queryParam("transactionid", transm.getTransmissionId() )
+                //.queryParam("protocol", protocol)
+                //.queryParam("useragent", useragent)
+                //.queryParam("useragentversion", useragentversion)
+                .queryParam("gwalias", APParts[2])
+                .queryParam("gwaccount", APParts[3])
+                .queryParam("gwreceivetimestamp", trans.getArrivedAt() )
+                .toUriString();
+
+    }
+
+  }

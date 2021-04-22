@@ -57,7 +57,6 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     private void intConsume(@NotNull ContainerMessage cm, int iteration) throws Exception {
 
-
         try {
           logger.info("Monitor received the message: " + toKibana(cm));
 
@@ -100,7 +99,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
           Thread.sleep(1000);
           logger.warn("Trying again, after sleep 1000");
           throw e;
-          
+
         }
     }
 
