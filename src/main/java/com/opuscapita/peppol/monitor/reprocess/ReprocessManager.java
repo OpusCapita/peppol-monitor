@@ -105,7 +105,7 @@ public class ReprocessManager {
                 //.queryParam("useragentversion", useragentversion)
                 .queryParam("gwalias", APParts[2])
                 .queryParam("gwaccount", APParts[3])
-                .queryParam("gwreceivetimestamp", trans.getArrivedAt() )
+                .queryParam("gwreceivetimestamp", transm.getArrivedAt() )
                 .toUriString();
 
     }
