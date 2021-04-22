@@ -41,16 +41,23 @@ public class ReprocessManager {
         logger.debug("Message reprocess requested for transmission: " + transmission.getTransmissionId());
 
         String endpoint;
+        HttpHeaders headers;
+        Object tupple[];
 
         if( transmission.getSource() == Source.GW ) {
-          endpoint = getEndpointForGW( transmission );
+          tupple = getEndpointForGW( transmission );
+
+          endpoint = tupple[0];
+          headers =  tupple[1];
         }
         else {
-          endpoint = getEndpoint( transmission.getFilename() );
+          tupple = getEndpoint( transmission.getFilename() );
+
+          headers = new HttpHeaders();
         }
         logger.info("Sending reprocess request to endpoint: " + endpoint + " for file: " + transmission.getFilename());
 
-        HttpHeaders headers = new HttpHeaders();
+
         authService.setAuthorizationHeader(headers);
         headers.set("Transfer-Encoding", "chunked");
         headers.set("Access-Point", transmission.getAccessPoint());
@@ -81,7 +88,7 @@ public class ReprocessManager {
                 .toUriString();
     }
 
-    private String getEndpointForGW(Transmission transm) {
+    private Object[] getEndpointForGW(Transmission transm) {
 
 /*
         TODO, where is this stored??
@@ -91,26 +98,58 @@ public class ReprocessManager {
 */
         String AP = transm.getAccessPoint();
         String APParts[] = AP.split(":");
+        Object tupel[];
 
         String baseName = FilenameUtils.getName(transm.getFilename());
 
         logger.info("AccessPoint: " + AP );
         logger.info("AccessPoint parts: " + APParts.length );
 
-        return UriComponentsBuilder
+        HttpHeaders headers = new HttpHeaders();
+
+        String url = UriComponentsBuilder
                 .fromUriString("http://peppol-inbound")
                 .port(3037)
                 .path("/reprocess")
                 .queryParam("filename", baseName )
-                .queryParam("transactionid", transm.getTransmissionId() )
+                ////.queryParam("transactionid", transm.getTransmissionId() )
                 //.queryParam("protocol", protocol)
                 //.queryParam("useragent", useragent)
                 //.queryParam("useragentversion", useragentversion)
-                .queryParam("gwalias", APParts[1])
-                .queryParam("gwaccount", APParts[2])
-                .queryParam("gwreceivetimestamp", transm.getArrivedAt() )
+                ////.queryParam("gwalias", APParts[1])
+                ////.queryParam("gwaccount", APParts[2])
+                ////.queryParam("gwreceivetimestamp", transm.getArrivedAt() )
                 .toUriString();
 
+        headers.set("transactionid", transm.getTransmissionId());
+        headers.set("gwalias", APParts[1]);
+        headers.set("gwaccount",APParts[2]);
+        headers.set("gwreceivetimestamp", transm.getArrivedAt());
+
+/*
+        md.setRecipientId(  "0000:000000000" );
+        md.setSenderId(     "0000:000000000" );
+        md.setDocumentTypeIdentifier( "cust:opuscapita:unidentified-document" );
+        md.setProfileTypeIdentifier(  "cust:opuscapita:unidentified-process" );
+
+        md.setMessageId( wrapper.getHeader("transactionid") );
+        md.setTransmissionId( wrapper.getHeader("transactionid") );
+
+        md.setProtocol( wrapper.getHeader("protocol") );
+        md.setUserAgent( wrapper.getHeader("useragent") );
+        md.setUserAgentVersion( wrapper.getHeader("useragentversion") );
+
+        md.setSendingAccessPoint( "GW:" + wrapper.getHeader("gwalias") + ":" + wrapper.getHeader("gwaccount") );
+
+        try {
+          md.setTimestamp(
+            new SimpleDateFormat("yyyy-MM-dd/HH:mm:ss").parse( wrapper.getHeader("gwreceivetimestamp") )
+*/
+
+      tupel[0] = url;
+      tupel[1] = headers;
+
+      return tupel;
     }
 
 }
