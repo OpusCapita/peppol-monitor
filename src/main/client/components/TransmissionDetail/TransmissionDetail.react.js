@@ -231,6 +231,10 @@ class TransmissionDetail extends Components.ContextComponent {
                                     <a className='btn btn-default' href="#" onClick={ () => { console.log("hej"); window.open( TNTLink ); }  } >
                                     Check in TNT
                                     </a>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
                                     <label className="control-label btn-link">Message ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
