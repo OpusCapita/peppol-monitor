@@ -47,11 +47,12 @@ public class ReprocessManager {
         if( transmission.getSource() == Source.GW ) {
           tupple = getEndpointForGW( transmission );
 
-          endpoint = tupple[0];
-          headers =  tupple[1];
+          endpoint = (String)       tupple[0];
+          headers =  (HttpHeaders)  tupple[1];
+
         }
         else {
-          tupple = getEndpoint( transmission.getFilename() );
+          endpoint = getEndpoint( transmission.getFilename() );
 
           headers = new HttpHeaders();
         }
