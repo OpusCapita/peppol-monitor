@@ -230,7 +230,7 @@ class TransmissionDetail extends Components.ContextComponent {
                                 <div className="col-sm-3">
                                     <a className='btn btn-default' href="#" onclick="window.open( TNTLink )">
                                     Check in TNT
-                                    </a> <!-- window.open('/relative_url'); -->
+                                    </a>
                                     <label className="control-label btn-link">Message ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
