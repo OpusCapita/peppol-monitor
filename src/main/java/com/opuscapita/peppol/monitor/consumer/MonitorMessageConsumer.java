@@ -56,48 +56,52 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
 
     private void intConsume(@NotNull ContainerMessage cm, int iteration) throws Exception {
-        logger.info("Monitor received the message: " + toKibana(cm));
 
-/*
-Apr 13, 2021 @ 15:34:14.916	2021-04-13 13:34:14.916 ERROR 1 --- [    container-1] o.h.i.ExceptionMapperStandardImpl        : HHH000346: Error during managed flush [org.hibernate.exception.ConstraintViolationException: could not execute statement]
-Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914 ERROR 1 --- [    container-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Column 'transmission_id' cannot be null
-Apr 13, 2021 @ 15:34:14.914	2021-04-13 13:34:14.914  WARN 1 --- [    container-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 1048, SQLState: 23000
-*/
-
-        if (cm.getMetadata() == null) {
-            logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
-            return;
-        }
-
-        String messageId = cm.getMetadata().getMessageId();
-        String transmissionId = cm.getMetadata().getTransmissionId();
-        Message message = messageService.getMessage(messageId);
-
-        if (message == null) {
-            message = createMessageEntity(cm);
-        }
-
-        Transmission transmission = transmissionService.getTransmission(transmissionId);
-
-        if (transmission == null) {
-            transmission = createTransmissionEntity(cm, message);
-        } else if (transmission.getStatus().isFinal()) {
-            return;
-
-        } else {
-            transmission = updateTransmissionEntity(cm, transmission);
-        }
 
         try {
-            transmissionService.saveTransmission(transmission);
-            logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
+          logger.info("Monitor received the message: " + toKibana(cm));
 
+          if (cm.getMetadata() == null) {
+              logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
+              return;
+          }
+
+          String messageId = cm.getMetadata().getMessageId();
+          String transmissionId = cm.getMetadata().getTransmissionId();
+
+          Message message = messageService.getMessage(messageId);
+          if (message == null) {
+              message = createMessageEntity(cm);
+          }
+
+          Transmission transmission = transmissionService.getTransmission(transmissionId);
+          if (transmission == null) {
+              transmission = createTransmissionEntity(cm, message);
+
+          } else if (transmission.getStatus().isFinal()) {
+              return;
+
+          } else {
+              transmission = updateTransmissionEntity(cm, transmission);
+          }
+
+          try {
+              transmissionService.saveTransmission(transmission);
+              logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
+
+          } catch (Exception e) {
+              handleDBErrors(transmission, cm, e, iteration);
+          }
+
+          mlrManager.sendToMlrReporter(cm, transmission.getStatus());
         } catch (Exception e) {
-            handleDBErrors(transmission, cm, e, iteration);
+
+          logger.info( "intConsume threw exception " + e.getMessage() + " on " + iteration + " try..");
+          Thread.sleep(1000);
+          logger.warn("Trying again, after sleep 1000");
+          throw e;
+
         }
-
-        mlrManager.sendToMlrReporter(cm, transmission.getStatus());
-
     }
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
