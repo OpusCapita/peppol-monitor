@@ -94,6 +94,9 @@ public class ReprocessManager {
 
         String baseName = FilenameUtils.getName(transm.getFilename());
 
+        logger.info("AccessPoint: " + AP );
+        logger.info("AccessPoint parts: " + APParts.length() );
+
         return UriComponentsBuilder
                 .fromUriString("http://peppol-inbound")
                 .port(3037)
@@ -103,8 +106,8 @@ public class ReprocessManager {
                 //.queryParam("protocol", protocol)
                 //.queryParam("useragent", useragent)
                 //.queryParam("useragentversion", useragentversion)
-                .queryParam("gwalias", APParts[2])
-                .queryParam("gwaccount", APParts[3])
+                .queryParam("gwalias", APParts[1])
+                .queryParam("gwaccount", APParts[2])
                 .queryParam("gwreceivetimestamp", transm.getArrivedAt() )
                 .toUriString();
 
