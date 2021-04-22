@@ -56,41 +56,52 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
 
     private void intConsume(@NotNull ContainerMessage cm, int iteration) throws Exception {
-        logger.info("Monitor received the message: " + toKibana(cm));
 
-        if (cm.getMetadata() == null) {
-            logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
-            return;
-        }
-
-        String messageId = cm.getMetadata().getMessageId();
-        String transmissionId = cm.getMetadata().getTransmissionId();
-
-        Message message = messageService.getMessage(messageId);
-        if (message == null) {
-            message = createMessageEntity(cm);
-        }
-
-        Transmission transmission = transmissionService.getTransmission(transmissionId);
-        if (transmission == null) {
-            transmission = createTransmissionEntity(cm, message);
-
-        } else if (transmission.getStatus().isFinal()) {
-            return;
-
-        } else {
-            transmission = updateTransmissionEntity(cm, transmission);
-        }
 
         try {
-            transmissionService.saveTransmission(transmission);
-            logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
+          logger.info("Monitor received the message: " + toKibana(cm));
 
+          if (cm.getMetadata() == null) {
+              logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
+              return;
+          }
+
+          String messageId = cm.getMetadata().getMessageId();
+          String transmissionId = cm.getMetadata().getTransmissionId();
+
+          Message message = messageService.getMessage(messageId);
+          if (message == null) {
+              message = createMessageEntity(cm);
+          }
+
+          Transmission transmission = transmissionService.getTransmission(transmissionId);
+          if (transmission == null) {
+              transmission = createTransmissionEntity(cm, message);
+
+          } else if (transmission.getStatus().isFinal()) {
+              return;
+
+          } else {
+              transmission = updateTransmissionEntity(cm, transmission);
+          }
+
+          try {
+              transmissionService.saveTransmission(transmission);
+              logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
+
+          } catch (Exception e) {
+              handleDBErrors(transmission, cm, e, iteration);
+          }
+
+          mlrManager.sendToMlrReporter(cm, transmission.getStatus());
         } catch (Exception e) {
-            handleDBErrors(transmission, cm, e, iteration);
-        }
 
-        mlrManager.sendToMlrReporter(cm, transmission.getStatus());
+          logger.info( "intConsume threw exception " + e.getMessage() + " on " + iteration + " try..");
+          Thread.sleep(1000);
+          logger.warn("Trying again, after sleep 1000");
+          throw e;
+          
+        }
     }
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
