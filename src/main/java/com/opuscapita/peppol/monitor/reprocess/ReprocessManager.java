@@ -89,8 +89,6 @@ public class ReprocessManager {
         md.setUserAgent( wrapper.getHeader("useragent") );
         md.setUserAgentVersion( wrapper.getHeader("useragentversion") );
 */
-        try {
-
         String AP = transm.getAccessPoint();
         String APParts[] = AP.split(":");
 
