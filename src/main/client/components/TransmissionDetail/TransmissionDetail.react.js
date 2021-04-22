@@ -218,7 +218,7 @@ class TransmissionDetail extends Components.ContextComponent {
         const {loading, transmission, fixComment, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
 
-        var TNTLink = "/tnt?fullTextSearch=%22"+ {transmission.messageId} +"%22";
+        var TNTLink = "/tnt?fullTextSearch=%22"+ this.state.transmission.messageId +"%22";
 
         return (
             <div>
