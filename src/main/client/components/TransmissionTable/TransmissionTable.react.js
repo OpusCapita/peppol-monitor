@@ -497,7 +497,7 @@ class TransmissionTable extends Components.ContextComponent {
                                 </div>
                                 <div className="form-group">
                                     <div className="col-sm-3">
-                                        <label className="control-label">Access Point</label>
+                                        <label className="control-label">Gateway Channel</label>
                                     </div>
                                     <div className="offset-md-1 col-md-8">
                                         <input type="text" className="form-control" value={searchValues.accessPoint}
@@ -665,13 +665,13 @@ class TransmissionTable extends Components.ContextComponent {
                                 <span className={`label label-${this.getStatusLabelClass(value)}`}>{value}</span>
                         },
                         {
-                            width: 150,
+                            width: 145,
                             accessor: 'invoiceNumber',
                             Header: 'Invoice Number'
                         },
                         {
                             id: 'sender',
-                            width: 150,
+                            width: 145,
                             accessor: 'sender',
                             Header: 'Sender',
                             Cell: ({value}) =>
@@ -681,7 +681,7 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'receiver',
-                            width: 150,
+                            width: 145,
                             accessor: 'receiver',
                             Header: 'Receiver',
                             Cell: ({value}) =>
@@ -691,21 +691,21 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'accessPoint',
-                            width: 100,
+                            width: 200,
                             accessor: 'accessPoint',
-                            Header: 'Access Point',
+                            Header: 'Gateway Channel',
                             Cell: ({value}) => <span className={value === 'PNO000104' ? 'opuscapita-id' : ''}>{value}</span>
                         },
                         {
                             id: 'source',
-                            width: 155,
+                            width: 150,
                             accessor: row => row,
                             Header: 'Direction',
                             Cell: ({value}) => <span className="well">{value.source} <span className="glyphicon glyphicon-arrow-right right-arrow"></span> {(value.direction) ? value.direction.toUpperCase() : '-'}</span>
                         },
                         {
                             id: 'arrivedAt',
-                            width: 150,
+                            width: 145,
                             accessor: 'arrivedAt',
                             Header: 'Arrived At',
                             Cell: props => <span>{i18n.formatDateTime(props.value)}</span>

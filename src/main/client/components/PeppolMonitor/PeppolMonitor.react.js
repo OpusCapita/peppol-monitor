@@ -27,7 +27,7 @@ class PeppolMonitor extends Components.ContextComponent {
         // noinspection HtmlUnknownTarget
         return (
             <div>
-                <h2>PEPPOL Access Point Monitoring</h2>
+                <h2>Gateway Access Point Monitoring</h2>
                 <div className="form-horizontal monitoring-home">
                     <div className="row">
                         <div className="col-lg-6">
