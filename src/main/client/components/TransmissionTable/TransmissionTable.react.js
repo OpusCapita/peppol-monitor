@@ -691,14 +691,14 @@ class TransmissionTable extends Components.ContextComponent {
                         },
                         {
                             id: 'accessPoint',
-                            width: 200,
+                            width: 250,
                             accessor: 'accessPoint',
                             Header: 'Gateway Channel',
                             Cell: ({value}) => <span className={value === 'PNO000104' ? 'opuscapita-id' : ''}>{value}</span>
                         },
                         {
                             id: 'source',
-                            width: 150,
+                            width: 155,
                             accessor: row => row,
                             Header: 'Direction',
                             Cell: ({value}) => <span className="well">{value.source} <span className="glyphicon glyphicon-arrow-right right-arrow"></span> {(value.direction) ? value.direction.toUpperCase() : '-'}</span>
