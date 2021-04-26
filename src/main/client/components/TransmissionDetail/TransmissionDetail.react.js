@@ -217,6 +217,9 @@ class TransmissionDetail extends Components.ContextComponent {
         const {i18n, router} = this.context;
         const {loading, transmission, fixComment, showHistory, showInfos, showErrors, showWarnings} = this.state;
 
+
+        var TNTLink = "/tnt?fullTextSearch=%22"+ this.state.transmission.messageId +"%22";
+
         return (
             <div>
                 <h3>Transmission Details</h3>
@@ -225,9 +228,13 @@ class TransmissionDetail extends Components.ContextComponent {
                         <div className="col-md-12">
                             <div className="form-group">
                                 <div className="col-sm-3">
-                                    <a className='btn btn-default' href=/tnt?fullTextSearch=%22{transmission.messageId}%22 target="_blank">
+                                    <a className='btn btn-default' href="#" onClick={ () => { console.log("hej"); window.open( TNTLink ); }  } >
                                     Check in TNT
                                     </a>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="col-sm-3">
                                     <label className="control-label btn-link">Message ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
