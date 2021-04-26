@@ -13,6 +13,7 @@ import com.opuscapita.peppol.monitor.repository.MessageService;
 import com.opuscapita.peppol.monitor.repository.ParticipantRepository;
 import com.opuscapita.peppol.monitor.repository.TransmissionService;
 import com.opuscapita.peppol.monitor.util.TransmissionHistorySerializer;
+import com.opuscapita.peppol.commons.container.state.Source;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -48,41 +49,58 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
 
     @Override
     public void consume(@NotNull ContainerMessage cm) throws Exception {
-        logger.info("Monitor received the message: " + toKibana(cm));
 
-        if (cm.getMetadata() == null) {
-            logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
-            return;
-        }
+        this.intConsume( cm, 0 );
 
-        String messageId = cm.getMetadata().getMessageId();
-        String transmissionId = cm.getMetadata().getTransmissionId();
+    }
 
-        Message message = messageService.getMessage(messageId);
-        if (message == null) {
-            message = createMessageEntity(cm);
-        }
 
-        Transmission transmission = transmissionService.getTransmission(transmissionId);
-        if (transmission == null) {
-            transmission = createTransmissionEntity(cm, message);
-
-        } else if (transmission.getStatus().isFinal()) {
-            return;
-
-        } else {
-            transmission = updateTransmissionEntity(cm, transmission);
-        }
+    private void intConsume(@NotNull ContainerMessage cm, int iteration) throws Exception {
 
         try {
-            transmissionService.saveTransmission(transmission);
-            logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
+          logger.info("Monitor received the message: " + toKibana(cm));
 
+          if (cm.getMetadata() == null) {
+              logger.warn("Ignoring message without a valid metadata: " + cm.getFileName());
+              return;
+          }
+
+          String messageId = cm.getMetadata().getMessageId();
+          String transmissionId = cm.getMetadata().getTransmissionId();
+
+          Message message = messageService.getMessage(messageId);
+          if (message == null) {
+              message = createMessageEntity(cm);
+          }
+
+          Transmission transmission = transmissionService.getTransmission(transmissionId);
+          if (transmission == null) {
+              transmission = createTransmissionEntity(cm, message);
+
+          } else if (transmission.getStatus().isFinal()) {
+              return;
+
+          } else {
+              transmission = updateTransmissionEntity(cm, transmission);
+          }
+
+          try {
+              transmissionService.saveTransmission(transmission);
+              logger.info("Monitor saved the message: " + transmission.getFilename() + " with status: " + transmission.getStatus());
+
+          } catch (Exception e) {
+              handleDBErrors(transmission, cm, e, iteration);
+          }
+
+          mlrManager.sendToMlrReporter(cm, transmission.getStatus());
         } catch (Exception e) {
-            handleDBErrors(transmission, cm, e);
-        }
 
-        mlrManager.sendToMlrReporter(cm, transmission.getStatus());
+          logger.info( "intConsume threw exception " + e.getMessage() + " on " + iteration + " try..");
+          Thread.sleep(1000);
+          logger.warn("Trying again, after sleep 1000");
+          throw e;
+
+        }
     }
 
     private Transmission updateTransmissionEntity(ContainerMessage cm, Transmission transmission) {
@@ -95,7 +113,16 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         transmission.setSource(cm.getSource());
         transmission.setSender(getParticipant(metadata.getSenderId(), business.getSenderName()));
         transmission.setReceiver(getParticipant(metadata.getRecipientId(), business.getReceiverName()));
-        transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
+
+        //TODO
+        //Use accesspoint from sender if sender type is GW
+        if( cm.getSource() == Source.GW )  {
+          transmission.setAccessPoint(metadata.getSendingAccessPoint());
+        }
+        else {
+          transmission.setAccessPoint(getAccessPointId(cm.getApInfo()));
+        }
+
         transmission.setInvoiceNumber(business.getDocumentId());
         transmission.setInvoiceDate(business.getIssueDate());
         if (cm.getRoute() != null && cm.getRoute().getDestination() != null) {
@@ -174,7 +201,7 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
         try {
             accessPoint = accessPointRepository.saveAndFlush(accessPoint);
         } catch (Exception e) {
-            logger.debug("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
+            logger.warn("Couldn't save the access point (" + accessPoint.getId() + "), reason: " + e.getMessage());
         }
         return accessPoint.getId();
     }
@@ -202,10 +229,26 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
     }
 
     // https://opuscapita.atlassian.net/wiki/spaces/IIPEP/pages/773882045/Monitoring+Service+Concurrency+Issues
-    private void handleDBErrors(Transmission transmission, ContainerMessage cm, Exception e) throws Exception {
-        logger.debug("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
+    private void handleDBErrors(Transmission transmission, ContainerMessage cm, Exception e, int iteration ) throws Exception {
+        logger.warn("Error occurred while saving the message: " + transmission.getFilename() + " [status: " + transmission.getStatus() + "], reason: " + e.getMessage());
         if (transmission.getStatus().isFinal()) {
-            consume(cm);
+
+          if( iteration > 100 ) {
+            logger.warn("Giving up on: " + transmission.getFilename() + " after " + iteration + " tries...");
+            return;
+          }
+
+          try
+          {
+              Thread.sleep(1000);
+              logger.warn("Trying again, after sleep 1000");
+          }
+          catch(Exception se)
+          {
+              logger.warn("Sleep Exception");
+          }
+
+          intConsume(cm, iteration + 1);
         }
     }
 

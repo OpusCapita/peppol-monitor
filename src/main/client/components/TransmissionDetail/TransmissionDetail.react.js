@@ -225,6 +225,9 @@ class TransmissionDetail extends Components.ContextComponent {
                         <div className="col-md-12">
                             <div className="form-group">
                                 <div className="col-sm-3">
+                                    <a className='btn btn-default' href=/tnt?fullTextSearch=%22{transmission.messageId}%22 target="_blank">
+                                    Check in TNT
+                                    </a>
                                     <label className="control-label btn-link">Message ID</label>
                                 </div>
                                 <div className="offset-md-1 col-md-8">
