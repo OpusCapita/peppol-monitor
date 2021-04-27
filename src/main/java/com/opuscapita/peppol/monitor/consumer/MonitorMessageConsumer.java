@@ -92,7 +92,12 @@ public class MonitorMessageConsumer implements ContainerMessageConsumer {
               handleDBErrors(transmission, cm, e, iteration);
           }
 
-          mlrManager.sendToMlrReporter(cm, transmission.getStatus());
+          if( cm.getSource() != Source.GW )  {
+            mlrManager.sendToMlrReporter(cm, transmission.getStatus());
+          }
+          else {
+            logger.info( "Skipping MLR for GW message " + transmission.getFilename() );
+          }
         } catch (Exception e) {
 
           logger.info( "intConsume threw exception " + e.getMessage() + " on " + iteration + " try..");

@@ -103,7 +103,16 @@ public class MonitorWriteRestController {
                 Transmission transmission = transmissionService.getByFilename(filename);
                 if (transmission != null) {
                     logger.info("Send MLR requested for file: " + transmission.getFilename() + " by: " + userId);
-                    mlrManager.sendToMlrReporter(transmission);
+
+                    if( transmission.getSource() != Source.GW )  {
+                      mlrManager.sendToMlrReporter(transmission);
+                    }
+                    else {
+                      logger.info( "Skipping MLR for GW message " + transmission.getFilename() );
+                      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                    }
+
+
                 }
             } catch (Exception e) {
                 logger.error("Advanced bulk send-mlr operation failed for file: " + filename, e);
@@ -119,7 +128,15 @@ public class MonitorWriteRestController {
         }
 
         logger.info("Send MLR requested for file: " + transmission.getFilename() + " by: " + userId);
-        mlrManager.sendToMlrReporter(transmission);
+
+        if( transmission.getSource() != Source.GW )  {
+          mlrManager.sendToMlrReporter(transmission);
+        }
+        else {
+          logger.info( "Skipping MLR for GW message " + transmission.getFilename() );
+          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         return ResponseEntity.ok().build();
     }
 
