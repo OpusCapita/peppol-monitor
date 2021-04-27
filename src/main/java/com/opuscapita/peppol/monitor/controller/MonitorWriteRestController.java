@@ -109,7 +109,7 @@ public class MonitorWriteRestController {
                     }
                     else {
                       logger.info( "Skipping MLR for GW message " + transmission.getFilename() );
-                      return ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                     }
 
 
@@ -134,7 +134,7 @@ public class MonitorWriteRestController {
         }
         else {
           logger.info( "Skipping MLR for GW message " + transmission.getFilename() );
-          return ResponseEntity<>(HttpStatus.BAD_REQUEST);
+          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         return ResponseEntity.ok().build();
