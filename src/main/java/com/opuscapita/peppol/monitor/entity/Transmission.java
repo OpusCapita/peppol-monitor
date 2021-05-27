@@ -175,7 +175,7 @@ public class Transmission {
     }
 
     public void setAccessPoint(String accessPoint) {
-        this.accessPoint = accessPoint;
+        this.accessPoint = this.fieldTruncate( accessPoint, 35);
     }
 
     public String getInvoiceNumber() {
