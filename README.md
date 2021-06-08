@@ -7,7 +7,8 @@ The service reads files from the `peppol.monitor.queue.in.name:peppol.message.mo
 * Saving metadata of the file
 * Saving history of the file
 
-After processing, monitoring information will be available in the support-ui. 
+After processing, monitoring information will be available in the support-ui.
+
 
 Please check the wiki pages for more information:
 * [Message History](https://github.com/OpusCapita/peppol-monitor/wiki/Message-History)
