@@ -17,6 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import com.opuscapita.peppol.commons.eventing.TicketReporter;
+
+
+
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,15 +38,34 @@ public class MonitorReadRestController {
     private final TransmissionService transmissionService;
     private final ParticipantRepository participantRepository;
     private final AccessPointRepository accessPointRepository;
+    private final TicketReporter ticketReporter;
 
     @Autowired
     public MonitorReadRestController(MessageService messageService, StatisticsService statisticsService, TransmissionService transmissionService,
-                                     ParticipantRepository participantRepository, AccessPointRepository accessPointRepository) {
+                                     ParticipantRepository participantRepository, AccessPointRepository accessPointRepository,
+                                     TicketReporter ticketReporter) {
         this.messageService = messageService;
         this.statisticsService = statisticsService;
         this.transmissionService = transmissionService;
         this.participantRepository = participantRepository;
         this.accessPointRepository = accessPointRepository;
+        this.ticketReporter = ticketReporter;
+    }
+
+    @GetMapping("/trigger-dummy-ticket")
+    public String triggerDummyTicket() throws Exception {
+      try {
+        this.ticketReporter.reportWithoutContainerMessage(
+            "opuscapita", "dummyfile.xml", new Exception("this is a dummy exception"), "this is a dummy ticket"
+            );
+
+        return "ok";
+      }
+      catch ( Exception e ) {
+          return e.toString();
+      }
+
+
     }
 
     @PostMapping("/get-transmissions")
