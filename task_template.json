@@ -40,7 +40,6 @@
       "populate-test-data": "true"
     },
     "limit-memory": "900M",
-    "reserve-memory": "500M",
     "oc-service-user-create-override": "true"
   },
   "prod": {
